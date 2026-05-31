@@ -278,7 +278,7 @@ function AuthPage({ ctx, role, mode }) {
             <div style={{ gridColumn:"1/-1" }}><Inp label="Email *" v={f.email} set={set("email")} type="email"/></div>
             {!isLogin&&!isAdmin&&<>
               <Inp label="Téléphone *" v={f.tel} set={set("tel")} type="tel"/>
-              {isPro&&<><Inp label="Nom entreprise *" v={f.entreprise} set={set("entreprise")}/><div style={{ gridColumn:"1/-1" }}><Inp label="N° SIRET *" v={f.siret} set={set("siret")}/></div></>}
+              {isPro&&<><Inp label="Nom entreprise *" v={f.entreprise} set={set("entreprise")}/><div style={{ gridColumn:"1/-1" }}><Inp label="N SIRET *" v={f.siret} set={set("siret")}/></div><div style={{ gridColumn:"1/-1" }}><label style={S.lbl}>Specialites *</label><div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:8 }}>{TRAVAUX_OPTS.map((t,i)=>{ const active=(f.specialites||[]).includes(t); return <button key={t} type="button" onClick={()=>{ const prev=f.specialites||[]; setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]})); }} style={{ padding:"6px 12px", borderRadius:8, border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.1)"), background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)", color:active?"#FF6F00":"rgba(255,255,255,0.45)", fontSize:12, cursor:"pointer" }}>{TRAVAUX_ICONS[i]} {t}</button>; })}</div></div></>}
             </>}
             <div style={{ gridColumn:"1/-1" }}><Inp label="Mot de passe *" v={f.pass} set={set("pass")} type="password"/></div>
           </div>
