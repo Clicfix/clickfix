@@ -478,7 +478,7 @@ function LeadForm({ ctx }) {
           )}
           {cur.type==="categories" && (
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
-              {TRAVAUX_CATS.map(cat=>{const active=ans.type===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,categorie:cat.label,catId:cat.id,type:[],precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
+              {TRAVAUX_CATS.map(cat=>{const active=ans.categorie===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,categorie:cat.label,catId:cat.id,type:[],precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
                 <img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
                 <div style={{position:"absolute",inset:0,background:active?"rgba(255,111,0,0.55)":"rgba(0,0,0,0.45)"}}/>
                 <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"6px 4px",color:"#fff",fontSize:10,fontWeight:700,textAlign:"center"}}>{cat.label}</div>
