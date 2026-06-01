@@ -127,6 +127,7 @@ export default function App() {
         assigned_to:  null,
       };
       updateLeads(prev => [...prev, newLead]);
+      fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify(newLead)}).catch(console.log);
       // Sync Supabase
       // Email de confirmation au client
       if (newLead.client_email) {
