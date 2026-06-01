@@ -293,7 +293,7 @@ function AuthPage({ ctx, role, mode }) {
             <div style={{ gridColumn:"1/-1" }}><Inp label="Email *" v={f.email} set={set("email")} type="email"/></div>
             {!isLogin&&!isAdmin&&<>
               <Inp label="Téléphone *" v={f.tel} set={set("tel")} type="tel"/>
-              {isPro&&<><Inp label="Nom entreprise *" v={f.entreprise} set={set("entreprise")}/><div style={{ gridColumn:"1/-1" }}><Inp label="N SIRET *" v={f.siret} set={set("siret")}/></div><div style={{ gridColumn:"1/-1" }}><label style={S.lbl}>Specialites * ({(f.specialites||[]).length} choisie(s))</label>{SPECIALITES_CATEGORIES.map(cat=>(<div key={cat.cat} style={{ marginTop:10 }}><div style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:700,marginBottom:5 }}>{cat.cat}</div><div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>{cat.items.map(t=>{const active=(f.specialites||[]).includes(t);return <button key={t} type="button" onClick={()=>{const prev=f.specialites||[];setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]}));}} style={{ padding:"4px 9px",borderRadius:6,border:"1px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:11,cursor:"pointer" }}>{t}</button>;})}</div></div>))}</div></>}
+              {isPro&&<><Inp label="Nom entreprise *" v={f.entreprise} set={set("entreprise")}/><div style={{ gridColumn:"1/-1" }}><Inp label="N SIRET *" v={f.siret} set={set("siret")}/></div><div style={{ gridColumn:"1/-1" }}><label style={S.lbl}>Specialites * ({(f.specialites||[]).length} choisie(s))</label>{SPECIALITES_CATEGORIES.filter(cat=>!ans.catId||cat.cat.toLowerCase().includes(ans.catId.substring(0,4))).map(cat=>(<div key={cat.cat} style={{ marginTop:10 }}><div style={{ fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:700,marginBottom:5 }}>{cat.cat}</div><div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>{cat.items.map(t=>{const active=(f.specialites||[]).includes(t);return <button key={t} type="button" onClick={()=>{const prev=f.specialites||[];setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]}));}} style={{ padding:"4px 9px",borderRadius:6,border:"1px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:11,cursor:"pointer" }}>{t}</button>;})}</div></div>))}</div></>}
             </>}
             <div style={{ gridColumn:"1/-1" }}><Inp label="Mot de passe *" v={f.pass} set={set("pass")} type="password"/></div>
           </div>
@@ -456,7 +456,7 @@ function LeadForm({ ctx }) {
           <p style={{ fontSize:13, color:"rgba(255,255,255,0.36)", marginBottom:22 }}>{cur.sub}</p>
           {cur.type==="specialites_cats" && (
             <div style={{maxHeight:400,overflowY:"auto",paddingRight:4}}>
-              {SPECIALITES_CATEGORIES.map(cat=>(
+              {SPECIALITES_CATEGORIES.filter(cat=>!ans.catId||cat.cat.toLowerCase().includes(ans.catId.substring(0,4))).map(cat=>(
                 <div key={cat.cat} style={{marginBottom:14}}>
                   <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:700,letterSpacing:1,marginBottom:6}}>{cat.cat}</div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
@@ -478,7 +478,7 @@ function LeadForm({ ctx }) {
           )}
           {cur.type==="categories" && (
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
-              {TRAVAUX_CATS.map(cat=>{const active=ans.type===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,type:cat.label,precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
+              {TRAVAUX_CATS.map(cat=>{const active=ans.type===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,categorie:cat.label,catId:cat.id,type:[],precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
                 <img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
                 <div style={{position:"absolute",inset:0,background:active?"rgba(255,111,0,0.55)":"rgba(0,0,0,0.45)"}}/>
                 <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"6px 4px",color:"#fff",fontSize:10,fontWeight:700,textAlign:"center"}}>{cat.label}</div>
