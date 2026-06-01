@@ -474,7 +474,7 @@ function LeadForm({ ctx }) {
             <CalendarPicker selected={ans.slots||[]} onChange={slots=>setAns({...ans,slots})} />
           )}
           {cur.type==="input" && (<div style={{marginBottom:22}}><input type="text" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>)}
-        {(cur.type==="multi" || cur.type==="single") && (
+        {(cur.type==="multi" || cur.type==="single") && cur.type !== "input" && cur.type !== "categories" && cur.type !== "subcategories" && (
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:22 }}>
               {cur.opts.map(opt=>{
                 const active=cur.type==="multi"?(ans[cur.id]||[]).includes(opt.label):ans[cur.id]===opt.label;
