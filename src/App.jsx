@@ -123,7 +123,7 @@ export default function App() {
         timing:       formData.timing || "",
         statut:       "en attente",
         note:         formData.message || "",
-        user_id:      sess?.id || null,
+        user_id:      null,
         assigned_to:  null,
         nb_artisans: formData.artisans || '3 artisans',
         creneaux: JSON.stringify(formData.slots || []),
