@@ -111,7 +111,6 @@ export default function App() {
     setBusy(true);
     try {
       const newLead = {
-        id: Date.now(),
         created_at: new Date().toISOString(),
         heure: "Sur RDV",
         client_nom:   (formData.prenom||"") + " " + (formData.nom||""),
