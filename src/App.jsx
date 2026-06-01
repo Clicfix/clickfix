@@ -15,6 +15,7 @@ const SPECIALITES_CATEGORIES = [
   { cat: "Serrurerie & Securite", items: ["Serrurerie generale","Depannage urgence","Blindage porte","Coffre-fort"] },
   { cat: "Specialise", items: ["Adaptation PMR","Debarras & Nettoyage","Desamiantage","Traitement termites","Ramonage"] },
 ];
+const TRAVAUX_CATS=[{id:"plomberie",label:"Plomberie",img:"https://images.unsplash.com/photo-1585704032915-c3400305e979?w=400&q=80",subs:["Fuite d eau","Robinet","WC bouche","Chauffe-eau","Salle de bain","Piscine"]},{id:"elec",label:"Electricite",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",subs:["Panne","Installation","Tableau","Borne recharge","Alarme","Domotique"]},{id:"renov",label:"Renovation",img:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80",subs:["Peinture","Carrelage","Faux plafond","Cuisine","Dressing","Decoration"]},{id:"fen",label:"Fenetres & Portes",img:"https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&q=80",subs:["Fenetres","Porte entree","Porte garage","Volets","Veranda","Portail"]},{id:"chauf",label:"Chauffage",img:"https://images.unsplash.com/photo-1518481852452-9415b262eba4?w=400&q=80",subs:["Chauffage panne","Chaudiere","Climatisation","Pompe chaleur","Isolation","Solaire"]},{id:"gros",label:"Gros Oeuvre",img:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80",subs:["Fissures","Extension","Demolition","Terrassement","Construction","Ravalement"]},{id:"ext",label:"Exterieur",img:"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80",subs:["Jardin","Terrasse","Elagage","Paysagisme","Allee","Cloture"]},{id:"serr",label:"Serrurerie",img:"https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80",subs:["Porte bloquee","Serrure","Blindage","Urgence","Alarme","Camera"]},{id:"toit",label:"Toiture",img:"https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=400&q=80",subs:["Fuite","Tuiles","Nettoyage","Charpente","Gouttieres","Velux"]},{id:"cuis",label:"Cuisine & SDB",img:"https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&q=80",subs:["Cuisine","Salle de bain","Douche","Faience","Robinetterie","Plan travail"]},{id:"energ",label:"Energie",img:"https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&q=80",subs:["Solaire","Pompe chaleur","Isolation combles","Isolation murs","VMC","Cheminee"]},{id:"div",label:"Divers",img:"https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80",subs:["Debarras","Nettoyage","Desamiantage","Ramonage","PMR","Nuisibles"]}];
 const TRAVAUX_OPTS=['Maconnerie','Menuiserie','Electricite','Plomberie','Chauffage','Isolation','Peinture','Carrelage','Toiture','Amenagement'];
 const TRAVAUX_ICONS=['🧱','🪟','⚡','🚿','🌡️','🏠','🎨','🪵','🏗️','🌿'];
 const STEPS=[{id:'type',title:'Vos travaux',sub:'Selectionnez vos travaux',type:'multi',opts:TRAVAUX_OPTS.map((l,i)=>({icon:TRAVAUX_ICONS[i],label:l}))},{id:'surface',title:'Surface du chantier',sub:'Indiquez la superficie en m²',type:'input',placeholder:'Ex: 45 m²'},{id:'budget',title:'Budget estimé',sub:'Indiquez votre budget approximatif',type:'input',placeholder:'Ex: 8 000 €'},{id:'artisans',title:'Nombre d artisans',sub:'Combien d artisans souhaitez-vous rencontrer ?',type:'single',opts:[{icon:'3️⃣',label:'3 artisans'},{icon:'4️⃣',label:'4 artisans'},{icon:'5️⃣',label:'5 artisans'},{icon:'🔟',label:'+ de 5'}]},{id:'calendar',title:'Vos disponibilites',sub:'Selectionnez au minimum 3 creneaux',type:'calendar'},{id:'contact',title:'Vos coordonnees',sub:'Recevez vos devis gratuits sous 24h',type:'form'}];
@@ -374,6 +375,9 @@ function LeadForm({ ctx }) {
       return form.nom.trim() && form.prenom.trim() && emailValid && telValid && form.adresse.trim();
     }
     if (cur.type==="calendar") return (ans.slots||[]).length >= 3;
+    if (cur.type==="categories") return !!ans.type;
+    if (cur.type==="subcategories") return !!ans.precision;
+    if (cur.type==="input") return !!(ans[cur.id]||"").trim();
     const v=ans[cur.id];
     return cur.type==="multi"?v?.length>0:!!v;
   }
@@ -448,6 +452,24 @@ function LeadForm({ ctx }) {
         <div style={S.card}>
           <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", letterSpacing:"-0.5px", marginBottom:6 }}>{cur.title}</h2>
           <p style={{ fontSize:13, color:"rgba(255,255,255,0.36)", marginBottom:22 }}>{cur.sub}</p>
+          {cur.type==="categories" && (
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
+              {TRAVAUX_CATS.map(cat=>{const active=ans.type===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,type:cat.label,precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
+                <img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                <div style={{position:"absolute",inset:0,background:active?"rgba(255,111,0,0.55)":"rgba(0,0,0,0.45)"}}/>
+                <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"6px 4px",color:"#fff",fontSize:10,fontWeight:700,textAlign:"center"}}>{cat.label}</div>
+                {active&&<div style={{position:"absolute",top:4,right:4,width:18,height:18,background:"#FF6F00",borderRadius:"50%",fontSize:10,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}>+</div>}
+              </button>);})}
+            </div>
+          )}
+          {cur.type==="subcategories" && (
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
+              {(TRAVAUX_CATS.find(c=>c.label===ans.type)?.subs||[]).map(sub=>{const active=ans.precision===sub;return(<button key={sub} onClick={()=>setAns({...ans,precision:sub})} style={{background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)",border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),borderRadius:12,padding:"14px 12px",cursor:"pointer",textAlign:"left",color:active?"#FF6F00":"rgba(255,255,255,0.7)",fontSize:13,fontWeight:active?700:400}}>{sub}</button>);})}
+            </div>
+          )}
+          {cur.type==="input" && (
+            <div style={{marginBottom:22}}><input type="text" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>
+          )}
           {cur.type==="calendar" && (
             <CalendarPicker selected={ans.slots||[]} onChange={slots=>setAns({...ans,slots})} />
           )}
@@ -977,4 +999,13 @@ function GStyles() {
     @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
     @keyframes spin{to{transform:rotate(360deg)}}
   `}</style>;
+const STEPS = [
+  { id:"type", title:"En quoi pouvons-nous vous aider ?", sub:"Selectionnez votre besoin", type:"categories" },
+  { id:"precision", title:"Precisez votre besoin", sub:"Choisissez parmi les options", type:"subcategories" },
+  { id:"surface", title:"Surface du chantier", sub:"Indiquez la superficie", type:"input", placeholder:"Ex: 45 m2" },
+  { id:"budget", title:"Budget estime", sub:"Indiquez votre budget", type:"input", placeholder:"Ex: 8 000 EUR" },
+  { id:"artisans", title:"Nombre d artisans", sub:"Combien souhaitez-vous rencontrer ?", type:"single", opts:[{icon:"3",label:"3 artisans"},{icon:"4",label:"4 artisans"},{icon:"5",label:"5 artisans"},{icon:"+",label:"+ de 5 artisans"}] },
+  { id:"calendar", title:"Vos disponibilites", sub:"Selectionnez au minimum 3 creneaux", type:"calendar" },
+  { id:"contact", title:"Vos coordonnees", sub:"Recevez vos devis gratuits sous 24h", type:"form" },
+];
 }
