@@ -269,16 +269,22 @@ function AuthPage({ ctx, role, mode }) {
   const isPro=role==="pro", isAdmin=role==="admin", isLogin=mode==="login", color=isAdmin?"#a855f7":isPro?"#FF6F00":"#38bdf8";
   const [f,setF] = useState({prenom:"",nom:"",email:"",pass:"",tel:"",entreprise:"",siret:""});
   const set = k => e => setF(p=>({...p,[k]:e.target.value}));
-  function submit() {
-    if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
-    if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
-    else {
-      if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
-      if (isPro&&(!f.entreprise||!f.siret||!f.tel)) { ctx.notify("Entreprise, SIRET et téléphone requis","err"); return; }
-      ctx.register({...f,role});
-    }
-    if (isAdmin && isLogin) { ctx.login(f.email, f.pass, "admin"); }
-  }
+  function submit() {
+    if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
+    if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
+    else {
+      if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
+      if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
+      if (isPro) {
+        if (!f.entreprise||!f.siret||!f.tel) { ctx.notify("Entreprise SIRET et telephone requis","err"); return; }
+        if (!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))) { ctx.notify("Telephone invalide ex: 0612345678","err"); return; }
+        if (!/^[0-9]{14}$/.test(f.siret.replace(/\s/g,""))) { ctx.notify("SIRET invalide 14 chiffres requis","err"); return; }
+        if (!f.specialites||f.specialites.length===0) { ctx.notify("Selectionnez au moins une specialite","err"); return; }
+      }
+      ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").replace(/\s/g,"")});
+    }
+  }
   return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:20, position:"relative" }}>
       <BgFx />
