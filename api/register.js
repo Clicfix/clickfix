@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
-  const { email, pass, prenom, nom, role, tel, entreprise, siret, specialites } = req.body;
+  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+  const { email, pass, prenom, nom, role, tel, entreprise, siret, specialites } = body;
   const SB_URL = "https://bipqtqezntzcmxwiaqdz.supabase.co";
   const SB_SERVICE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
   try {
