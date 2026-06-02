@@ -173,6 +173,9 @@ export default function App() {
     updateSession({ pack, rdv_restants: toAssign.length, rdv_total: pack.rdv });
     setPage("pro-dashboard");
     notify("Pack " + pack.name + " activé 🎉 " + toAssign.length + " RDV disponibles !");
+    if (sess?.email) {
+      fetch("/api/send-email", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ type:"pack_active", to:sess.email, data:{ prenom:sess.prenom, pack_name:pack.name, pack_rdv:pack.rdv, pack_prix:pack.prix, pack_par:pack.par, abonnement:pack.abonnement } }) }).catch(console.log);
+    }
   }
 
   // ── UPLOAD DOC ───────────────────────────────────────────

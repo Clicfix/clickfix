@@ -26,6 +26,10 @@ else if(type==="rappel_rdv_pro"){
 subject="Rappel - Vous avez un RDV demain";
 html=wrap(`<h2 style="color:#FBC005;margin:0 0 12px;font-size:22px">Rappel RDV demain !</h2><p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 12px">Bonjour ${data.prenom}, vous avez un RDV demain :</p>${box(row("Client",data.client_nom)+row("Adresse",data.adresse||"-")+row("Travaux",data.travaux)+row("Heure",data.creneau||"-"))}${btn("Voir les details","https://click-fix.fr","#FBC005")}`);
 }
+else if(type==="pack_active"){
+subject="Votre pack Click&fix est active - Recapitulatif";
+html=wrap(`<h2 style="color:#FF6F00;margin:0 0 12px;font-size:22px">Pack ${data.pack_name} active !</h2><p style="color:#444;font-size:14px;line-height:1.6;margin:0 0 16px">Bonjour ${data.prenom}, votre pack a bien ete active. Voici le recapitulatif de votre offre :</p>${box(row("Pack",data.pack_name)+row("Nombre de RDV",data.pack_rdv+" RDV")+row("Prix",data.pack_prix+" EUR"+(data.abonnement?" / mois":""))+row("Tarif par RDV",data.pack_par)+row("Type",data.abonnement?"Abonnement mensuel":"Paiement unique")+row("Statut","Actif"))}<p style="color:#555;font-size:13px;margin:16px 0 8px">Vous allez bientot recevoir vos premiers RDV qualifies. Chaque lead sera dispatche selon vos specialites.</p>${btn("Acceder a mon espace","https://click-fix.fr")}`);
+}
 if(!subject)return res.status(400).json({error:"Type inconnu"});
 try{
 const r=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},body:JSON.stringify({from:"Click&fix <contact@click-fix.fr>",to:[to],subject,html})});
