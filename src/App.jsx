@@ -5,17 +5,17 @@ const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJl
 const sb={async signUp(e,p,m){const r=await fetch(SB_URL+"/auth/v1/signup",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON},body:JSON.stringify({email:e,password:p,data:m})});return r.json()},async signIn(e,p){const r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON},body:JSON.stringify({email:e,password:p})});return r.json()},async getProfile(uid,t){const r=await fetch(SB_URL+"/rest/v1/profiles?id=eq."+uid+"&select=*",{headers:{"apikey":SB_ANON,"Authorization":"Bearer "+t}});const d=await r.json();return d[0]||null},async upsertProfile(p,t){await fetch(SB_URL+"/rest/v1/profiles",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON,"Authorization":"Bearer "+t,"Prefer":"resolution=merge-duplicates"},body:JSON.stringify(p)})}};
 const CAT_MAPPING = {
   plomberie: "Plomberie & Sanitaires",
-  electricite: "Electricite",
-  renovation: "Amenagement interieur",
-  fenetres: "Menuiserie & Fenetres",
-  chauffage: "Energie & Chauffage",
-  grosoeuvre: "Gros Oeuvre & Structure",
-  exterieur: "Exterieur & Paysage",
-  serrurerie: "Serrurerie & Securite",
-  toiture: "Toiture & Charpente",
-  cuisinesdb: "Amenagement interieur",
-  energie: "Energie & Chauffage",
-  divers: "Specialise",
+  elec: "Electricite",
+  renov: "Amenagement interieur",
+  fen: "Menuiserie & Fenetres",
+  chauf: "Energie & Chauffage",
+  gros: "Gros Oeuvre & Structure",
+  ext: "Exterieur & Paysage",
+  serr: "Serrurerie & Securite",
+  toit: "Toiture & Charpente",
+  cuis: "Amenagement interieur",
+  energ: "Energie & Chauffage",
+  div: "Specialise",
 };
 const SPECIALITES_CATEGORIES = [
   { cat: "Gros Oeuvre & Structure", items: ["Maconnerie generale","Construction neuve","Renovation complete","Extension & Surelevation","Veranda","Demolition","Fondations & Terrassement"] },
