@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + RESEND_KEY },
-      body: JSON.stringify({ from: "Click&fix <onboarding@resend.dev>", to: [to], subject, html })
+      body: JSON.stringify({ from: "Click&fix <contact@click-fix.fr>", to: [to], subject, html })
     });
     const result = await r.json();
     res.status(200).json({ ok: true, result });
