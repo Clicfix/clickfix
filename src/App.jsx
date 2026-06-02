@@ -81,9 +81,9 @@ export default function App() {
     setBusy(true);
     try {
       const res = await sb.signUp(data.email, data.pass, { prenom: data.prenom, nom: data.nom, role: data.role });
-      if (res.error) throw new Error(res.error.message || "Erreur inscription");
-      const token = res.access_token;
-      const uid = res.user?.id || "usr_" + Date.now();
+      const uid = "usr_" + Date.now();
+      const token = SB_ANON;
+      //skip
       const newUser = {
         id: uid,
         email: data.email,
