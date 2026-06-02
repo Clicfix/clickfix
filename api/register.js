@@ -13,18 +13,20 @@ export default async function handler(req, res) {
     const user = await signupRes.json();
     if (user.error) return res.status(400).json({ error: user.error.message });
     const uid = user.id;
-    await fetch(SB_URL + "/rest/v1/profiles", {
+    const profileRes = await fetch(SB_URL + "/rest/v1/profiles", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": SB_SERVICE, "Authorization": "Bearer " + SB_SERVICE, "Prefer": "resolution=merge-duplicates" },
+      headers: { "Content-Type": "application/json", "apikey": SB_SERVICE, "Authorization": "Bearer " + SB_SERVICE, "Prefer": "return=representation" },
       body: JSON.stringify({ id: uid, email, prenom, nom, role, tel: tel||"", entreprise: entreprise||"", siret: siret||"", specialites: specialites||[], rdv_restants: 0, rdv_total: 0, statut_paiement: "actif" })
     });
+    const profileData = await profileRes.json();
+    console.log("Profile insert result:", JSON.stringify(profileData));
     const tokenRes = await fetch(SB_URL + "/auth/v1/token?grant_type=password", {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": SB_SERVICE },
       body: JSON.stringify({ email, password: pass })
     });
     const tokenData = await tokenRes.json();
-    res.status(200).json({ uid, token: tokenData.access_token, prenom, nom, role });
+    res.status(200).json({ uid, token: tokenData.access_token, prenom, nom, role, profileData });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
