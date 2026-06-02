@@ -430,7 +430,7 @@ function LeadForm({ ctx }) {
     }
     if (cur.type==="calendar") return (ans.slots||[]).length >= 3;
     if (cur.type==="categories") return !!ans.categorie;
-    if (cur.type==="specialites_cats") return true;
+    if (cur.type==="specialites_cats") return !!(ans.type&&Array.isArray(ans.type)&&ans.type.length>0);
     if (cur.type==="subcategories") return !!ans.precision;
     if (cur.type==="input") return !!(ans[cur.id]||"").trim();
     const v=ans[cur.id];
