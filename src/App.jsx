@@ -93,6 +93,9 @@ export default function App() {
       saveSession(newUser);
       setPage(data.role === "pro" ? "pro-docs" : "part-home");
       notify("Bienvenue " + result.prenom + " !");
+      if (data.role === "pro") {
+        fetch("/api/send-email", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ type:"welcome_pro", to:data.email, data:{ prenom:result.prenom, email:data.email, entreprise:data.entreprise||"" } }) }).catch(console.log);
+      }
     } catch(e) { notify(e.message, "err"); }
     setBusy(false);
   }
