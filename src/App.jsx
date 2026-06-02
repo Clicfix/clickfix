@@ -944,8 +944,12 @@ function CalendarPicker({ selected, onChange }) {
   function toggleSlot(date, hour) {
     const key = date + "_" + hour;
     const exists = selected.find(s => s.key === key);
-    if (exists) onChange(selected.filter(s => s.key !== key));
-    else onChange([...selected, { key, date, hour, label: date + " à " + hour }]);
+    if (exists) {
+      onChange(selected.filter(s => s.key !== key));
+    } else {
+      const filtered = selected.filter(s => s.date !== date);
+      onChange([...filtered, { key, date, hour, label: date + " a " + hour }]);
+    }
   }
 
   function isSel(date, hour) { return !!selected.find(s => s.key === (date + "_" + hour)); }
