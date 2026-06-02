@@ -430,7 +430,8 @@ function LeadForm({ ctx }) {
       return form.nom.trim() && form.prenom.trim() && emailValid && telValid && form.adresse.trim() && form.ville.trim() && form.code_postal.trim();
     }
     if (cur.type==="calendar") return (ans.slots||[]).length >= 3;
-    if (cur.type==="categories") return !!ans.type;
+    if (cur.type==="categories") return !!ans.categorie;
+    if (cur.type==="specialites_cats") return !!(ans.type&&ans.type.length>0);
     if (cur.type==="subcategories") return !!ans.precision;
     if (cur.type==="input") return !!(ans[cur.id]||"").trim();
     const v=ans[cur.id];
