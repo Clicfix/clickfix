@@ -150,7 +150,6 @@ export default function App() {
         ville:        formData.ville || "",
         code_postal:  formData.code_postal || "",
       };
-      };
       fetch("/api/save-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(newLead)}).catch(console.log);
       // Email de confirmation au client
       if (newLead.client_email) {
