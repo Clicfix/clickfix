@@ -80,34 +80,19 @@ export default function App() {
   async function register(data) {
     setBusy(true);
     try {
-      const res = await sb.signUp(data.email, data.pass, { prenom: data.prenom, nom: data.nom, role: data.role });
-      const uid = "usr_" + Date.now();
-      const token = SB_ANON;
-      //skip
-      const newUser = {
-        id: uid,
-        email: data.email,
-        pass: data.pass,
-        prenom: data.prenom,
-        nom: data.nom,
-        role: data.role,
-        tel: data.tel || "",
-        entreprise: data.entreprise || "",
-        siret: data.siret || "",
-        specialites: data.specialites || [],
-        docs: {},
-        pack: null,
-        rdv_restants: 0,
-        rdv_total: 0,
-        token: token,
-        createdAt: new Date().toISOString(),
-      };
-      await sb.upsertProfile({ id: uid, email: data.email, prenom: data.prenom, nom: data.nom, role: data.role, tel: data.tel||"", entreprise: data.entreprise||"", siret: data.siret||"", specialites: data.specialites||[], rdv_restants: 0, rdv_total: 0, statut_paiement: "actif" }, token);
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      const newUser = { id: result.uid, email: data.email, pass: data.pass, prenom: result.prenom, nom: result.nom, role: result.role, tel: data.tel||"", entreprise: data.entreprise||"", siret: data.siret||"", specialites: data.specialites||[], docs: {}, pack: null, rdv_restants: 0, rdv_total: 0, token: result.token };
       const users = getUsers();
       saveUsers([...users, newUser]);
       saveSession(newUser);
       setPage(data.role === "pro" ? "pro-docs" : "part-home");
-      notify("Bienvenue " + data.prenom + " 🎉");
+      notify("Bienvenue " + result.prenom + " !");
     } catch(e) { notify(e.message, "err"); }
     setBusy(false);
   }
