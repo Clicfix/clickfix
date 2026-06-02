@@ -544,7 +544,7 @@ function LeadForm({ ctx }) {
           )}
           {cur.type==="subcategories" && (
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
-              {(TRAVAUX_CATS.find(c=>c.label===ans.type)?.subs||[]).map(sub=>{const active=ans.precision===sub;return(<button key={sub} onClick={()=>setAns({...ans,precision:sub})} style={{background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)",border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),borderRadius:12,padding:"14px 12px",cursor:"pointer",textAlign:"left",color:active?"#FF6F00":"rgba(255,255,255,0.7)",fontSize:13,fontWeight:active?700:400}}>{sub}</button>);})}
+              {(TRAVAUX_CATS.find(c=>c.label===ans.categorie)?.subs||[]).map(sub=>{const active=ans.precision===sub;return(<button key={sub} onClick={()=>setAns({...ans,precision:sub})} style={{background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)",border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),borderRadius:12,padding:"14px 12px",cursor:"pointer",textAlign:"left",color:active?"#FF6F00":"rgba(255,255,255,0.7)",fontSize:13,fontWeight:active?700:400}}>{sub}</button>);})}
             </div>
           )}
           {cur.type==="input" && (
