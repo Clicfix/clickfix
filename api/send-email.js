@@ -16,7 +16,7 @@ html=wrap(`<h2 style="color:#FF6F00;margin:0 0 12px;font-size:22px">Bienvenue ${
 }
 else if(type==="new_lead_pro"){
 subject="Nouveau RDV qualifié - Confirmez votre presence";
-html=wrap(`<div style="background:rgba(255,111,0,0.1);border:1px solid rgba(255,111,0,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px"><p style="margin:0;color:#FF6F00;font-weight:700">Nouveau RDV qualifié disponible !</p></div><h2 style="color:#fff;margin:0 0 12px;font-size:20px">Bonjour ${data.prenom},</h2><p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 12px">Un client recherche un artisan :</p>${box(row("Travaux",data.travaux)+row("Surface",data.surface||"-")+row("Budget",data.budget||"-")+row("Ville",data.ville||"-")+row("Votre creneau",data.creneau||"Sur RDV"))}${btn("Confirmer ma présence","https://click-fix.fr","#22c55e")}`);
+html=wrap(`<div style="background:rgba(255,111,0,0.1);border:1px solid rgba(255,111,0,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px"><p style="margin:0;color:#FF6F00;font-weight:700">Nouveau RDV qualifié disponible !</p></div><h2 style="color:#fff;margin:0 0 12px;font-size:20px">Bonjour ${data.prenom},</h2><p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 12px">Un client recherche un artisan pour les travaux suivants :</p>${box(row("Travaux",data.travaux)+row("Surface",data.surface||"-")+row("Budget",data.budget||"-")+row("Ville",data.ville||"-")+row("Votre créneau",data.creneau||"Sur RDV"))}${btn("Confirmer ma présence","https://click-fix.fr","#22c55e")}`);
 }
 else if(type==="confirm_rdv_client"){
 subject="Votre RDV est confirme - Coordonnees de votre artisan";
