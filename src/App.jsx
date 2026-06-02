@@ -80,10 +80,12 @@ export default function App() {
   async function register(data) {
     setBusy(true);
     try {
-      const users = getUsers();
-      if (users.find(u => u.email === data.email)) throw new Error("Email déjà utilisé");
+      const res = await sb.signUp(data.email, data.pass, { prenom: data.prenom, nom: data.nom, role: data.role });
+      if (res.error) throw new Error(res.error.message || "Erreur inscription");
+      const token = res.access_token;
+      const uid = res.user?.id || "usr_" + Date.now();
       const newUser = {
-        id: "usr_" + Date.now(),
+        id: uid,
         email: data.email,
         pass: data.pass,
         prenom: data.prenom,
@@ -92,16 +94,18 @@ export default function App() {
         tel: data.tel || "",
         entreprise: data.entreprise || "",
         siret: data.siret || "",
+        specialites: data.specialites || [],
         docs: {},
         pack: null,
         rdv_restants: 0,
         rdv_total: 0,
+        token: token,
         createdAt: new Date().toISOString(),
       };
+      await sb.upsertProfile({ id: uid, email: data.email, prenom: data.prenom, nom: data.nom, role: data.role, tel: data.tel||"", entreprise: data.entreprise||"", siret: data.siret||"", specialites: data.specialites||[], rdv_restants: 0, rdv_total: 0, statut_paiement: "actif" }, token);
+      const users = getUsers();
       saveUsers([...users, newUser]);
       saveSession(newUser);
-
-      // Sync Supabase en arrière-plan (sans bloquer)
       setPage(data.role === "pro" ? "pro-docs" : "part-home");
       notify("Bienvenue " + data.prenom + " 🎉");
     } catch(e) { notify(e.message, "err"); }
