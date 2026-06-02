@@ -178,7 +178,34 @@ export default function App() {
     }
   }
 
-  // ── UPLOAD DOC ───────────────────────────────────────────
+  async function confirmerRdv(lead) {
+    setBusy(true);
+    try {
+      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+      const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
+      await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"confirme"})});
+      if(lead.client_email){fetch("/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"confirm_rdv_client",to:lead.client_email,data:{client_prenom:(lead.client_nom||"").split(" ")[0],artisan_prenom:sess?.prenom||"",artisan_nom:sess?.nom||"",artisan_entreprise:sess?.entreprise||"",artisan_tel:sess?.tel||"",artisan_email:sess?.email||"",creneau:lead.heure||"Sur RDV"}})}).catch(console.log);}
+      updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"confirme"}:l));
+      notify("RDV confirme ! Le client a ete notifie.");
+    } catch(e){notify(e.message,"err");}
+    setBusy(false);
+  }
+
+  async function refuserRdv(lead) {
+    setBusy(true);
+    try {
+      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+      const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
+      await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"refuse"})});
+      updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"refuse"}:l));
+      notify("RDV refuse.");
+    } catch(e){notify(e.message,"err");}
+    setBusy(false);
+  }
+
+  // ── UPLOAD DOC ───────────────────────────────────────────
   async function uploadDoc(docId, file) {
     setBusy(true);
     try {
@@ -200,7 +227,7 @@ export default function App() {
   const myLeadsPart = leads.filter(l => l.user_id === sess?.id);
   const myLeadsPro  = leads.filter(l => l.assigned_to === sess?.id);
 
-  const ctx = { sess, page, setPage, busy, docsOk, login, register, logout, updateSession, submitLead, buyPack, uploadDoc, notify, myLeadsPart, myLeadsPro };
+  const ctx = { sess, page, setPage, busy, docsOk, login, register, logout, updateSession, submitLead, buyPack, uploadDoc, notify, myLeadsPart, myLeadsPro, confirmerRdv, refuserRdv };
 
   return (
     <div style={{ fontFamily:"'Outfit',sans-serif", background:"#07090f", minHeight:"100vh" }}>
@@ -715,6 +742,8 @@ function ProDashboard({ ctx }) {
                     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                       {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}>📞 {l.client_tel}</a>}
                       {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}>✉️ Email</a>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}>✅ Confirmer</button>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}>✗ Refuser</button>}
                     </div>
                   </div>
                 </div>
