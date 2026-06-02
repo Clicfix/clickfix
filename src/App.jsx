@@ -3,6 +3,20 @@ const LS = { get:(k)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v
 const SB_URL="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
 const sb={async signUp(e,p,m){const r=await fetch(SB_URL+"/auth/v1/signup",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON},body:JSON.stringify({email:e,password:p,data:m})});return r.json()},async signIn(e,p){const r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON},body:JSON.stringify({email:e,password:p})});return r.json()},async getProfile(uid,t){const r=await fetch(SB_URL+"/rest/v1/profiles?id=eq."+uid+"&select=*",{headers:{"apikey":SB_ANON,"Authorization":"Bearer "+t}});const d=await r.json();return d[0]||null},async upsertProfile(p,t){await fetch(SB_URL+"/rest/v1/profiles",{method:"POST",headers:{"Content-Type":"application/json","apikey":SB_ANON,"Authorization":"Bearer "+t,"Prefer":"resolution=merge-duplicates"},body:JSON.stringify(p)})}};
+const CAT_MAPPING = {
+  plomberie: "Plomberie & Sanitaires",
+  electricite: "Electricite",
+  renovation: "Amenagement interieur",
+  fenetres: "Menuiserie & Fenetres",
+  chauffage: "Energie & Chauffage",
+  grosoeuvre: "Gros Oeuvre & Structure",
+  exterieur: "Exterieur & Paysage",
+  serrurerie: "Serrurerie & Securite",
+  toiture: "Toiture & Charpente",
+  cuisinesdb: "Amenagement interieur",
+  energie: "Energie & Chauffage",
+  divers: "Specialise",
+};
 const SPECIALITES_CATEGORIES = [
   { cat: "Gros Oeuvre & Structure", items: ["Maconnerie generale","Construction neuve","Renovation complete","Extension & Surelevation","Veranda","Demolition","Fondations & Terrassement"] },
   { cat: "Plomberie & Sanitaires", items: ["Plomberie generale","Salle de bain complete","Debouchage & Urgence","Traitement humidite","Piscine & Spa","Arrosage automatique"] },
@@ -456,7 +470,7 @@ function LeadForm({ ctx }) {
           <p style={{ fontSize:13, color:"rgba(255,255,255,0.36)", marginBottom:22 }}>{cur.sub}</p>
           {cur.type==="specialites_cats" && (
             <div style={{maxHeight:400,overflowY:"auto",paddingRight:4}}>
-              {SPECIALITES_CATEGORIES.filter(cat=>!ans?.catId||cat.cat.toLowerCase().includes((ans?.catId||"").substring(0,4))).map(cat=>(
+              {SPECIALITES_CATEGORIES.filter(cat=>!ans?.catId||cat.cat===CAT_MAPPING[ans.catId]).map(cat=>(
                 <div key={cat.cat} style={{marginBottom:14}}>
                   <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:700,letterSpacing:1,marginBottom:6}}>{cat.cat}</div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
