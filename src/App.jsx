@@ -53,7 +53,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 export default function App() {
   const [page, setPage]   = useState("home");
   const [sess, setSess]   = useState(() => LS.get("cf_sess"));
-  const [toast, setToast] = useState(null);
+  useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const updated={...sess,token:d.access_token};setSess(updated);LS.set("cf_sess",updated);}}).catch(()=>{});}},[]);  const [toast, setToast] = useState(null);
   const [busy, setBusy]   = useState(false);
   const [leads, setLeads] = useState(() => getLeads());
 
