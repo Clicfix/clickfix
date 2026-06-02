@@ -4,8 +4,12 @@ export default async function handler(req, res) {
   const { email, pass, prenom, nom, role, tel, entreprise, siret, specialites } = body;
   const SB_URL = "https://bipqtqezntzcmxwiaqdz.supabase.co";
   const SB_SERVICE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
-  try {
-    const signupRes = await fetch(SB_URL + "/auth/v1/admin/users", {
+  try {
+    // Verifier doublons
+    const chk = await fetch(SB_URL+"/rest/v1/profiles?select=email,tel,siret&or=(email.eq."+encodeURIComponent(email)+",tel.eq."+encodeURIComponent(tel||"")+",siret.eq."+encodeURIComponent(siret||"")+")",&{headers:{"apikey":SB_SERVICE,"Authorization":"Bearer "+SB_SERVICE}});
+    const ex = await chk.json();
+    if(ex&&ex.length>0){const d=ex[0];if(d.email===email)return res.status(400).json({error:"Email deja utilise"});if(tel&&d.tel===tel)return res.status(400).json({error:"Telephone deja utilise"});if(siret&&d.siret===siret)return res.status(400).json({error:"SIRET deja utilise"});}
+    const signupRes = await fetch(SB_URL + "/auth/v1/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": SB_SERVICE, "Authorization": "Bearer " + SB_SERVICE },
       body: JSON.stringify({ email, password: pass, email_confirm: true, user_metadata: { prenom, nom, role } })
