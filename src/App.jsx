@@ -947,9 +947,9 @@ function CalendarPicker({ selected, onChange }) {
     if (exists) {
       onChange(selected.filter(s => s.key !== key));
     } else {
-      const filtered = selected.filter(s => s.date !== date);
-      onChange([...filtered, { key, date, hour, label: date + " a " + hour }]);
+      onChange([...selected, { key, date, hour, label: date + " a " + hour }]);
     }
+  }
   }
 
   function isSel(date, hour) { return !!selected.find(s => s.key === (date + "_" + hour)); }
