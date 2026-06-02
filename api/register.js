@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const SK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
   const H = { "Content-Type": "application/json", "apikey": SK, "Authorization": "Bearer " + SK };
   try {
-    const chk = await fetch(SB + "/rest/v1/profiles?select=email,tel,siret&email=eq." + encodeURIComponent(email), { headers: H });
+    const chk = await fetch(SB + "/rest/v1/profiles?select=email&email=eq." + encodeURIComponent(email), { headers: H });
     const ex = await chk.json();
     if (ex && ex.length > 0) return res.status(400).json({ error: "Cet email est deja utilise" });
     if (tel) {
@@ -19,6 +19,14 @@ export default async function handler(req, res) {
       const exSiret = await chkSiret.json();
       if (exSiret && exSiret.length > 0) return res.status(400).json({ error: "Ce SIRET est deja utilise" });
     }
+    let lat = null, lon = null;
+    if (ville_intervention) {
+      try {
+        const geoRes = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(ville_intervention + ", France"), { headers: { "User-Agent": "clickfix/1.0 contact@click-fix.fr" } });
+        const geoData = await geoRes.json();
+        if (geoData && geoData[0]) { lat = parseFloat(geoData[0].lat); lon = parseFloat(geoData[0].lon); }
+      } catch(e) {}
+    }
     const signupRes = await fetch(SB + "/auth/v1/admin/users", {
       method: "POST",
       headers: H,
@@ -30,7 +38,7 @@ export default async function handler(req, res) {
     const profileRes = await fetch(SB + "/rest/v1/profiles", {
       method: "POST",
       headers: { ...H, "Prefer": "return=representation" },
-      body: JSON.stringify({ id: uid, email, prenom, nom, role, tel: tel||"", entreprise: entreprise||"", siret: siret||"", ville_intervention: ville_intervention||"", rayon: rayon||"", specialites: specialites||[], rdv_restants: 0, rdv_total: 0, statut_paiement: "actif" })
+      body: JSON.stringify({ id: uid, email, prenom, nom, role, tel: tel||"", entreprise: entreprise||"", siret: siret||"", specialites: specialites||[], ville_intervention: ville_intervention||"", rayon: rayon||"", lat, lon, rdv_restants: 0, rdv_total: 0, statut_paiement: "actif" })
     });
     const profileData = await profileRes.json();
     const tokenRes = await fetch(SB + "/auth/v1/token?grant_type=password", {
