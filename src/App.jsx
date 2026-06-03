@@ -222,7 +222,7 @@ export default function App() {
   }
 
   const docsOk      = DOCS_DEF.filter(d=>d.oblig).every(d=>sess?.docs?.[d.id]);
-  const myLeadsPart = leads.filter(l => l.user_id === sess?.id);
+  const myLeadsPart = leads.filter(l => l.client_email === sess?.email || l.user_id === sess?.id);
   const myLeadsPro  = leads.filter(l => l.assigned_to === sess?.id);
 
   const ctx = { sess, page, setPage, busy, docsOk, login, register, logout, updateSession, submitLead, buyPack, uploadDoc, notify, myLeadsPart, myLeadsPro, confirmerRdv, refuserRdv };
@@ -368,39 +368,91 @@ function AuthPage({ ctx, role, mode }) {
 //  PARTICULIER HOME
 // ══════════════════════════════════════════════════════════════
 function PartHome({ ctx }) {
-  return (
-    <Shell ctx={ctx} color="#38bdf8" title="Espace Particulier">
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
-        <StatCard icon="📋" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
-        <StatCard icon="✅" label="Confirmées"   val={ctx.myLeadsPart.filter(l=>l.statut==="confirmé").length} color="#22c55e"/>
-      </div>
-      <div style={S.card}>
-        <ST>📋 Mes demandes de devis</ST>
-        {ctx.myLeadsPart.length===0
-          ? <Empty icon="🏠" title="Aucune demande" sub="Déposez votre premier projet pour recevoir des devis gratuits."/>
-          : ctx.myLeadsPart.map(l=>(
-            <div key={l.id} style={S.leadRow}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
-                <div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||"—"}</div>
-                <SBadge s={l.statut}/>
-              </div>
-              <div style={{ color:"rgba(255,255,255,0.36)", fontSize:12, marginTop:6, display:"flex", flexWrap:"wrap", gap:12 }}>
-                {l.budget&&<span>💶 {l.budget}</span>}
-                {l.surface&&<span>📐 {l.surface}</span>}
-                {l.timing&&<span>⏱ {l.timing}</span>}
-                {l.adresse&&<span>📍 {l.adresse}</span>}
-              </div>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", marginTop:4 }}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
-            </div>
-          ))
-        }
-      </div>
-      <BigBtn style={{ marginTop:16, background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844" }} onClick={()=>ctx.setPage("part-lead")}>
-        + Nouvelle demande de devis
-      </BigBtn>
-    </Shell>
-  );
+  const [tab,setTab] = useState("demandes");
+  const confirmed = ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirme");
+  return (
+    <Shell ctx={ctx} color="#38bdf8" title="Espace Particulier">
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
+        <StatCard icon="📋" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
+        <StatCard icon="✅" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
+      </div>
+      <div style={{ display:"flex", gap:10, marginBottom:18 }}>
+        {[{id:"demandes",label:"📋 Mes demandes"},{id:"rdv",label:"✅ RDV confirmes"}].map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{ padding:"9px 18px", borderRadius:10, border:"1.5px solid "+(tab===t.id?"#38bdf8":"rgba(255,255,255,0.08)"), background:tab===t.id?"rgba(56,189,248,0.12)":"transparent", color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:tab===t.id?700:400, cursor:"pointer" }}>{t.label}</button>
+        ))}
+      </div>
+      {tab==="demandes"&&<div style={S.card}>
+        <ST>📋 Mes demandes de devis</ST>
+        {ctx.myLeadsPart.length===0
+          ? <Empty icon="🏠" title="Aucune demande" sub="Deposez votre premier projet pour recevoir des devis gratuits."/>
+          : ctx.myLeadsPart.map(l=>(
+            <div key={l.id} style={S.leadRow}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+                <div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||"—"}</div>
+                <SBadge s={l.statut}/>
+              </div>
+              <div style={{ color:"rgba(255,255,255,0.36)", fontSize:12, marginTop:6, display:"flex", flexWrap:"wrap", gap:12 }}>
+                {l.budget&&<span>💶 {l.budget}</span>}
+                {l.surface&&<span>📐 {l.surface}</span>}
+                {l.ville&&<span>📍 {l.ville}</span>}
+              </div>
+              {l.creneaux&&JSON.parse(l.creneaux||"[]").length>0&&(
+                <div style={{ marginTop:8, display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {JSON.parse(l.creneaux||"[]").map(s=>(
+                    <span key={s.key} style={{ fontSize:11, padding:"3px 8px", borderRadius:6, background:"rgba(56,189,248,0.1)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.2)" }}>{s.label}</span>
+                  ))}
+                </div>
+              )}
+              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", marginTop:4 }}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
+            </div>
+          ))
+        }
+      </div>}
+      {tab==="rdv"&&<div style={S.card}>
+        <ST>✅ Rendez-vous confirmes</ST>
+        {confirmed.length===0
+          ? <Empty icon="📅" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
+          : confirmed.map(l=>(
+            <div key={l.id} style={{ ...S.leadRow, border:"1px solid rgba(34,197,94,0.2)" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8 }}>
+                <div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||"—"}</div>
+                <SBadge s={l.statut}/>
+              </div>
+              {l.heure&&<div style={{ color:"#38bdf8", fontSize:12, marginTop:4 }}>📅 {l.heure}</div>}
+              {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+            </div>
+          ))
+        }
+      </div>}
+      <BigBtn style={{ marginTop:16, background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844" }} onClick={()=>ctx.setPage("part-lead")}>
+        + Nouvelle demande de devis
+      </BigBtn>
+    </Shell>
+  );
 }
+
+function ArtisanInfo({ id }) {
+  const [pro,setPro] = useState(null);
+  useEffect(()=>{
+    const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+    const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+    fetch(SB+"/rest/v1/profiles?id=eq."+id+"&select=prenom,nom,entreprise,tel,email",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}})
+    .then(r=>r.json()).then(d=>d&&d[0]&&setPro(d[0])).catch(()=>{});
+  },[id]);
+  if(!pro) return null;
+  return (
+    <div style={{ marginTop:10, background:"rgba(34,197,94,0.07)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:8, padding:"10px 12px" }}>
+      <div style={{ color:"#22c55e", fontSize:11, fontWeight:700, marginBottom:6 }}>VOTRE ARTISAN</div>
+      <div style={{ color:"#fff", fontSize:13, fontWeight:700 }}>{pro.prenom} {pro.nom}</div>
+      <div style={{ color:"rgba(255,255,255,0.5)", fontSize:12 }}>{pro.entreprise}</div>
+      <div style={{ display:"flex", gap:12, marginTop:6 }}>
+        {pro.tel&&<a href={"tel:"+pro.tel} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}>📞 {pro.tel}</a>}
+        {pro.email&&<a href={"mailto:"+pro.email} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}>✉️ {pro.email}</a>}
+      </div>
+    </div>
+  );
+}
+
 
 // ══════════════════════════════════════════════════════════════
 //  LEAD FORM
