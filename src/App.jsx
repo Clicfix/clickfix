@@ -155,6 +155,7 @@ export default function App() {
         const slots = formData.slots || [];
         const travaux = Array.isArray(formData.type) ? formData.type.join(", ") : (formData.type||"travaux");
       }
+      setBusy(false);
       return true;
     } catch(e) { notify("Erreur : "+e.message,"err"); setBusy(false); return false; }
   }
