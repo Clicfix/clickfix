@@ -950,7 +950,6 @@ function CalendarPicker({ selected, onChange }) {
       onChange([...selected, { key, date, hour, label: date + " a " + hour }]);
     }
   }
-  }
 
   function isSel(date, hour) { return !!selected.find(s => s.key === (date + "_" + hour)); }
 
