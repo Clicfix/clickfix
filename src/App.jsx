@@ -570,7 +570,7 @@ function LeadForm({ ctx }) {
               ))}
               <div style={{ gridColumn:"1/-1" }}><Inp label="Adresse du chantier *" v={form.adresse} set={e=>setForm({...form,adresse:e.target.value})}/></div>
               <Inp label="Ville *" v={form.ville} set={e=>setForm({...form,ville:e.target.value})}/>
-              <Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value})} type="tel" maxLength={5} pattern="[0-9]*"/>
+              <Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value.replace(/[^0-9]/g,"")})} type="tel" maxLength={5} pattern="[0-9]*"/>
               <div style={{ gridColumn:"1/-1" }}>
                 <label style={S.lbl}>Message (optionnel)</label>
                 <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Décrivez votre projet..." style={{ ...S.inp, height:72, resize:"vertical" }}/>
