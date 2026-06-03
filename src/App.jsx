@@ -33,10 +33,10 @@ const SPECIALITES_CATEGORIES = [
 ];
 const TRAVAUX_CATS=[{id:"plomberie",label:"Plomberie & Eau",img:"https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=400",subs:["Fuite d eau","Robinet","WC bouche","Chauffe-eau","Salle de bain","Piscine"]},{id:"elec",label:"Electricite",img:"https://images.pexels.com/photos/5663011/pexels-photo-5663011.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Panne","Installation","Tableau","Borne recharge","Alarme","Domotique"]},{id:"renov",label:"Renovation",img:"https://images.pexels.com/photos/30482688/pexels-photo-30482688.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Peinture","Carrelage","Faux plafond","Cuisine","Dressing","Decoration"]},{id:"fen",label:"Fenetres & Portes",img:"https://images.pexels.com/photos/36406089/pexels-photo-36406089.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Fenetres","Porte entree","Porte garage","Volets","Veranda","Portail"]},{id:"chauf",label:"Chauffage",img:"https://images.pexels.com/photos/36864512/pexels-photo-36864512.png?auto=compress&cs=tinysrgb&w=400",subs:["Chauffage panne","Chaudiere","Climatisation","Pompe chaleur","Isolation","Solaire"]},{id:"gros",label:"Gros Oeuvre",img:"https://images.pexels.com/photos/9712971/pexels-photo-9712971.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Fissures","Extension","Demolition","Terrassement","Construction","Ravalement"]},{id:"ext",label:"Exterieur",img:"https://images.pexels.com/photos/16239801/pexels-photo-16239801.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Jardin","Terrasse","Elagage","Paysagisme","Allee","Cloture"]},{id:"serr",label:"Serrurerie",img:"https://images.pexels.com/photos/30958693/pexels-photo-30958693.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Porte bloquee","Serrure","Blindage","Urgence","Alarme","Camera"]},{id:"toit",label:"Toiture",img:"https://images.pexels.com/photos/37704246/pexels-photo-37704246.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Fuite","Tuiles","Nettoyage","Charpente","Gouttieres","Velux"]},{id:"cuis",label:"Cuisine & SDB",img:"https://images.pexels.com/photos/19984614/pexels-photo-19984614.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Cuisine","Salle de bain","Douche","Faience","Robinetterie","Plan travail"]},{id:"energ",label:"Energie",img:"https://images.pexels.com/photos/6876537/pexels-photo-6876537.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Solaire","Pompe chaleur","Isolation combles","Isolation murs","VMC","Cheminee"]},{id:"div",label:"Divers",img:"https://images.pexels.com/photos/30958693/pexels-photo-30958693.jpeg?auto=compress&cs=tinysrgb&w=400",subs:["Debarras","Nettoyage","Desamiantage","Ramonage","PMR","Nuisibles"]}];
 const TRAVAUX_OPTS=['Maconnerie','Menuiserie','Electricite','Plomberie','Chauffage','Isolation','Peinture','Carrelage','Toiture','Amenagement'];
-const TRAVAUX_ICONS=['🧱','🪟','⚡','🚿','🌡️','🏠','🎨','🪵','🏗️','🌿'];
+const TRAVAUX_ICONS=['','','','','','','','','',''];
 const STEPS=[{id:"type",title:"En quoi pouvons-nous vous aider ?",sub:"Selectionnez votre besoin",type:"categories"},{id:"precision",title:"Precisez votre besoin",sub:"Choisissez la specialite",type:"specialites_cats"},{id:"surface",title:"Surface du chantier",sub:"Indiquez la superficie",type:"input",placeholder:"Ex: 45 m2"},{id:"budget",title:"Budget estime",sub:"Indiquez votre budget",type:"input",placeholder:"Ex: 8 000 EUR"},{id:"artisans",title:"Nombre d artisans",sub:"Combien souhaitez-vous rencontrer ?",type:"single",opts:[{icon:"3",label:"3 artisans"},{icon:"4",label:"4 artisans"},{icon:"5",label:"5 artisans"},{icon:"+",label:"+ de 5 artisans"}]},{id:"calendar",title:"Vos disponibilites",sub:"Min 3 creneaux",type:"calendar"},{id:"contact",title:"Vos coordonnees",sub:"Recevez vos devis gratuits sous 24h",type:"form"}];
 const PACKS=[{id:'decouverte',name:'Decouverte',rdv:5,prix:249,par:'49 EUR/RDV',couleur:'#38bdf8',tagline:'Sans engagement',abonnement:false,stripeUrl:'https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00',features:['5 RDV','Support email','Sans engagement']},{id:'pro',name:'Pro',rdv:15,prix:599,par:'39 EUR/RDV',couleur:'#FF6F00',tagline:'Populaire',best:true,abonnement:true,stripeUrl:'https://buy.stripe.com/test_6oUfZj79eba41gSdFL7wA02',features:['15 RDV/mois','Support prioritaire']},{id:'elite',name:'Elite',rdv:30,prix:999,par:'33 EUR/RDV',couleur:'#facc15',tagline:'Maximum',abonnement:true,stripeUrl:'https://buy.stripe.com/test_3cI14p65aemgcZA6dj7wA01',features:['30 RDV/mois','Account manager']}];
-const DOCS_DEF=[{id:'kbis',label:'Kbis',icon:'📋',oblig:true,desc:'Moins 3 mois'},{id:'decen',label:'Decennale',icon:'🛡️',oblig:true,desc:'En cours'},{id:'rc',label:'RC Pro',icon:'📄',oblig:true,desc:'RC civile'},{id:'rib',label:'RIB',icon:'🏦',oblig:true,desc:'Coordonnees bancaires'},{id:'rge',label:'RGE',icon:'⭐',oblig:false,desc:'Recommande'}];
+const DOCS_DEF=[{id:'kbis',label:'Kbis',icon:'',oblig:true,desc:'Moins 3 mois'},{id:'decen',label:'Decennale',icon:'',oblig:true,desc:'En cours'},{id:'rc',label:'RC Pro',icon:'',oblig:true,desc:'RC civile'},{id:'rib',label:'RIB',icon:'',oblig:true,desc:'Coordonnees bancaires'},{id:'rge',label:'RGE',icon:'',oblig:false,desc:'Recommande'}];
 const DEMO_LEADS=[{id:1001,created_at:'2025-06-02',heure:'09:00',client_nom:'Martin Lefevre',client_tel:'06 12 34 56 78',client_email:'martin@email.com',adresse:'12 rue de la Paix Paris',travaux:'Plomberie',surface:'30-80 m2',budget:'5000-20000 EUR',statut:'en attente',note:'',user_id:null,assigned_to:null},{id:1002,created_at:'2025-06-03',heure:'14:30',client_nom:'Sophie Renaud',client_tel:'07 23 45 67 89',client_email:'sophie@email.com',adresse:'8 avenue Victor Hugo Lyon',travaux:'Electricite',surface:'80-150 m2',budget:'5000-20000 EUR',statut:'en attente',note:'',user_id:null,assigned_to:null}];
 const RESEND_API_KEY='re_ifi5vKQp_LM6JP8eoGccKGZrKEtTFTEQx';
 
@@ -46,13 +46,13 @@ function saveLeads(l) { LS.set("cf_leads", l); }
 function getUsers() { return LS.get("cf_users") || []; }
 function saveUsers(u) { LS.set("cf_users", u); }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  ROOT APP
-// ══════════════════════════════════════════════════════════════
+// 
 export default function App() {
   const [page, setPage]   = useState("home");
   const [sess, setSess]   = useState(() => LS.get("cf_sess"));
-  useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const updated={...sess,token:d.access_token};setSess(updated);LS.set("cf_sess",updated);}}).catch(()=>{});}},[]);  const [toast, setToast] = useState(null);
+useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const updated={...sess,token:d.access_token};setSess(updated);LS.set("cf_sess",updated);}}).catch(()=>{});}},[]);  const [toast, setToast] = useState(null);
   const [busy, setBusy]   = useState(false);
   const [leads, setLeads] = useState(() => getLeads());
 
@@ -75,7 +75,7 @@ export default function App() {
     });
   }
 
-  // ── AUTH ──────────────────────────────────────────────────
+  //  AUTH 
   async function register(data) {
     setBusy(true);
     try {
@@ -99,31 +99,31 @@ export default function App() {
     setBusy(false);
   }
 
-  async function login(email, pass, role) {
-    setBusy(true);
-    try {
-      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-      const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
-      const authRes=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":AK},body:JSON.stringify({email,password:pass})});
-      const auth=await authRes.json();
-      if(auth.error)throw new Error("Email ou mot de passe incorrect");
-      const token=auth.access_token;
-      const uid=auth.user?.id;
-      const profileRes=await fetch(SB+"/rest/v1/profiles?id=eq."+uid+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+token}});
-      const profiles=await profileRes.json();
-      const profile=profiles[0];
-      if(!profile)throw new Error("Profil introuvable");
-      if(role!=="admin"&&profile.role!==role)throw new Error("Email ou mot de passe incorrect");
-      const u={...profile,id:uid,pass,token};
-      saveSession(u);
-      const users=getUsers();
-      if(!users.find(x=>x.id===uid))saveUsers([...users,u]);
-      else saveUsers(users.map(x=>x.id===uid?u:x));
-      setPage(u.role==="pro"?"pro-dashboard":"part-home");
-      notify("Bienvenue "+u.prenom+" !");
-    } catch(e){notify(e.message,"err");}
-    setBusy(false);
-  }
+async function login(email, pass, role) {
+setBusy(true);
+try {
+const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+const authRes=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":AK},body:JSON.stringify({email,password:pass})});
+const auth=await authRes.json();
+if(auth.error)throw new Error("Email ou mot de passe incorrect");
+const token=auth.access_token;
+const uid=auth.user?.id;
+const profileRes=await fetch(SB+"/rest/v1/profiles?id=eq."+uid+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+token}});
+const profiles=await profileRes.json();
+const profile=profiles[0];
+if(!profile)throw new Error("Profil introuvable");
+if(role!=="admin"&&profile.role!==role)throw new Error("Email ou mot de passe incorrect");
+const u={...profile,id:uid,pass,token};
+saveSession(u);
+const users=getUsers();
+if(!users.find(x=>x.id===uid))saveUsers([...users,u]);
+else saveUsers(users.map(x=>x.id===uid?u:x));
+setPage(u.role==="pro"?"pro-dashboard":"part-home");
+notify("Bienvenue "+u.prenom+" !");
+} catch(e){notify(e.message,"err");}
+setBusy(false);
+}
   }
 
   function logout() {
@@ -139,7 +139,7 @@ export default function App() {
     saveUsers(users.map(u => u.id===updated.id ? updated : u));
   }
 
-  // ── LEADS ────────────────────────────────────────────────
+  //  LEADS 
   async function submitLead(formData) {
     setBusy(true);
     try {
@@ -174,7 +174,7 @@ export default function App() {
     } catch(e) { notify("Erreur : "+e.message,"err"); setBusy(false); return false; }
   }
 
-  // ── PACK ─────────────────────────────────────────────────
+  //  PACK 
   function buyPack(pack) {
     const available = leads.filter(l => l.assigned_to === null);
     const toAssign  = available.slice(0, pack.rdv);
@@ -184,40 +184,40 @@ export default function App() {
     ));
     updateSession({ pack, rdv_restants: toAssign.length, rdv_total: pack.rdv });
     setPage("pro-dashboard");
-    notify("Pack " + pack.name + " activé 🎉 " + toAssign.length + " RDV disponibles !");
+    notify("Pack " + pack.name + " activé  " + toAssign.length + " RDV disponibles !");
     if (sess?.email) {
       fetch("/api/send-email", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ type:"pack_active", to:sess.email, data:{ prenom:sess.prenom, pack_name:pack.name, pack_rdv:pack.rdv, pack_prix:pack.prix, pack_par:pack.par, abonnement:pack.abonnement } }) }).catch(console.log);
     }
   }
 
-  async function confirmerRdv(lead) {
-    setBusy(true);
-    try {
-      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
-      const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
-      await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"confirme"})});
-      if(lead.client_email){fetch("/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"confirm_rdv_client",to:lead.client_email,data:{client_prenom:(lead.client_nom||"").split(" ")[0],artisan_prenom:sess?.prenom||"",artisan_nom:sess?.nom||"",artisan_entreprise:sess?.entreprise||"",artisan_tel:sess?.tel||"",artisan_email:sess?.email||"",creneau:lead.heure||"Sur RDV"}})}).catch(console.log);}
-      updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"confirme"}:l));
-      notify("RDV confirme ! Le client a ete notifie.");
-    } catch(e){notify(e.message,"err");}
-    setBusy(false);
-  }
+async function confirmerRdv(lead) {
+setBusy(true);
+try {
+const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
+await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"confirme"})});
+if(lead.client_email){fetch("/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"confirm_rdv_client",to:lead.client_email,data:{client_prenom:(lead.client_nom||"").split(" ")[0],artisan_prenom:sess?.prenom||"",artisan_nom:sess?.nom||"",artisan_entreprise:sess?.entreprise||"",artisan_tel:sess?.tel||"",artisan_email:sess?.email||"",creneau:lead.heure||"Sur RDV"}})}).catch(console.log);}
+updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"confirme"}:l));
+notify("RDV confirme ! Le client a ete notifie.");
+} catch(e){notify(e.message,"err");}
+setBusy(false);
+}
 
-  async function refuserRdv(lead) {
-    setBusy(true);
-    try {
-      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
-      const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
-      await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"refuse"})});
-      updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"refuse"}:l));
-      notify("RDV refuse.");
-    } catch(e){notify(e.message,"err");}
-    setBusy(false);
-  }
+async function refuserRdv(lead) {
+setBusy(true);
+try {
+const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+const H={"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY};
+await fetch(SB+"/rest/v1/leads?id=eq."+lead.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"refuse"})});
+updateLeads(prev=>prev.map(l=>l.id===lead.id?{...l,statut:"refuse"}:l));
+notify("RDV refuse.");
+} catch(e){notify(e.message,"err");}
+setBusy(false);
+}
 
-  // ── UPLOAD DOC ───────────────────────────────────────────
+//  UPLOAD DOC 
   async function uploadDoc(docId, file) {
     setBusy(true);
     try {
@@ -230,13 +230,13 @@ export default function App() {
       });
       const newDocs = {...(sess.docs||{}), [docId]: url};
       updateSession({ docs: newDocs });
-      notify("\"" + (DOCS_DEF.find(d=>d.id===docId)?.label||"Document") + "\" déposé ✅");
+      notify("\"" + (DOCS_DEF.find(d=>d.id===docId)?.label||"Document") + "\" déposé ");
     } catch(e) { notify("Erreur upload : "+e.message,"err"); }
     setBusy(false);
   }
 
   const docsOk      = DOCS_DEF.filter(d=>d.oblig).every(d=>sess?.docs?.[d.id]);
-  const myLeadsPart = leads.filter(l => l.client_email === sess?.email || l.user_id === sess?.id);
+const myLeadsPart = leads.filter(l => l.client_email === sess?.email || l.user_id === sess?.id);
   const myLeadsPro  = leads.filter(l => l.assigned_to === sess?.id);
 
   const ctx = { sess, page, setPage, busy, docsOk, login, register, logout, updateSession, submitLead, buyPack, uploadDoc, notify, myLeadsPart, myLeadsPro, confirmerRdv, refuserRdv };
@@ -260,15 +260,15 @@ export default function App() {
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  HOME
-// ══════════════════════════════════════════════════════════════
+// 
 function HomePage({ ctx }) {
   const [hov, setHov] = useState(null);
   const cards = [
-    { role:"part", emoji:"🏠", title:"Espace Particulier",   sub:"Obtenez des devis gratuits pour vos travaux de rénovation", cta:"Déposer ma demande →", color:"#38bdf8",
+    { role:"part", emoji:"", title:"Espace Particulier",   sub:"Obtenez des devis gratuits pour vos travaux de rénovation", cta:"Déposer ma demande ", color:"#38bdf8",
       features:["Devis gratuit & sans engagement","Artisans certifiés RGE","Réponse sous 24h","Suivi de vos demandes"] },
-    { role:"pro",  emoji:"🔨", title:"Espace Professionnel", sub:"Recevez des RDV qualifiés et développez votre activité",    cta:"Accéder à mon espace →", color:"#FF6F00",
+    { role:"pro",  emoji:"", title:"Espace Professionnel", sub:"Recevez des RDV qualifiés et développez votre activité",    cta:"Accéder à mon espace ", color:"#FF6F00",
       features:["RDV qualifiés livrés clé en main","Docs & suivi centralisés","Packs 10 / 20 / 50 RDV","Dashboard complet"] },
   ];
 
@@ -276,7 +276,7 @@ function HomePage({ ctx }) {
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 16px", position:"relative", overflow:"hidden" }}>
       <BgFx />
       <div style={{ zIndex:2, textAlign:"center", marginBottom:50, animation:"fadeUp .5s ease" }}>
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,111,0,0.08)", border:"1px solid rgba(255,111,0,0.2)", borderRadius:99, padding:"5px 16px", marginBottom:18, fontSize:11, color:"#FF6F00", fontWeight:700, letterSpacing:1 }}>🔧 PLATEFORME RÉNOVATION N°1</div>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,111,0,0.08)", border:"1px solid rgba(255,111,0,0.2)", borderRadius:99, padding:"5px 16px", marginBottom:18, fontSize:11, color:"#FF6F00", fontWeight:700, letterSpacing:1 }}> PLATEFORME RÉNOVATION N1</div>
         <h1 style={{ fontSize:"clamp(38px,6vw,64px)", fontWeight:900, color:"#fff", letterSpacing:"-2.5px", lineHeight:1, marginBottom:12 }}>click<span style={{ color:"#FF6F00" }}>&</span>fix</h1>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.38)", maxWidth:420, margin:"0 auto", lineHeight:1.65 }}>La plateforme qui connecte particuliers et artisans pour des travaux réussis.</p>
       </div>
@@ -299,7 +299,7 @@ function HomePage({ ctx }) {
         ))}
       </div>
       <div style={{ zIndex:2, marginTop:32, display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-        {["⭐ 4.9/5 — 2 400 avis","🏅 Artisans RGE","🆓 Devis gratuit","⚡ Réponse 24h","🔒 Données sécurisées"].map(b=>(
+        {[" 4.9/5  2 400 avis"," Artisans RGE"," Devis gratuit"," Réponse 24h"," Données sécurisées"].map(b=>(
           <div key={b} style={{ fontSize:12, color:"rgba(255,255,255,0.28)", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:99, padding:"5px 13px" }}>{b}</div>
         ))}
       </div>
@@ -307,37 +307,37 @@ function HomePage({ ctx }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  AUTH
-// ══════════════════════════════════════════════════════════════
+// 
 function AuthPage({ ctx, role, mode }) {
   const isPro=role==="pro", isAdmin=role==="admin", isLogin=mode==="login", color=isAdmin?"#a855f7":isPro?"#FF6F00":"#38bdf8";
   const [f,setF] = useState({prenom:"",nom:"",email:"",pass:"",tel:"",entreprise:"",siret:"",ville_intervention:"",rayon:""});
   const set = k => e => setF(p=>({...p,[k]:e.target.value}));
-  function submit() {
-    if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
-    if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
-    else {
-      if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
-      if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
-      if (isPro) {
-        if (!f.entreprise||!f.siret||!f.tel) { ctx.notify("Entreprise SIRET et telephone requis","err"); return; }
-        if (!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))) { ctx.notify("Telephone invalide ex: 0612345678","err"); return; }
-        if (!/^[0-9]{14}$/.test(f.siret.replace(/\s/g,""))) { ctx.notify("SIRET invalide 14 chiffres requis","err"); return; }
-        if (!f.specialites||f.specialites.length===0) { ctx.notify("Selectionnez au moins une specialite","err"); return; }
-      }
-      ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").replace(/\s/g,"")});
-    }
-  }
+function submit() {
+if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
+if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
+else {
+if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
+if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
+if (isPro) {
+if (!f.entreprise||!f.siret||!f.tel) { ctx.notify("Entreprise SIRET et telephone requis","err"); return; }
+if (!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))) { ctx.notify("Telephone invalide ex: 0612345678","err"); return; }
+if (!/^[0-9]{14}$/.test(f.siret.replace(/\s/g,""))) { ctx.notify("SIRET invalide 14 chiffres requis","err"); return; }
+if (!f.specialites||f.specialites.length===0) { ctx.notify("Selectionnez au moins une specialite","err"); return; }
+}
+ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").replace(/\s/g,"")});
+}
+}
   return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:20, position:"relative" }}>
       <BgFx />
       <div style={{ zIndex:2, width:"100%", maxWidth:isLogin?420:560, animation:"fadeUp .4s ease" }}>
-        <button onClick={()=>ctx.setPage("home")} style={S.backBtn}>← Retour</button>
+        <button onClick={()=>ctx.setPage("home")} style={S.backBtn}> Retour</button>
         <div style={S.authCard}>
           <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28 }}>
-            <span style={{ fontSize:28 }}>{isAdmin?"⚙️":isPro?"🔨":"🏠"}</span>
+            <span style={{ fontSize:28 }}>{isAdmin?"":isPro?"":""}</span>
             <div>
               <div style={{ fontSize:21, fontWeight:900, color:"#fff", letterSpacing:"-0.4px" }}>{isAdmin?"Accès Admin":isLogin?"Connexion":"Créer un compte"}</div>
               <div style={{ fontSize:12, color, fontWeight:700, marginTop:2 }}>{isAdmin?"Espace Administrateur":isPro?"Espace Professionnel":"Espace Particulier"}</div>
@@ -364,7 +364,7 @@ function AuthPage({ ctx, role, mode }) {
             <div style={{ gridColumn:"1/-1" }}><div><div><Inp label="Mot de passe *" v={f.pass} set={set("pass")} type="password" autoComplete="new-password"/>{f.pass&&f.pass.length<8&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Minimum 8 caracteres</div>}</div>{f.pass&&f.pass.length<8&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Minimum 8 caracteres</div>}</div></div>
           </div>
           <BigBtn style={{ marginTop:20, background:`linear-gradient(135deg,${color},${color}bb)`, boxShadow:`0 4px 24px ${color}44` }} onClick={submit}>
-            {isLogin?"Se connecter →":"Créer mon compte →"}
+            {isLogin?"Se connecter ":"Créer mon compte "}
           </BigBtn>
           {!isAdmin && <div style={{ textAlign:"center", marginTop:14, fontSize:13, color:"rgba(255,255,255,0.28)" }}>
             {isLogin?"Pas encore de compte ?":"Déjà inscrit ?"}{" "}
@@ -378,103 +378,103 @@ function AuthPage({ ctx, role, mode }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  PARTICULIER HOME
-// ══════════════════════════════════════════════════════════════
+// 
 function PartHome({ ctx }) {
-  const [tab,setTab] = useState("demandes");
-  const confirmed = ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirme");
-  return (
-    <Shell ctx={ctx} color="#38bdf8" title="Espace Particulier">
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
-        <StatCard icon="📋" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
-        <StatCard icon="✅" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
-      </div>
-      <div style={{ display:"flex", gap:10, marginBottom:18 }}>
-        {[{id:"demandes",label:"📋 Mes demandes"},{id:"rdv",label:"✅ RDV confirmes"}].map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{ padding:"9px 18px", borderRadius:10, border:"1.5px solid "+(tab===t.id?"#38bdf8":"rgba(255,255,255,0.08)"), background:tab===t.id?"rgba(56,189,248,0.12)":"transparent", color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:tab===t.id?700:400, cursor:"pointer" }}>{t.label}</button>
-        ))}
-      </div>
-      {tab==="demandes"&&<div style={S.card}>
-        <ST>📋 Mes demandes de devis</ST>
-        {ctx.myLeadsPart.length===0
-          ? <Empty icon="🏠" title="Aucune demande" sub="Deposez votre premier projet pour recevoir des devis gratuits."/>
-          : ctx.myLeadsPart.map(l=>(
-            <div key={l.id} style={S.leadRow}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
-                <div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||"—"}</div>
-                <SBadge s={l.statut}/>
-              </div>
-              <div style={{ color:"rgba(255,255,255,0.36)", fontSize:12, marginTop:6, display:"flex", flexWrap:"wrap", gap:12 }}>
-                {l.budget&&<span>💶 {l.budget}</span>}
-                {l.surface&&<span>📐 {l.surface}</span>}
-                {l.ville&&<span>📍 {l.ville}</span>}
-              </div>
-              {l.creneaux&&JSON.parse(l.creneaux||"[]").length>0&&(
-                <div style={{ marginTop:8, display:"flex", flexWrap:"wrap", gap:6 }}>
-                  {JSON.parse(l.creneaux||"[]").map(s=>(
-                    <span key={s.key} style={{ fontSize:11, padding:"3px 8px", borderRadius:6, background:"rgba(56,189,248,0.1)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.2)" }}>{s.label}</span>
-                  ))}
-                </div>
-              )}
-              <div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", marginTop:4 }}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
-            </div>
-          ))
-        }
-      </div>}
-      {tab==="rdv"&&<div style={S.card}>
-        <ST>✅ Rendez-vous confirmes</ST>
-        {confirmed.length===0
-          ? <Empty icon="📅" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
-          : confirmed.map(l=>(
-            <div key={l.id} style={{ ...S.leadRow, border:"1px solid rgba(34,197,94,0.2)" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8 }}>
-                <div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||"—"}</div>
-                <SBadge s={l.statut}/>
-              </div>
-              {l.heure&&<div style={{ color:"#38bdf8", fontSize:12, marginTop:4 }}>📅 {l.heure}</div>}
-              {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
-            </div>
-          ))
-        }
-      </div>}
-      <BigBtn style={{ marginTop:16, background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844" }} onClick={()=>ctx.setPage("part-lead")}>
-        + Nouvelle demande de devis
-      </BigBtn>
-    </Shell>
-  );
+const [tab,setTab] = useState("demandes");
+const confirmed = ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirme");
+return (
+<Shell ctx={ctx} color="#38bdf8" title="Espace Particulier">
+<div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
+<StatCard icon="" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
+<StatCard icon="" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
+</div>
+<div style={{ display:"flex", gap:10, marginBottom:18 }}>
+{[{id:"demandes",label:" Mes demandes"},{id:"rdv",label:" RDV confirmes"}].map(t=>(
+<button key={t.id} onClick={()=>setTab(t.id)} style={{ padding:"9px 18px", borderRadius:10, border:"1.5px solid "+(tab===t.id?"#38bdf8":"rgba(255,255,255,0.08)"), background:tab===t.id?"rgba(56,189,248,0.12)":"transparent", color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:tab===t.id?700:400, cursor:"pointer" }}>{t.label}</button>
+))}
+</div>
+{tab==="demandes"&&<div style={S.card}>
+<ST> Mes demandes de devis</ST>
+{ctx.myLeadsPart.length===0
+? <Empty icon="" title="Aucune demande" sub="Deposez votre premier projet pour recevoir des devis gratuits."/>
+: ctx.myLeadsPart.map(l=>(
+<div key={l.id} style={S.leadRow}>
+<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+<div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||""}</div>
+<SBadge s={l.statut}/>
+</div>
+<div style={{ color:"rgba(255,255,255,0.36)", fontSize:12, marginTop:6, display:"flex", flexWrap:"wrap", gap:12 }}>
+{l.budget&&<span> {l.budget}</span>}
+{l.surface&&<span> {l.surface}</span>}
+{l.ville&&<span> {l.ville}</span>}
+</div>
+{l.creneaux&&JSON.parse(l.creneaux||"[]").length>0&&(
+<div style={{ marginTop:8, display:"flex", flexWrap:"wrap", gap:6 }}>
+{JSON.parse(l.creneaux||"[]").map(s=>(
+<span key={s.key} style={{ fontSize:11, padding:"3px 8px", borderRadius:6, background:"rgba(56,189,248,0.1)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.2)" }}>{s.label}</span>
+))}
+</div>
+)}
+<div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", marginTop:4 }}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
+</div>
+))
+}
+</div>}
+{tab==="rdv"&&<div style={S.card}>
+<ST> Rendez-vous confirmes</ST>
+{confirmed.length===0
+? <Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
+: confirmed.map(l=>(
+<div key={l.id} style={{ ...S.leadRow, border:"1px solid rgba(34,197,94,0.2)" }}>
+<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8 }}>
+<div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||""}</div>
+<SBadge s={l.statut}/>
+</div>
+{l.heure&&<div style={{ color:"#38bdf8", fontSize:12, marginTop:4 }}> {l.heure}</div>}
+{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+</div>
+))
+}
+</div>}
+<BigBtn style={{ marginTop:16, background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844" }} onClick={()=>ctx.setPage("part-lead")}>
++ Nouvelle demande de devis
+</BigBtn>
+</Shell>
+);
 }
 
 function ArtisanInfo({ id }) {
-  const [pro,setPro] = useState(null);
-  useEffect(()=>{
-    const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-    const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
-    fetch(SB+"/rest/v1/profiles?id=eq."+id+"&select=prenom,nom,entreprise,tel,email",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}})
-    .then(r=>r.json()).then(d=>d&&d[0]&&setPro(d[0])).catch(()=>{});
-  },[id]);
-  if(!pro) return null;
-  return (
-    <div style={{ marginTop:10, background:"rgba(34,197,94,0.07)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:8, padding:"10px 12px" }}>
-      <div style={{ color:"#22c55e", fontSize:11, fontWeight:700, marginBottom:6 }}>VOTRE ARTISAN</div>
-      <div style={{ color:"#fff", fontSize:13, fontWeight:700 }}>{pro.prenom} {pro.nom}</div>
-      <div style={{ color:"rgba(255,255,255,0.5)", fontSize:12 }}>{pro.entreprise}</div>
-      <div style={{ display:"flex", gap:12, marginTop:6 }}>
-        {pro.tel&&<a href={"tel:"+pro.tel} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}>📞 {pro.tel}</a>}
-        {pro.email&&<a href={"mailto:"+pro.email} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}>✉️ {pro.email}</a>}
-      </div>
-    </div>
-  );
+const [pro,setPro] = useState(null);
+useEffect(()=>{
+const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+fetch(SB+"/rest/v1/profiles?id=eq."+id+"&select=prenom,nom,entreprise,tel,email",{headers:{"apikey":KEY,"Authorization":"Bearer "+KEY}})
+.then(r=>r.json()).then(d=>d&&d[0]&&setPro(d[0])).catch(()=>{});
+},[id]);
+if(!pro) return null;
+return (
+<div style={{ marginTop:10, background:"rgba(34,197,94,0.07)", border:"1px solid rgba(34,197,94,0.2)", borderRadius:8, padding:"10px 12px" }}>
+<div style={{ color:"#22c55e", fontSize:11, fontWeight:700, marginBottom:6 }}>VOTRE ARTISAN</div>
+<div style={{ color:"#fff", fontSize:13, fontWeight:700 }}>{pro.prenom} {pro.nom}</div>
+<div style={{ color:"rgba(255,255,255,0.5)", fontSize:12 }}>{pro.entreprise}</div>
+<div style={{ display:"flex", gap:12, marginTop:6 }}>
+{pro.tel&&<a href={"tel:"+pro.tel} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}> {pro.tel}</a>}
+{pro.email&&<a href={"mailto:"+pro.email} style={{ color:"#38bdf8", fontSize:12, textDecoration:"none" }}> {pro.email}</a>}
+</div>
+</div>
+);
 }
 
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  LEAD FORM
-// ══════════════════════════════════════════════════════════════
+// 
 function LeadForm({ ctx }) {
   const [step,setStep]   = useState(0);
   const [ans,setAns]     = useState({});
-  const [form,setForm]   = useState({ nom:ctx.sess?.nom||"", prenom:ctx.sess?.prenom||"", email:ctx.sess?.email||"", tel:ctx.sess?.tel||"", adresse:"", ville:"", code_postal:"", message:"" });
+const [form,setForm]= useState({ nom:ctx.sess?.nom||"", prenom:ctx.sess?.prenom||"", email:ctx.sess?.email||"", tel:ctx.sess?.tel||"", adresse:"", ville:"", code_postal:"", message:"" });
   const [done,setDone]   = useState(false);
   const [sending,setSending] = useState(false);
   const cur = STEPS[step];
@@ -508,8 +508,8 @@ function LeadForm({ ctx }) {
     if (!form.email.includes("@") && form.email.includes(".")) errors.push("Email invalide");
     if (form.tel.trim().length < 10) errors.push("Téléphone invalide");
     if (!form.adresse.trim()) errors.push("Adresse du chantier manquante");
-    if (!form.ville.trim()) errors.push("Ville manquante");
-    if (!form.code_postal.trim()) errors.push("Code postal manquant");
+if (!form.ville.trim()) errors.push("Ville manquante");
+if (!form.code_postal.trim()) errors.push("Code postal manquant");
     return errors;
   }
 
@@ -528,7 +528,7 @@ function LeadForm({ ctx }) {
     if (step<STEPS.length-1) { setStep(step+1); return; }
     // Vérification finale complète
     if (!ans.type?.length || !ans.surface || !ans.budget || !ans.artisans || (ans.slots||[]).length < 3) {
-      ctx.notify("Votre demande est incomplète — vérifiez tous les champs", "err");
+      ctx.notify("Votre demande est incomplète  vérifiez tous les champs", "err");
       return;
     }
     setSending(true);
@@ -541,7 +541,7 @@ function LeadForm({ ctx }) {
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:20, position:"relative" }}>
       <BgFx/>
       <div style={{ ...S.card, zIndex:2, maxWidth:480, textAlign:"center" }}>
-        <div style={{ fontSize:60, marginBottom:14 }}>🎉</div>
+        <div style={{ fontSize:60, marginBottom:14 }}></div>
         <div style={{ fontSize:24, fontWeight:900, color:"#fff", marginBottom:8 }}>Demande envoyée !</div>
         <div style={{ color:"rgba(255,255,255,0.42)", fontSize:14, lineHeight:1.75, marginBottom:24 }}>
           Merci <strong style={{ color:"#fff" }}>{form.prenom}</strong> !<br/>Nos artisans vous contactent sous <strong style={{ color:"#38bdf8" }}>24h</strong>.
@@ -554,7 +554,7 @@ function LeadForm({ ctx }) {
             </div>
           ))}
         </div>
-        <BigBtn style={{ background:"linear-gradient(135deg,#38bdf8,#0ea5e9)" }} onClick={()=>ctx.setPage("part-home")}>Voir mes demandes →</BigBtn>
+        <BigBtn style={{ background:"linear-gradient(135deg,#38bdf8,#0ea5e9)" }} onClick={()=>ctx.setPage("part-home")}>Voir mes demandes </BigBtn>
       </div>
     </div>
   );
@@ -563,7 +563,7 @@ function LeadForm({ ctx }) {
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", padding:"24px 16px", position:"relative" }}>
       <BgFx/>
       <div style={{ zIndex:2, width:"100%", maxWidth:560 }}>
-        <button onClick={()=>step===0?ctx.setPage("part-home"):setStep(step-1)} style={S.backBtn}>← {step===0?"Retour":"Précédent"}</button>
+        <button onClick={()=>step===0?ctx.setPage("part-home"):setStep(step-1)} style={S.backBtn}> {step===0?"Retour":"Précédent"}</button>
         <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
           <div style={{ flex:1, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
             <div style={{ width:`${(step/(STEPS.length-1))*100}%`, height:"100%", background:"linear-gradient(90deg,#38bdf8,#0ea5e9)", borderRadius:99, transition:"width .4s" }}/>
@@ -624,7 +624,7 @@ function LeadForm({ ctx }) {
                   <button key={opt.label} onClick={()=>sel(opt.label)} style={{ background:active?"rgba(56,189,248,0.1)":"rgba(255,255,255,0.03)", border:`1.5px solid ${active?"#38bdf8":"rgba(255,255,255,0.08)"}`, borderRadius:12, padding:"14px 12px", cursor:"pointer", textAlign:"left", position:"relative", transition:"all .15s" }}>
                     <div style={{ fontSize:22, marginBottom:6 }}>{opt.icon}</div>
                     <div style={{ fontSize:13, color:"#fff", fontWeight:600, lineHeight:1.3 }}>{opt.label}</div>
-                    {active&&<span style={{ position:"absolute", top:8, right:8, width:18, height:18, background:"#38bdf8", borderRadius:"50%", fontSize:10, color:"#fff", fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center" }}>✓</span>}
+                    {active&&<span style={{ position:"absolute", top:8, right:8, width:18, height:18, background:"#38bdf8", borderRadius:"50%", fontSize:10, color:"#fff", fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center" }}></span>}
                   </button>
                 );
               })}
@@ -636,8 +636,8 @@ function LeadForm({ ctx }) {
                 <Inp key={k} label={l} v={form[k]} set={e=>setForm({...form,[k]:e.target.value})} type={t}/>
               ))}
               <div style={{ gridColumn:"1/-1" }}><Inp label="Adresse du chantier *" v={form.adresse} set={e=>setForm({...form,adresse:e.target.value})}/></div>
-              <Inp label="Ville *" v={form.ville} set={e=>setForm({...form,ville:e.target.value})}/>
-              <Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value.replace(/[^0-9]/g,"")})} type="tel" maxLength={5} pattern="[0-9]*"/>
+<Inp label="Ville *" v={form.ville} set={e=>setForm({...form,ville:e.target.value})}/>
+<Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value.replace(/[^0-9]/g,"")})} type="tel" maxLength={5} pattern="[0-9]*"/>
               <div style={{ gridColumn:"1/-1" }}>
                 <label style={S.lbl}>Message (optionnel)</label>
                 <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Décrivez votre projet..." style={{ ...S.inp, height:72, resize:"vertical" }}/>
@@ -645,7 +645,7 @@ function LeadForm({ ctx }) {
             </div>
           )}
           <BigBtn style={{ background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844", opacity:canNext()?1:.4 }} disabled={!canNext()||sending} onClick={next}>
-            {sending?"Envoi en cours...":step===STEPS.length-1?"🚀 Envoyer ma demande":"Continuer →"}
+            {sending?"Envoi en cours...":step===STEPS.length-1?" Envoyer ma demande":"Continuer "}
           </BigBtn>
         </div>
       </div>
@@ -653,20 +653,20 @@ function LeadForm({ ctx }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  PRO DOCS
-// ══════════════════════════════════════════════════════════════
+// 
 function ProDocs({ ctx }) {
   return (
     <Shell ctx={ctx} color="#FF6F00" title="Documents requis">
       <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, lineHeight:1.75, marginBottom:24 }}>
-        Déposez vos justificatifs pour activer votre compte partenaire. Fichiers stockés de façon sécurisée. 🔒
+        Déposez vos justificatifs pour activer votre compte partenaire. Fichiers stockés de façon sécurisée. 
       </p>
       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:22 }}>
         {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
       </div>
       <BigBtn style={{ opacity:ctx.docsOk?1:.4 }} disabled={!ctx.docsOk} onClick={()=>ctx.setPage("pro-pricing")}>
-        {ctx.docsOk?"Choisir mon pack →":"⚠️ Documents obligatoires manquants"}
+        {ctx.docsOk?"Choisir mon pack ":" Documents obligatoires manquants"}
       </BigBtn>
     </Shell>
   );
@@ -685,16 +685,16 @@ function DocRow({ doc, status, onUpload }) {
         <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{doc.desc}</div>
       </div>
       {status
-        ? <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}>✓ Déposé</span>
-        : <><input ref={ref} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={e=>e.target.files[0]&&onUpload(doc.id,e.target.files[0])}/><button style={S.smBtn} onClick={()=>ref.current?.click()}>📎 Déposer</button></>
+        ? <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}> Déposé</span>
+        : <><input ref={ref} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={e=>e.target.files[0]&&onUpload(doc.id,e.target.files[0])}/><button style={S.smBtn} onClick={()=>ref.current?.click()}> Déposer</button></>
       }
     </div>
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  PRO PRICING
-// ══════════════════════════════════════════════════════════════
+// 
 function ProPricing({ ctx }) {
   const [hov,setHov]=useState(null);
   return (
@@ -706,7 +706,7 @@ function ProPricing({ ctx }) {
         {PACKS.map(p=>(
           <div key={p.id} onMouseEnter={()=>setHov(p.id)} onMouseLeave={()=>setHov(null)}
             style={{ position:"relative", background:hov===p.id?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)", border:`1.5px solid ${hov===p.id||p.best?p.couleur:"rgba(255,255,255,0.08)"}`, borderRadius:22, padding:"28px 22px", display:"flex", flexDirection:"column", transition:"all .22s", transform:hov===p.id?"translateY(-5px)":"none", boxShadow:hov===p.id?`0 24px 60px ${p.couleur}25`:"none" }}>
-            {p.best&&<div style={{ position:"absolute", top:-13, left:"50%", transform:"translateX(-50%)", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, color:"#fff", fontSize:11, fontWeight:800, padding:"4px 14px", borderRadius:99, letterSpacing:.5, whiteSpace:"nowrap", boxShadow:`0 4px 16px ${p.couleur}55` }}>⭐ Plus populaire</div>}
+            {p.best&&<div style={{ position:"absolute", top:-13, left:"50%", transform:"translateX(-50%)", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, color:"#fff", fontSize:11, fontWeight:800, padding:"4px 14px", borderRadius:99, letterSpacing:.5, whiteSpace:"nowrap", boxShadow:`0 4px 16px ${p.couleur}55` }}> Plus populaire</div>}
             <div style={{ color:p.couleur, fontWeight:800, fontSize:12, letterSpacing:2, textTransform:"uppercase", marginBottom:6 }}>{p.name}</div>
             <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12, marginBottom:18 }}>{p.tagline}</div>
             <div style={{ display:"flex", alignItems:"flex-end", gap:4, marginBottom:2 }}>
@@ -714,14 +714,14 @@ function ProPricing({ ctx }) {
               <span style={{ color:"rgba(255,255,255,0.35)", marginBottom:7, fontSize:16 }}>€</span>
             </div>
             <div style={{ color:p.couleur, fontSize:12, fontWeight:700, marginBottom:8 }}>{p.par}</div>
-            <div style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, display:"inline-block", marginBottom:16, background:p.abonnement?"rgba(255,111,0,0.1)":"rgba(56,189,248,0.1)", color:p.abonnement?"#FF6F00":"#38bdf8", border:`1px solid ${p.abonnement?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}` }}>{p.abonnement?"🔄 Abonnement mensuel":"✅ Paiement unique"}</div>
+            <div style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, display:"inline-block", marginBottom:16, background:p.abonnement?"rgba(255,111,0,0.1)":"rgba(56,189,248,0.1)", color:p.abonnement?"#FF6F00":"#38bdf8", border:`1px solid ${p.abonnement?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}` }}>{p.abonnement?" Abonnement mensuel":" Paiement unique"}</div>
             <div style={{ background:`${p.couleur}18`, border:`1px solid ${p.couleur}33`, borderRadius:12, padding:"10px", textAlign:"center", marginBottom:22 }}>
               <span style={{ fontSize:34, fontWeight:900, color:p.couleur }}>{p.rdv}</span>
               <span style={{ color:"rgba(255,255,255,0.4)", fontSize:13 }}> rendez-vous</span>
             </div>
             {p.features.map(f=>(
               <div key={f} style={{ display:"flex", gap:8, marginBottom:8, fontSize:13, color:"rgba(255,255,255,0.5)" }}>
-                <span style={{ color:p.couleur, flexShrink:0 }}>✓</span>{f}
+                <span style={{ color:p.couleur, flexShrink:0 }}></span>{f}
               </div>
             ))}
             <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto", paddingTop:14, width:"100%", padding:"13px 0", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, border:"none", borderRadius:12, color:"#fff", fontWeight:800, fontSize:14, cursor:"pointer", fontFamily:"'Outfit',sans-serif", boxShadow:`0 4px 24px ${p.couleur}44`, letterSpacing:.3 }}>
@@ -730,25 +730,25 @@ function ProPricing({ ctx }) {
           </div>
         ))}
       </div>
-      <div style={{ textAlign:"center", color:"rgba(255,255,255,0.2)", fontSize:12 }}>💳 Paiement sécurisé · ✅ Satisfait ou remboursé 7 jours · 📞 Support dédié</div>
+      <div style={{ textAlign:"center", color:"rgba(255,255,255,0.2)", fontSize:12 }}> Paiement sécurisé   Satisfait ou remboursé 7 jours   Support dédié</div>
     </Shell>
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  PRO DASHBOARD
-// ══════════════════════════════════════════════════════════════
+// 
 function ProDashboard({ ctx }) {
   const [tab,setTab]=useState("rdv");
   const s=ctx.sess, rdv=ctx.myLeadsPro, conf=rdv.filter(l=>l.statut==="confirmé").length;
-  const TABS=[{id:"rdv",ico:"📅",label:"Mes RDV"},{id:"docs",ico:"📁",label:"Documents"},{id:"pack",ico:"💎",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
+  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
 
   return (
     <div style={{ display:"flex", minHeight:"100vh" }}>
       <div style={{ width:232, background:"rgba(255,255,255,0.025)", borderRight:"1px solid rgba(255,255,255,0.055)", display:"flex", flexDirection:"column", flexShrink:0 }}>
         <div style={{ padding:"24px 18px 16px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
-            <span style={{ fontSize:20 }}>🔧</span>
+            <span style={{ fontSize:20 }}></span>
             <span style={{ fontSize:17, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix <span style={{ fontSize:9, background:"rgba(255,111,0,0.15)", color:"#FF6F00", border:"1px solid rgba(255,111,0,0.3)", borderRadius:4, padding:"1px 5px", fontWeight:700, letterSpacing:1 }}>PRO</span></span>
           </div>
           <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{s?.prenom} {s?.nom}</div>
@@ -772,33 +772,33 @@ function ProDashboard({ ctx }) {
           </div>
         )}
         <div style={{ padding:"0 8px 14px" }}>
-          <button onClick={ctx.logout} style={{ width:"100%", padding:"9px", background:"transparent", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, color:"rgba(255,255,255,0.22)", fontFamily:"'Outfit',sans-serif", fontSize:12, cursor:"pointer" }}>← Déconnexion</button>
+          <button onClick={ctx.logout} style={{ width:"100%", padding:"9px", background:"transparent", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, color:"rgba(255,255,255,0.22)", fontFamily:"'Outfit',sans-serif", fontSize:12, cursor:"pointer" }}> Déconnexion</button>
         </div>
       </div>
 
       <div style={{ flex:1, overflow:"auto", background:"#07090f" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 28px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
           <div>
-            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {s?.prenom} 👋</div>
+            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {s?.prenom} </div>
             <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
           </div>
           <div style={{ display:"flex", gap:8 }}>
-            {!ctx.docsOk&&<button style={S.smBtn} onClick={()=>setTab("docs")}>⚠️ Documents</button>}
-            {!s?.pack&&<button style={S.smBtn} onClick={()=>ctx.setPage("pro-pricing")}>🚀 Acheter un pack</button>}
+            {!ctx.docsOk&&<button style={S.smBtn} onClick={()=>setTab("docs")}> Documents</button>}
+            {!s?.pack&&<button style={S.smBtn} onClick={()=>ctx.setPage("pro-pricing")}> Acheter un pack</button>}
           </div>
         </div>
 
         <div style={{ padding:"24px 28px" }}>
           {tab==="rdv"&&<>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
-              <StatCard icon="📅" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
-              <StatCard icon="✅" label="Confirmés"     val={conf}               color="#22c55e"/>
-              <StatCard icon="⏳" label="En attente"    val={rdv.length-conf}    color="#FBC005"/>
-              <StatCard icon="🎯" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
+              <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
+              <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
+              <StatCard icon="" label="En attente"    val={rdv.length-conf}    color="#FBC005"/>
+              <StatCard icon="" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
             </div>
-            <ST>📅 Rendez-vous qualifiés</ST>
+            <ST> Rendez-vous qualifiés</ST>
             {rdv.length===0
-              ? <Empty icon="📅" title="Aucun RDV pour l'instant" sub="Activez un pack pour recevoir vos premiers RDV qualifiés sous 48h." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
+              ? <Empty icon="" title="Aucun RDV pour l'instant" sub="Activez un pack pour recevoir vos premiers RDV qualifiés sous 48h." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
               : rdv.map(l=>(
                 <div key={l.id} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"16px 18px", marginBottom:10 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
@@ -808,18 +808,18 @@ function ProDashboard({ ctx }) {
                         <SBadge s={l.statut}/>
                       </div>
                       <div style={{ display:"flex", flexWrap:"wrap", gap:14, fontSize:12, color:"rgba(255,255,255,0.4)" }}>
-                        {l.created_at&&<span>📅 {new Date(l.created_at).toLocaleDateString("fr-FR")}</span>}
-                        {l.adresse&&<span>📍 {l.adresse}</span>}
-                        {l.travaux&&<span>🔧 {l.travaux}</span>}
-                        {l.budget&&<span>💶 {l.budget}</span>}
+                        {l.created_at&&<span> {new Date(l.created_at).toLocaleDateString("fr-FR")}</span>}
+                        {l.adresse&&<span> {l.adresse}</span>}
+                        {l.travaux&&<span> {l.travaux}</span>}
+                        {l.budget&&<span> {l.budget}</span>}
                       </div>
-                      {l.note&&<div style={{ marginTop:6, fontSize:12, color:"rgba(255,165,0,.65)", fontStyle:"italic" }}>💬 {l.note}</div>}
+                      {l.note&&<div style={{ marginTop:6, fontSize:12, color:"rgba(255,165,0,.65)", fontStyle:"italic" }}> {l.note}</div>}
                     </div>
                     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                      {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}>📞 {l.client_tel}</a>}
-                      {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}>✉️ Email</a>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}>✅ Confirmer</button>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}>✗ Refuser</button>}
+                      {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}> {l.client_tel}</a>}
+                      {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}> Email</a>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}> Confirmer</button>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}> Refuser</button>}
                     </div>
                   </div>
                 </div>
@@ -828,21 +828,21 @@ function ProDashboard({ ctx }) {
           </>}
 
           {tab==="docs"&&<>
-            <ST>📁 Mes Documents</ST>
+            <ST> Mes Documents</ST>
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
               {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
             </div>
           </>}
 
           {tab==="pack"&&<>
-            <ST>💎 Mon Pack & Facturation</ST>
+            <ST> Mon Pack & Facturation</ST>
             {s?.pack
               ? <div style={{ background:"rgba(255,111,0,0.07)", border:"1px solid rgba(255,111,0,0.2)", borderRadius:18, padding:24, marginBottom:22 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:16, marginBottom:14 }}>
                     <div>
                       <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:4 }}>PACK ACTIF</div>
                       <div style={{ fontSize:28, fontWeight:900, color:"#FF6F00" }}>{s.pack.name}</div>
-                      <div style={{ color:"rgba(255,255,255,0.38)", fontSize:13, marginTop:4 }}>30 jours · {s.rdv_restants||0}/{s.rdv_total||0} RDV restants</div>
+                      <div style={{ color:"rgba(255,255,255,0.38)", fontSize:13, marginTop:4 }}>30 jours  {s.rdv_restants||0}/{s.rdv_total||0} RDV restants</div>
                     </div>
                     <div style={{ textAlign:"right" }}>
                       <div style={{ fontSize:36, fontWeight:900, color:"#fff" }}>{s.pack.prix?.toLocaleString("fr-FR")} €</div>
@@ -851,21 +851,21 @@ function ProDashboard({ ctx }) {
                   <div style={{ height:5, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
                     <div style={{ width:`${s.rdv_total>0?((s.rdv_restants||0)/s.rdv_total)*100:0}%`, height:"100%", background:"linear-gradient(90deg,#FF6F00,#FBC005)", borderRadius:99 }}/>
                   </div>
-                  <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.setPage("pro-pricing")}>Renouveler ou changer de pack →</BigBtn>
+                  <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.setPage("pro-pricing")}>Renouveler ou changer de pack </BigBtn>
                 </div>
-              : <Empty icon="💎" title="Aucun pack actif" sub="Choisissez un pack pour commencer à recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
+              : <Empty icon="" title="Aucun pack actif" sub="Choisissez un pack pour commencer à recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
             }
           </>}
 
           {tab==="profil"&&<>
-            <ST>👤 Mon Profil</ST>
+            <ST> Mon Profil</ST>
             <div style={{ ...S.card, maxWidth:520 }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
                 {[["Prénom",s?.prenom],["Nom",s?.nom],["Email",s?.email],["Téléphone",s?.tel||""],["Entreprise",s?.entreprise||""],["SIRET",s?.siret||""]].map(([l,v])=>(
                   <Inp key={l} label={l} v={v||""} set={()=>{}}/>
                 ))}
               </div>
-              <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.notify("Profil mis à jour ✅")}>Enregistrer</BigBtn>
+              <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.notify("Profil mis à jour ")}>Enregistrer</BigBtn>
             </div>
           </>}
         </div>
@@ -874,9 +874,9 @@ function ProDashboard({ ctx }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════
+// 
 //  SHARED UI
-// ══════════════════════════════════════════════════════════════
+// 
 function Shell({ ctx, color, title, maxW=660, children }) {
   return (
     <div style={{ minHeight:"100vh", position:"relative", padding:"24px 20px" }}>
@@ -884,7 +884,7 @@ function Shell({ ctx, color, title, maxW=660, children }) {
       <div style={{ zIndex:2, maxWidth:maxW, margin:"0 auto", position:"relative" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:26 }}>
           <div>
-            <button onClick={()=>ctx.setPage("home")} style={S.backBtn}>← Accueil</button>
+            <button onClick={()=>ctx.setPage("home")} style={S.backBtn}> Accueil</button>
             <div style={{ fontSize:21, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix</div>
             <div style={{ fontSize:13, color, fontWeight:700, marginTop:1 }}>{title}</div>
           </div>
@@ -929,7 +929,7 @@ function StatCard({ icon, label, val, color }) {
 
 function SBadge({ s }) {
   const ok=s==="confirmé";
-  return <span style={{ fontSize:11, fontWeight:700, padding:"3px 9px", borderRadius:99, background:ok?"rgba(34,197,94,0.1)":"rgba(251,192,5,0.1)", color:ok?"#22c55e":"#FBC005", border:`1px solid ${ok?"rgba(34,197,94,0.4)":"rgba(251,192,5,0.4)"}` }}>{ok?"✓ Confirmé":"⏳ En attente"}</span>;
+  return <span style={{ fontSize:11, fontWeight:700, padding:"3px 9px", borderRadius:99, background:ok?"rgba(34,197,94,0.1)":"rgba(251,192,5,0.1)", color:ok?"#22c55e":"#FBC005", border:`1px solid ${ok?"rgba(34,197,94,0.4)":"rgba(251,192,5,0.4)"}` }}>{ok?" Confirmé":" En attente"}</span>;
 }
 
 function ST({ children }) { return <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,0.3)", letterSpacing:1, textTransform:"uppercase", marginBottom:14 }}>{children}</div>; }
@@ -940,7 +940,7 @@ function Empty({ icon, title, sub, cta, onCta }) {
       <div style={{ fontSize:44, marginBottom:12 }}>{icon}</div>
       <div style={{ color:"#fff", fontWeight:800, fontSize:18, marginBottom:6 }}>{title}</div>
       <div style={{ color:"rgba(255,255,255,0.32)", fontSize:13, marginBottom:cta?20:0 }}>{sub}</div>
-      {cta&&<button style={{ ...S.smBtn, fontSize:13, padding:"9px 20px" }} onClick={onCta}>{cta} →</button>}
+      {cta&&<button style={{ ...S.smBtn, fontSize:13, padding:"9px 20px" }} onClick={onCta}>{cta} </button>}
     </div>
   );
 }
@@ -1043,7 +1043,7 @@ function CalendarPicker({ selected, onChange }) {
     const s = isSel(date, hour);
     return (
       <button onClick={()=>toggleSlot(date,hour)} style={{ padding:"7px 13px", borderRadius:8, border:`1.5px solid ${s?"#38bdf8":"rgba(255,255,255,0.1)"}`, background:s?"rgba(56,189,248,0.15)":"rgba(255,255,255,0.03)", color:s?"#38bdf8":"rgba(255,255,255,0.45)", fontSize:12, fontWeight:s?700:400, cursor:"pointer", transition:"all .15s" }}>
-        {hour}{s?" ✓":""}
+        {hour}{s?" ":""}
       </button>
     );
   };
@@ -1054,8 +1054,8 @@ function CalendarPicker({ selected, onChange }) {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
         <div style={{ fontSize:13 }}>
           {selected.length < 3
-            ? <span style={{ color:"#FBC005" }}>⚠️ Encore {3-selected.length} créneau{3-selected.length>1?"x":""} requis</span>
-            : <span style={{ color:"#22c55e" }}>✓ {selected.length} créneaux sélectionnés</span>
+            ? <span style={{ color:"#FBC005" }}> Encore {3-selected.length} créneau{3-selected.length>1?"x":""} requis</span>
+            : <span style={{ color:"#22c55e" }}> {selected.length} créneaux sélectionnés</span>
           }
         </div>
         {selected.length>0 && <button onClick={()=>onChange([])} style={{ fontSize:11, color:"rgba(255,255,255,0.25)", background:"none", border:"none", cursor:"pointer" }}>Tout effacer</button>}
@@ -1063,17 +1063,17 @@ function CalendarPicker({ selected, onChange }) {
 
       {/* Légende */}
       <div style={{ display:"flex", gap:14, marginBottom:12, fontSize:11, color:"rgba(255,255,255,0.35)" }}>
-        <span>⬜ Semaine disponible</span>
-        <span style={{ color:"#FBC005" }}>🟨 Samedi disponible</span>
-        <span>⬛ Indisponible</span>
+        <span> Semaine disponible</span>
+        <span style={{ color:"#FBC005" }}> Samedi disponible</span>
+        <span> Indisponible</span>
       </div>
 
       {/* Calendrier */}
       <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:14, padding:"16px", marginBottom:12 }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-          <button onClick={prevMonth} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:20, padding:"2px 8px" }}>‹</button>
+          <button onClick={prevMonth} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:20, padding:"2px 8px" }}></button>
           <span style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{MONTHS[currentMonth]} {currentYear}</span>
-          <button onClick={nextMonth} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:20, padding:"2px 8px" }}>›</button>
+          <button onClick={nextMonth} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:20, padding:"2px 8px" }}></button>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:6 }}>
           {DAYS.map(d=><div key={d} style={{ textAlign:"center", fontSize:11, color:"rgba(255,255,255,0.28)", fontWeight:700 }}>{d}</div>)}
@@ -1090,7 +1090,7 @@ function CalendarPicker({ selected, onChange }) {
                 onClick={()=>setPickedDate(active?null:day)}
                 style={{ aspectRatio:"1", borderRadius:8, border:`1.5px solid ${active?"#38bdf8":hasSel?"rgba(34,197,94,0.5)":"rgba(255,255,255,0.07)"}`, background:active?"rgba(56,189,248,0.15)":hasSel?"rgba(34,197,94,0.07)":"transparent", color:hasSel?"#22c55e":dayColor(day), fontSize:12, fontWeight:hasSel?700:400, cursor:dis?"not-allowed":"pointer", transition:"all .15s", position:"relative" }}>
                 {day}
-                {hasSel&&<span style={{ position:"absolute", top:1, right:2, fontSize:7, color:"#22c55e" }}>●</span>}
+                {hasSel&&<span style={{ position:"absolute", top:1, right:2, fontSize:7, color:"#22c55e" }}></span>}
               </button>
             );
           })}
@@ -1101,18 +1101,18 @@ function CalendarPicker({ selected, onChange }) {
       {pickedDate && !isDisabled(pickedDate) && (
         <div style={{ background:"rgba(56,189,248,0.05)", border:"1px solid rgba(56,189,248,0.15)", borderRadius:14, padding:"14px 16px", marginBottom:12 }}>
           <div style={{ fontSize:13, color:"#38bdf8", fontWeight:700, marginBottom:14 }}>
-            📅 {String(pickedDate).padStart(2,"0")}/{String(currentMonth+1).padStart(2,"0")}/{currentYear}
+             {String(pickedDate).padStart(2,"0")}/{String(currentMonth+1).padStart(2,"0")}/{currentYear}
           </div>
           {/* Matin */}
           <div style={{ marginBottom:12 }}>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🌅 MATIN</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", fontWeight:700, letterSpacing:1, marginBottom:8 }}> MATIN</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
               {MATIN.map(h=><SlotBtn key={h} date={fmtDate(pickedDate)} hour={h}/>)}
             </div>
           </div>
           {/* Après-midi */}
           <div>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", fontWeight:700, letterSpacing:1, marginBottom:8 }}>🌆 APRÈS-MIDI</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", fontWeight:700, letterSpacing:1, marginBottom:8 }}> APRÈS-MIDI</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
               {APMIDI.map(h=><SlotBtn key={h} date={fmtDate(pickedDate)} hour={h}/>)}
             </div>
@@ -1127,7 +1127,7 @@ function CalendarPicker({ selected, onChange }) {
           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
             {selected.map(s=>(
               <div key={s.key} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(34,197,94,0.07)", border:"1px solid rgba(34,197,94,0.22)", borderRadius:8, padding:"5px 10px" }}>
-                <span style={{ fontSize:12, color:"#22c55e", fontWeight:600 }}>📅 {s.label}</span>
+                <span style={{ fontSize:12, color:"#22c55e", fontWeight:600 }}> {s.label}</span>
                 <button onClick={()=>onChange(selected.filter(x=>x.key!==s.key))} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.28)", cursor:"pointer", fontSize:13 }}>×</button>
               </div>
             ))}
