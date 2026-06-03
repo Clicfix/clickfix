@@ -410,7 +410,7 @@ function PartHome({ ctx }) {
 function LeadForm({ ctx }) {
   const [step,setStep]   = useState(0);
   const [ans,setAns]     = useState({});
-  const [form,setForm]   = useState({ nom:ctx.sess?.nom||"", prenom:ctx.sess?.prenom||"", email:ctx.sess?.email||"", tel:ctx.sess?.tel||"", adresse:"", message:"" });
+  const [form,setForm]   = useState({ nom:ctx.sess?.nom||"", prenom:ctx.sess?.prenom||"", email:ctx.sess?.email||"", tel:ctx.sess?.tel||"", adresse:"", ville:"", code_postal:"", message:"" });
   const [done,setDone]   = useState(false);
   const [sending,setSending] = useState(false);
   const cur = STEPS[step];
