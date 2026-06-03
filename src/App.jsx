@@ -38,7 +38,6 @@ const PACKS=[{id:'decouverte',name:'Decouverte',rdv:5,prix:249,par:'49 EUR/RDV',
 const DOCS_DEF=[{id:'kbis',label:'Kbis',icon:'📋',oblig:true,desc:'Moins 3 mois'},{id:'decen',label:'Decennale',icon:'🛡️',oblig:true,desc:'En cours'},{id:'rc',label:'RC Pro',icon:'📄',oblig:true,desc:'RC civile'},{id:'rib',label:'RIB',icon:'🏦',oblig:true,desc:'Coordonnees bancaires'},{id:'rge',label:'RGE',icon:'⭐',oblig:false,desc:'Recommande'}];
 const DEMO_LEADS=[{id:1001,created_at:'2025-06-02',heure:'09:00',client_nom:'Martin Lefevre',client_tel:'06 12 34 56 78',client_email:'martin@email.com',adresse:'12 rue de la Paix Paris',travaux:'Plomberie',surface:'30-80 m2',budget:'5000-20000 EUR',statut:'en attente',note:'',user_id:null,assigned_to:null},{id:1002,created_at:'2025-06-03',heure:'14:30',client_nom:'Sophie Renaud',client_tel:'07 23 45 67 89',client_email:'sophie@email.com',adresse:'8 avenue Victor Hugo Lyon',travaux:'Electricite',surface:'80-150 m2',budget:'5000-20000 EUR',statut:'en attente',note:'',user_id:null,assigned_to:null}];
 const RESEND_API_KEY='re_ifi5vKQp_LM6JP8eoGccKGZrKEtTFTEQx';
-async function sendConfirmationEmail(to,nom,slots,travaux){try{await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+RESEND_API_KEY},body:JSON.stringify({from:'onboarding@resend.dev',to:[to],subject:'Demande recue',html:'<p>Bonjour '+nom+', votre demande pour '+travaux+' a ete recue.</p>'})})}catch(e){}}
 import { useState, useEffect, useRef } from "react";
 
 
@@ -155,7 +154,6 @@ export default function App() {
       if (newLead.client_email) {
         const slots = formData.slots || [];
         const travaux = Array.isArray(formData.type) ? formData.type.join(", ") : (formData.type||"travaux");
-        sendConfirmationEmail(newLead.client_email, newLead.client_nom, slots, travaux);
       }
       setBusy(false);
       return true;
