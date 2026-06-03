@@ -236,7 +236,7 @@ setBusy(false);
   }
 
   const docsOk      = DOCS_DEF.filter(d=>d.oblig).every(d=>sess?.docs?.[d.id]);
-const myLeadsPart = leads.filter(l => l.client_email === sess?.email || l.user_id === sess?.id);
+  const myLeadsPart = leads.filter(l => l.client_email === sess?.email || l.user_id === sess?.id);
   const myLeadsPro  = leads.filter(l => l.assigned_to === sess?.id);
 
   const ctx = { sess, page, setPage, busy, docsOk, login, register, logout, updateSession, submitLead, buyPack, uploadDoc, notify, myLeadsPart, myLeadsPro, confirmerRdv, refuserRdv };
