@@ -99,17 +99,31 @@ export default function App() {
     setBusy(false);
   }
 
-  async function login(email, pass, role) {
-    setBusy(true);
-    try {
-      const users = getUsers();
-      const u = users.find(u => u.email===email && u.pass===pass && u.role===role);
-      if (!u) throw new Error("Email ou mot de passe incorrect");
-      saveSession(u);
-      setPage(role === "pro" ? "pro-dashboard" : "part-home");
-      notify("Bienvenue " + u.prenom + " 👋");
-    } catch(e) { notify(e.message, "err"); }
-    setBusy(false);
+  async function login(email, pass, role) {
+    setBusy(true);
+    try {
+      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+      const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+      const authRes=await fetch(SB+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":AK},body:JSON.stringify({email,password:pass})});
+      const auth=await authRes.json();
+      if(auth.error)throw new Error("Email ou mot de passe incorrect");
+      const token=auth.access_token;
+      const uid=auth.user?.id;
+      const profileRes=await fetch(SB+"/rest/v1/profiles?id=eq."+uid+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+token}});
+      const profiles=await profileRes.json();
+      const profile=profiles[0];
+      if(!profile)throw new Error("Profil introuvable");
+      if(role!=="admin"&&profile.role!==role)throw new Error("Email ou mot de passe incorrect");
+      const u={...profile,id:uid,pass,token};
+      saveSession(u);
+      const users=getUsers();
+      if(!users.find(x=>x.id===uid))saveUsers([...users,u]);
+      else saveUsers(users.map(x=>x.id===uid?u:x));
+      setPage(u.role==="pro"?"pro-dashboard":"part-home");
+      notify("Bienvenue "+u.prenom+" !");
+    } catch(e){notify(e.message,"err");}
+    setBusy(false);
+  }
   }
 
   function logout() {
