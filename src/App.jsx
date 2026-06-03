@@ -543,7 +543,7 @@ function LeadForm({ ctx }) {
             </div>
           )}
           {cur.type==="input" && (
-            <div style={{marginBottom:22}}><input type="text" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>
+            <div style={{marginBottom:22}}><input type="number" min="0" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>
           )}
           {cur.type==="calendar" && (
             <CalendarPicker selected={ans.slots||[]} onChange={slots=>setAns({...ans,slots})} />
@@ -569,7 +569,7 @@ function LeadForm({ ctx }) {
               ))}
               <div style={{ gridColumn:"1/-1" }}><Inp label="Adresse du chantier *" v={form.adresse} set={e=>setForm({...form,adresse:e.target.value})}/></div>
               <Inp label="Ville *" v={form.ville} set={e=>setForm({...form,ville:e.target.value})}/>
-              <Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value})} type="tel"/>
+              <Inp label="Code postal *" v={form.code_postal} set={e=>setForm({...form,code_postal:e.target.value})} type="tel" maxLength={5} pattern="[0-9]*"/>
               <div style={{ gridColumn:"1/-1" }}>
                 <label style={S.lbl}>Message (optionnel)</label>
                 <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Décrivez votre projet..." style={{ ...S.inp, height:72, resize:"vertical" }}/>
