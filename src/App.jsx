@@ -177,18 +177,7 @@ setBusy(false);
 
   //  PACK 
   function buyPack(pack) {
-    const available = leads.filter(l => l.assigned_to === null);
-    const toAssign  = available.slice(0, pack.rdv);
-    const ids       = toAssign.map(l => l.id);
-    updateLeads(prev => prev.map(l =>
-      ids.includes(l.id) ? {...l, assigned_to: sess.id, statut:"confirmé"} : l
-    ));
-    updateSession({ pack, rdv_restants: toAssign.length, rdv_total: pack.rdv });
-    setPage("pro-dashboard");
-    notify("Pack " + pack.name + " activé  " + toAssign.length + " RDV disponibles !");
-    if (sess?.email) {
-      fetch("/api/send-email", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ type:"pack_active", to:sess.email, data:{ prenom:sess.prenom, pack_name:pack.name, pack_rdv:pack.rdv, pack_prix:pack.prix, pack_par:pack.par, abonnement:pack.abonnement } }) }).catch(console.log);
-    }
+    window.location.href = pack.stripeUrl;
   }
 
 async function confirmerRdv(lead) {
