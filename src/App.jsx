@@ -809,7 +809,7 @@ function ProDashboard({ ctx }) {
               <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
               <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
               <StatCard icon="" label="En attente"    val={rdv.length-conf}    color="#FBC005"/>
-              <StatCard icon="" label="RDV restants"  val={profile?.rdv_restants||0} color="#38bdf8"/>
+              <StatCard icon="" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
             </div>
             <ST> Rendez-vous qualifiés</ST>
             {rdv.length===0
