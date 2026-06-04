@@ -50,7 +50,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 //  ROOT APP
 // 
 export default function App() {
-  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");if(!s)return "home";if(s.role==="pro")return "pro-dashboard";if(s.role==="part")return "part-home";return "home";});
+  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);if(params.get("welcome")==="1"&&s)return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess"));
   useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
@@ -177,7 +177,7 @@ setBusy(false);
 
   //  PACK 
   function buyPack(pack) {
-    window.location.href = pack.stripeUrl;
+    window.open(pack.stripeUrl, "_blank");
   }
 
 async function confirmerRdv(lead) {
@@ -246,6 +246,7 @@ setBusy(false);
       {page==="pro-docs"      && <ProDocs      ctx={ctx} />}
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
       {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
+      {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
     </div>
   );
 }
@@ -432,6 +433,30 @@ return (
 </BigBtn>
 </Shell>
 );
+}
+
+
+function PackWelcome({ ctx }) {
+  const s=ctx.sess;
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
+      <BgFx/>
+      <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
+        <div style={{fontSize:72,marginBottom:16}}>🎉</div>
+        <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
+        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{s?.prenom}</strong> !</p>
+        <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
+        <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
+          <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
+          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{s?.pack}</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{s?.rdv_restants||0} RDV disponibles</div>
+        </div>
+        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
+          Accéder à mon Dashboard →
+        </BigBtn>
+      </div>
+    </div>
+  );
 }
 
 function ArtisanInfo({ id }) {
