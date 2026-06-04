@@ -460,6 +460,42 @@ function PackWelcome({ ctx }) {
   );
 }
 
+function PackTab({ s, ctx }) {
+  const [sel,setSel]=useState(null);
+  const history=(s?.packs_history||[]).slice().reverse();
+  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
+  return (
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+        <div style={{color:"#fff",fontWeight:800,fontSize:18}}>Mon Pack</div>
+        <button onClick={()=>hasMonthly?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
+      </div>
+      {history.length===0&&<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:32,textAlign:"center",color:"rgba(255,255,255,0.3)"}}>Aucun pack actif. <span style={{color:"#FF6F00",cursor:"pointer"}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack</span></div>}
+      {history.map((p,i)=>(
+        <div key={i} onClick={()=>setSel(sel===i?null:i)} style={{background:"rgba(255,111,0,0.07)",border:"1px solid "+(sel===i?"#FF6F00":"rgba(255,111,0,0.2)"),borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{color:"#FF6F00",fontWeight:800,fontSize:15}}>{p.name}</div>
+              <div style={{color:"rgba(255,255,255,0.4)",fontSize:12,marginTop:2}}>{p.rdv} RDV · {p.prix} EUR · {new Date(p.date_achat).toLocaleDateString("fr-FR")}</div>
+            </div>
+            <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.abonnement?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.abonnement?"#FF6F00":"#38bdf8"}}>{p.abonnement?"Mensuel":"Unique"}</div>
+          </div>
+          {sel===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>RDV inclus</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.rdv}</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Prix</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.prix} EUR</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Date achat</div><div style={{color:"#fff",fontWeight:700,fontSize:13}}>{new Date(p.date_achat).toLocaleDateString("fr-FR")}</div></div>
+              {p.date_renouvellement&&<div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Renouvellement</div><div style={{color:"#FF6F00",fontWeight:700,fontSize:13}}>{new Date(p.date_renouvellement).toLocaleDateString("fr-FR")}</div></div>}
+            </div>
+            {p.specialites&&p.specialites.length>0&&<div style={{marginTop:8}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginBottom:6}}>Specialites</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{p.specialites.map(sp=><span key={sp} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}</span>)}</div></div>}
+          </div>}
+        </div>
+      ))}
+      {hasMonthly&&<div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
+    </>
+  );
+}
+
 function ArtisanInfo({ id }) {
 const [pro,setPro] = useState(null);
 useEffect(()=>{
@@ -849,32 +885,7 @@ function ProDashboard({ ctx }) {
             </div>
           </>}
 
-          {tab==="pack"&&<>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-              <ST style={{margin:0}}>Mon Pack</ST>
-              <button onClick={()=>s?.pack&&(s.pack==="Pro"||s.pack==="Elite")?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
-            </div>
-            {s?.pack
-              ? <>
-                  {[{name:s.pack,rdv:s.rdv_restants,total:s.rdv_total,monthly:s.pack==="Pro"||s.pack==="Elite"}].map((p,i)=>(
-                    <div key={i} style={{background:"rgba(255,111,0,0.07)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                        <div>
-                          <div style={{color:"#FF6F00",fontWeight:800,fontSize:16}}>{p.name}</div>
-                          <div style={{color:"rgba(255,255,255,0.4)",fontSize:12,marginTop:2}}>{p.rdv||0} / {p.total||0} RDV restants</div>
-                        </div>
-                        <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.monthly?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.monthly?"#FF6F00":"#38bdf8",border:`1px solid ${p.monthly?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}`}}>{p.monthly?"Mensuel":"Unique"}</div>
-                      </div>
-                      <div style={{height:4,background:"rgba(255,255,255,0.07)",borderRadius:99,marginTop:10}}>
-                        <div style={{width:`${p.total>0?Math.min(100,(p.rdv/p.total)*100):0}%`,height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99}}/>
-                      </div>
-                    </div>
-                  ))}
-                  {(s.pack==="Pro"||s.pack==="Elite")&&<div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
-                </>
-              : <Empty icon="" title="Aucun pack actif" sub="Choisissez un pack pour recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
-            }
-          </>}
+          {tab==="pack"&&<PackTab s={s} ctx={ctx}/>}
           {tab==="profil"&&<>
             <ST> Mon Profil</ST>
             <div style={{ ...S.card, maxWidth:520 }}>
