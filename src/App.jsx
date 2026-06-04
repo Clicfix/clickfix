@@ -712,6 +712,8 @@ function DocRow({ doc, status, onUpload }) {
 // 
 function ProPricing({ ctx }) {
   const [hov,setHov]=useState(null);
+  const s=ctx.sess;
+  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite"||s.pack==="pro"||s.pack==="elite");
   return (
     <Shell ctx={ctx} color="#FF6F00" title="Choisissez votre pack" maxW={940}>
       <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, textAlign:"center", marginBottom:34, lineHeight:1.7 }}>
@@ -739,9 +741,7 @@ function ProPricing({ ctx }) {
                 <span style={{ color:p.couleur, flexShrink:0 }}></span>{f}
               </div>
             ))}
-            <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto", paddingTop:14, width:"100%", padding:"13px 0", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, border:"none", borderRadius:12, color:"#fff", fontWeight:800, fontSize:14, cursor:"pointer", fontFamily:"'Outfit',sans-serif", boxShadow:`0 4px 24px ${p.couleur}44`, letterSpacing:.3 }}>
-              Activer ce pack
-            </button>
+            {hasMonthly&&p.id!=="decouverte" ? <button disabled style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,color:"rgba(255,255,255,0.3)",fontWeight:800,fontSize:14,cursor:"not-allowed",fontFamily:"Outfit,sans-serif" }}>Pack actif</button> : <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"Outfit,sans-serif",boxShadow:`0 4px 24px ${p.couleur}44`,letterSpacing:.3 }}>{p.id==="decouverte"&&hasMonthly?"+ Ajouter 5 RDV":"Choisir ce pack"}</button>}
           </div>
         ))}
       </div>
