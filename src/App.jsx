@@ -452,7 +452,7 @@ function PackWelcome({ ctx }) {
           <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{profile?.pack}</div>
           <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
         </div>
-        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
+        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");window.location.href="/";}}>
           Accéder à mon Dashboard →
         </BigBtn>
       </div>
