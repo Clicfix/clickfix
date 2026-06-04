@@ -849,29 +849,31 @@ function ProDashboard({ ctx }) {
             </div>
           </>}
 
-          {tab==="pack"&&<>
-            <ST> Mon Pack & Facturation</ST>
-            {s?.pack
-              ? <div style={{ background:"rgba(255,111,0,0.07)", border:"1px solid rgba(255,111,0,0.2)", borderRadius:18, padding:24, marginBottom:22 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:16, marginBottom:14 }}>
-                    <div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:4 }}>PACK ACTIF</div>
-                      <div style={{ fontSize:28, fontWeight:900, color:"#FF6F00" }}>{s.pack.name}</div>
-                      <div style={{ color:"rgba(255,255,255,0.38)", fontSize:13, marginTop:4 }}>30 jours  {s.rdv_restants||0}/{s.rdv_total||0} RDV restants</div>
-                    </div>
-                    <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:36, fontWeight:900, color:"#fff" }}>{s.pack.prix?.toLocaleString("fr-FR")} €</div>
-                    </div>
-                  </div>
-                  <div style={{ height:5, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
-                    <div style={{ width:`${s.rdv_total>0?((s.rdv_restants||0)/s.rdv_total)*100:0}%`, height:"100%", background:"linear-gradient(90deg,#FF6F00,#FBC005)", borderRadius:99 }}/>
-                  </div>
-                  <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.setPage("pro-pricing")}>Renouveler ou changer de pack </BigBtn>
-                </div>
-              : <Empty icon="" title="Aucun pack actif" sub="Choisissez un pack pour commencer à recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
-            }
-          </>}
-
+          {tab==="pack"&&<>
+            <ST>Mon Pack</ST>
+            {s?.pack
+              ? <>
+                  <div style={{background:"rgba(255,111,0,0.07)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:18,padding:24,marginBottom:16}}>
+                    <div style={{fontSize:11,color:"rgba(255,255,255,0.3)",letterSpacing:1,marginBottom:4}}>PACK ACTIF</div>
+                    <div style={{fontSize:28,fontWeight:900,color:"#FF6F00",marginBottom:4}}>{s.pack}</div>
+                    <div style={{color:"rgba(255,255,255,0.5)",fontSize:13,marginBottom:12}}>{s.rdv_restants||0} / {s.rdv_total||0} RDV restants</div>
+                    <div style={{height:6,background:"rgba(255,255,255,0.07)",borderRadius:99,marginBottom:16}}>
+                      <div style={{width:`${s.rdv_total>0?Math.min(100,((s.rdv_restants||0)/s.rdv_total)*100):0}%`,height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99}}/>
+                    </div>
+                    {(s.pack==="Pro"||s.pack==="Elite")&&<>
+                      <div style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginBottom:10}}>Ajouter des RDV :</div>
+                      <div style={{background:"rgba(56,189,248,0.07)",border:"1px solid rgba(56,189,248,0.2)",borderRadius:12,padding:"14px 16px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}} onClick={()=>window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank")}>
+                        <div><div style={{color:"#38bdf8",fontWeight:700,fontSize:14}}>Pack Decouverte</div><div style={{color:"rgba(255,255,255,0.4)",fontSize:12}}>+5 RDV supplementaires</div></div>
+                        <div style={{color:"#38bdf8",fontWeight:900,fontSize:18}}>249 EUR</div>
+                      </div>
+                      <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center"}}>Pour changer de pack : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>
+                    </>}
+                    {s.pack==="Decouverte"&&<BigBtn style={{marginTop:8}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack mensuel</BigBtn>}
+                  </div>
+                </>
+              : <Empty icon="" title="Aucun pack actif" sub="Choisissez un pack pour recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
+            }
+          </>}
           {tab==="profil"&&<>
             <ST> Mon Profil</ST>
             <div style={{ ...S.card, maxWidth:520 }}>
