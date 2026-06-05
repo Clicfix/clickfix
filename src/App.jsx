@@ -529,7 +529,7 @@ function LeadForm({ ctx }) {
   const [ans,setAns]     = useState({});
 const [form,setForm]= useState({ nom:ctx.sess?.nom||"", prenom:ctx.sess?.prenom||"", email:ctx.sess?.email||"", tel:ctx.sess?.tel||"", adresse:"", ville:"", code_postal:"", message:"" });
   const [adresseOk,setAdresseOk]=useState(false);
-  const [sending,setSending] = useState(false);
+  const [done,setDone]=useState(false);  const [sending,setSending] = useState(false);
   const cur = STEPS[step];
 
   function sel(label) {
