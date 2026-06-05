@@ -516,36 +516,40 @@ return (
 // 
 function AILeadForm({ctx}){
 const s=ctx.sess;
-const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+( s?.prenom||"")+" ! Je suis votre assistant Click&fix. Decrivez-moi votre projet de travaux en quelques mots et je m occupe de trouver les meilleurs artisans pour vous !"}]);
+const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+(s?.prenom||"")+" ! Je suis votre assistant Click&fix. Decrivez-moi votre projet de travaux en quelques mots et je m occupe de trouver les meilleurs artisans pour vous !"}]);
 const [input,setInput]=useState("");
 const [busy,setBusy]=useState(false);
 const [done,setDone]=useState(false);
+const [leadData,setLeadData]=useState(null);
+const [slots,setSlots]=useState([]);
+const [showCal,setShowCal]=useState(false);
 async function send(){
 if(!input.trim()||busy)return;
 const newMsgs=[...msgs,{role:"user",content:input}];
-setMsgs(newMsgs);
-setInput("");
-setBusy(true);
+setMsgs(newMsgs);setInput("");setBusy(true);
 try{
 const r=await fetch("/api/ai-chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:newMsgs,prenom:s?.prenom})});
 const d=await r.json();
 const text=d.text||"";
 const leadMatch=text.match(/<LEAD>([\s\S]*?)<\/LEAD>/);
-if(leadMatch){
-try{
-const lead=JSON.parse(leadMatch[1]);
-setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! J ai bien note toutes vos informations. Je recherche maintenant les meilleurs artisans disponibles pour vous..."}]);
-await ctx.submitLead({...lead,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:lead.slots,type:lead.travaux,message:""});
-setDone(true);
-}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(/<LEAD>[\s\S]*?<\/LEAD>/,"").trim()}]);}
-}else{
-setMsgs(prev=>[...prev,{role:"assistant",content:text}]);
-}
-}catch(e){
-setMsgs(prev=>[...prev,{role:"assistant",content:"Desolee, une erreur est survenue. Reessayez."}]);
-}
+if(leadMatch){try{const lead=JSON.parse(leadMatch[1]);setLeadData(lead);setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! J ai collecte toutes les informations. Pour finaliser votre demande, choisissez maintenant vos creneaux de disponibilite (minimum 3)."}]);setShowCal(true);}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(/<LEAD>[\s\S]*?<\/LEAD>/,"").trim()}]);}}
+else{setMsgs(prev=>[...prev,{role:"assistant",content:text}]);}
+}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:"Desolee, une erreur est survenue. Reessayez."}]);}
 setBusy(false);
 }
+async function submitWithSlots(){
+if(slots.length<3){alert("Choisissez au moins 3 creneaux");return;}
+await ctx.submitLead({...leadData,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,message:""});
+setDone(true);
+}
+function toggleSlot(date,hour){
+const key=date+"_"+hour;
+const label=date+" a "+hour;
+setSlots(prev=>prev.find(s=>s.key===key)?prev.filter(s=>s.key!==key):[...prev,{key,date,hour,label}]);
+}
+const today=new Date();
+const days=Array.from({length:14},(_, i)=>{const d=new Date(today);d.setDate(today.getDate()+i+1);return d;});
+const hours=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00"];
 if(done)return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex",alignItems:"center",justifyContent:"center"}}><BgFx/><div style={{zIndex:2,textAlign:"center",maxWidth:480,padding:20}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><h2 style={{color:"#fff",fontSize:28,fontWeight:900,marginBottom:12}}>Demande envoyee !</h2><p style={{color:"rgba(255,255,255,0.5)",marginBottom:28}}>Nous recherchons les meilleurs artisans pour votre projet. Vous serez contacte sous 24h.</p><BigBtn onClick={()=>ctx.setPage("part-home")}>Voir mes demandes</BigBtn></div></div>);
 return(
 <div style={{minHeight:"100vh",background:"#07090f",display:"flex",flexDirection:"column"}}>
@@ -564,11 +568,21 @@ return(
 </div>
 ))}
 {busy&&<div style={{display:"flex",justifyContent:"flex-start"}}><div style={{padding:"12px 16px",borderRadius:"18px 18px 18px 4px",background:"rgba(255,255,255,0.07)",color:"rgba(255,255,255,0.5)",fontSize:14}}>...</div></div>}
+{showCal&&<div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(56,189,248,0.2)",borderRadius:16,padding:16,marginTop:8}}>
+<div style={{color:"#38bdf8",fontWeight:700,fontSize:14,marginBottom:12}}>Choisissez vos creneaux ({slots.length}/3 minimum)</div>
+<div style={{overflowX:"auto"}}>
+<table style={{borderCollapse:"collapse",fontSize:12,color:"#fff",minWidth:400}}>
+<thead><tr><th style={{padding:"6px 8px",color:"rgba(255,255,255,0.4)"}}></th>{hours.map(h=><th key={h} style={{padding:"6px 8px",color:"rgba(255,255,255,0.4)",fontWeight:600}}>{h}</th>)}</tr></thead>
+<tbody>{days.map(d=>{const dateStr=d.toLocaleDateString("fr-FR");const dayName=d.toLocaleDateString("fr-FR",{weekday:"short"});return(<tr key={dateStr}><td style={{padding:"6px 8px",color:"rgba(255,255,255,0.5)",whiteSpace:"nowrap",paddingRight:12}}>{dayName} {dateStr}</td>{hours.map(h=>{const key=dateStr+"_"+h;const sel=slots.find(s=>s.key===key);return(<td key={h} style={{padding:"4px"}}><div onClick={()=>toggleSlot(dateStr,h)} style={{width:28,height:28,borderRadius:6,background:sel?"#38bdf8":"rgba(255,255,255,0.05)",border:"1px solid "+(sel?"#38bdf8":"rgba(255,255,255,0.1)"),cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:sel?"#07090f":"transparent",margin:"0 auto"}}>{sel?"✓":""}</div></td>);})}</tr>);})}
+</tbody></table>
 </div>
-<div style={{zIndex:2,padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}>
+<BigBtn style={{marginTop:14,background:slots.length>=3?"linear-gradient(135deg,#38bdf8,#0ea5e9)":"rgba(255,255,255,0.1)",cursor:slots.length>=3?"pointer":"not-allowed"}} onClick={submitWithSlots}>Envoyer ma demande ({slots.length} creneau{slots.length>1?"x":""})</BigBtn>
+</div>}
+</div>
+{!showCal&&<div style={{zIndex:2,padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}>
 <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ecrivez votre message..." style={{flex:1,background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,outline:"none"}}/>
 <button onClick={send} disabled={busy||!input.trim()} style={{padding:"12px 20px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Envoyer</button>
-</div>
+</div>}
 </div>
 );
 }
