@@ -887,17 +887,7 @@ function ProDashboard({ ctx }) {
           </>}
 
           {tab==="pack"&&<PackTab s={s} ctx={ctx}/>}
-          {tab==="profil"&&<>
-            <ST> Mon Profil</ST>
-            <div style={{ ...S.card, maxWidth:520 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                {[["Prénom",s?.prenom],["Nom",s?.nom],["Email",s?.email],["Téléphone",s?.tel||""],["Entreprise",s?.entreprise||""],["SIRET",s?.siret||""]].map(([l,v])=>(
-                  <Inp key={l} label={l} v={v||""} set={()=>{}}/>
-                ))}
-              </div>
-              <BigBtn style={{ marginTop:18 }} onClick={()=>ctx.notify("Profil mis à jour ")}>Enregistrer</BigBtn>
-            </div>
-          </>}
+          {tab==="profil"&&<ProfilTab s={s} ctx={ctx}/>}
         </div>
       </div>
     </div>
@@ -907,6 +897,7 @@ function ProDashboard({ ctx }) {
 // 
 //  SHARED UI
 // 
+function ProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",entreprise:s?.entreprise||"",ville_intervention:s?.ville_intervention||"",lat:s?.lat||null,lon:s?.lon||null,rayon:s?.rayon||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel,entreprise:f.entreprise,ville_intervention:f.ville_intervention,lat:f.lat,lon:f.lon,rayon:f.rayon})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{maxWidth:520}}><div style={{...S.card,marginBottom:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Entreprise" v={f.entreprise} set={e=>setF(p=>({...p,entreprise:e.target.value}))}/></div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Zone d intervention</div><ProAddressInput f={f} setF={setF}/><div style={{marginTop:14}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Rayon d intervention</div><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{const active=f.rayon===r;return <button key={r} type="button" onClick={()=>setF(p=>({...p,rayon:r}))} style={{padding:"7px 14px",borderRadius:8,border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:12,cursor:"pointer"}}>{r}</button>;})}</div></div></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 function Shell({ ctx, color, title, maxW=660, children }) {
   return (
     <div style={{ minHeight:"100vh", position:"relative", padding:"24px 20px" }}>
