@@ -527,7 +527,7 @@ setMsgs(newMsgs);
 setInput("");
 setBusy(true);
 try{
-const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:`Tu es un assistant pour la plateforme Click&fix qui met en relation particuliers et artisans. Ton role est de collecter les informations du projet de travaux du client de facon naturelle et conversationnelle. Tu dois collecter: 1) Type de travaux et specialite exacte (ex: Renovation/Parquet), 2) Adresse du chantier, 3) Surface approximative, 4) Budget estimatif, 5) Disponibilites (au moins 3 creneaux). Quand tu as toutes les infos, reponds avec un JSON valide dans une balise <LEAD> contenant: {"travaux":"...","precision":"...","adresse":"...","ville":"...","surface":"...","budget":"...","slots":[{"key":"date_heure","date":"JJ/MM/AAAA","hour":"HH:MM","label":"JJ/MM/AAAA a HH:MM"}]}. Pose une question a la fois. Sois chaleureux et professionnel. Reponds en francais.`,messages:newMsgs})});
+const r=await fetch("/api/ai-chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:newMsgs,prenom:s?.prenom})});
 const d=await r.json();
 const text=d.content?.[0]?.text||"";
 const leadMatch=text.match(/<LEAD>([\s\S]*?)<\/LEAD>/);
