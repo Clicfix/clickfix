@@ -371,70 +371,57 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 // 
 //  PARTICULIER HOME
 // 
-function PartHome({ ctx }) {
-const [tab,setTab] = useState("demandes");
-const confirmed = ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirme");
-return (
-<Shell ctx={ctx} color="#38bdf8" title="Espace Particulier">
-<div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
+function PartHome({ctx}){
+const s=ctx.sess;
+const [tab,setTab]=useState("demandes");
+const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed");
+const TABS=[{id:"demandes",ico:"",label:"Mes demandes"},{id:"rdv",ico:"",label:"RDV confirmes"},{id:"profil",ico:"",label:"Mon profil"}];
+return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
+<BgFx/>
+<div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
+<div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
+<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
+<button onClick={()=>ctx.setPage("part-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
+{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
+<div style={{flex:1}}/>
+<button onClick={()=>ctx.logout()} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.25)",fontSize:13,cursor:"pointer",textAlign:"left"}}>Deconnexion</button>
+</div>
+<div style={{flex:1,padding:"32px 24px",zIndex:2,overflowY:"auto"}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:22}}>
 <StatCard icon="" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
 <StatCard icon="" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
 </div>
-<div style={{ display:"flex", gap:10, marginBottom:18 }}>
-{[{id:"demandes",label:" Mes demandes"},{id:"rdv",label:" RDV confirmes"}].map(t=>(
-<button key={t.id} onClick={()=>setTab(t.id)} style={{ padding:"9px 18px", borderRadius:10, border:"1.5px solid "+(tab===t.id?"#38bdf8":"rgba(255,255,255,0.08)"), background:tab===t.id?"rgba(56,189,248,0.12)":"transparent", color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:tab===t.id?700:400, cursor:"pointer" }}>{t.label}</button>
-))}
-</div>
 {tab==="demandes"&&<div style={S.card}>
-<ST> Mes demandes de devis</ST>
+<ST>Mes demandes de devis</ST>
 {ctx.myLeadsPart.length===0
-? <Empty icon="" title="Aucune demande" sub="Deposez votre premier projet pour recevoir des devis gratuits."/>
-: ctx.myLeadsPart.map(l=>(
-<div key={l.id} style={S.leadRow}>
-<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
-<div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||""}</div>
+?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("part-lead")}/>
+:ctx.myLeadsPart.map(l=>(<div key={l.id} style={S.leadRow}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}{l.precision&&<span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}> — {l.precision}</span>}</div>
 <SBadge s={l.statut}/>
 </div>
-<div style={{ color:"rgba(255,255,255,0.36)", fontSize:12, marginTop:6, display:"flex", flexWrap:"wrap", gap:12 }}>
-{l.budget&&<span> {l.budget}</span>}
-{l.surface&&<span> {l.surface}</span>}
-{l.ville&&<span> {l.ville}</span>}
+<div style={{color:"rgba(255,255,255,0.36)",fontSize:12,marginTop:6,display:"flex",flexWrap:"wrap",gap:12}}>
+{l.budget&&<span> {l.budget}</span>}{l.surface&&<span> {l.surface}</span>}{l.ville&&<span> {l.ville}</span>}
 </div>
-{l.creneaux&&JSON.parse(l.creneaux||"[]").length>0&&(
-<div style={{ marginTop:8, display:"flex", flexWrap:"wrap", gap:6 }}>
-{JSON.parse(l.creneaux||"[]").map(s=>(
-<span key={s.key} style={{ fontSize:11, padding:"3px 8px", borderRadius:6, background:"rgba(56,189,248,0.1)", color:"#38bdf8", border:"1px solid rgba(56,189,248,0.2)" }}>{s.label}</span>
-))}
-</div>
-)}
-<div style={{ fontSize:11, color:"rgba(255,255,255,0.2)", marginTop:4 }}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
-</div>
-))
-}
+<div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4}}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
+</div>))}
 </div>}
 {tab==="rdv"&&<div style={S.card}>
-<ST> Rendez-vous confirmes</ST>
+<ST>Rendez-vous confirmes</ST>
 {confirmed.length===0
-? <Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
-: confirmed.map(l=>(
-<div key={l.id} style={{ ...S.leadRow, border:"1px solid rgba(34,197,94,0.2)" }}>
-<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:8 }}>
-<div style={{ color:"#fff", fontWeight:700, fontSize:15 }}>{l.travaux||""}</div>
-<SBadge s={l.statut}/>
+?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
+:confirmed.map(l=>(<div key={l.id} style={{...S.leadRow,border:"1px solid rgba(34,197,94,0.2)"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}</div><SBadge s={l.statut}/>
 </div>
-{l.heure&&<div style={{ color:"#38bdf8", fontSize:12, marginTop:4 }}> {l.heure}</div>}
+{l.heure&&<div style={{color:"#38bdf8",fontSize:12,marginTop:4}}> {l.heure}</div>}
 {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
-</div>
-))
-}
+</div>))}
 </div>}
-<BigBtn style={{ marginTop:16, background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844" }} onClick={()=>ctx.setPage("part-lead")}>
-+ Nouvelle demande de devis
-</BigBtn>
-</Shell>
-);
+{tab==="profil"&&<PartProfilTab s={s} ctx={ctx}/>}
+</div>
+</div>);
 }
-
 
 function PackWelcome({ ctx }) {
   const s=ctx.sess;
@@ -499,6 +486,7 @@ function PackTab({ s, ctx }) {
 function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){onChange(v);if(v.length<2){setSugg([]);return;}fetch("https://geo.api.gouv.fr/communes?nom="+encodeURIComponent(v)+"\&fields=nom,codesPostaux,centre\&limit=5\&boost=population").then(r=>r.json()).then(d=>{setSugg(d||[]);setShow(true);}).catch(()=>{});}function pick(c){const cp=c.codesPostaux?.[0]||"";const lat=c.centre?.coordinates?.[1]||null;const lon=c.centre?.coordinates?.[0]||null;onSelect({ville:c.nom,code_postal:cp,lat,lon});setSugg([]);setShow(false);}return(<div style={{position:"relative",gridColumn:"1/-1"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>{label}</label><input value={value} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: Paris, Lyon, Marseille..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((c,i)=><div key={i} onClick={()=>pick(c)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:14}} onMouseDown={e=>e.preventDefault()}>{c.nom} <span style={{color:"rgba(255,255,255,0.4)",fontSize:12}}>({c.codesPostaux?.[0]})</span></div>)}</div>}</div>);}
 function AddressInput({form,setForm,onValidate}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setForm(f=>({...f,adresse:v}));if(onValidate)onValidate(false);if(onValidate)onValidate(false);if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5\&type=housenumber").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(f){const p=f.properties;setForm(prev=>({...prev,adresse:p.name||p.label,ville:p.city||"",code_postal:p.postcode||"",lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);if(onValidate)onValidate(true);}return(<div style={{gridColumn:"1/-1",position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse du chantier *</label><input value={form.adresse} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((f,i)=><div key={i} onClick={()=>pick(f)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{f.properties.label}</div>)}</div>}{form.ville&&<div style={{marginTop:6,fontSize:12,color:"rgba(255,255,255,0.4)"}}>{form.ville} {form.code_postal}</div>}</div>);}
 function ProAddressInput({f,setF}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setF(p=>({...p,ville_intervention:v,lat:null,lon:null}));if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(ft){const p=ft.properties;setF(prev=>({...prev,ville_intervention:p.city||p.name,lat:ft.geometry?.coordinates?.[1]||null,lon:ft.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);}return(<div style={{position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse entreprise *</label><input value={f.ville_intervention||""} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((ft,i)=><div key={i} onClick={()=>pick(ft)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{ft.properties.label}</div>)}</div>}{f.ville_intervention&&f.lat&&<div style={{marginTop:6,fontSize:12,color:"#22c55e"}}>Adresse validee</div>}</div>);}
+function PartProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",email:s?.email||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{...S.card,maxWidth:480}}><ST>Mon profil</ST><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Email" v={f.email} set={()=>{}}/></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 function ArtisanInfo({ id }) {
 const [pro,setPro] = useState(null);
 useEffect(()=>{
