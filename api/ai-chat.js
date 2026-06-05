@@ -4,7 +4,7 @@ const {messages,prenom}=req.body;
 try{
 const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
 method:"POST",
-headers:{"Content-Type":"application/json","Authorization":"Bearer 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"},
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
 body:JSON.stringify({
 model:"llama-3.3-70b-versatile",
 max_tokens:1000,
