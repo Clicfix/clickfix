@@ -529,7 +529,7 @@ setBusy(true);
 try{
 const r=await fetch("/api/ai-chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:newMsgs,prenom:s?.prenom})});
 const d=await r.json();
-const text=d.content?.[0]?.text||"";
+const text=d.text||"";
 const leadMatch=text.match(/<LEAD>([\s\S]*?)<\/LEAD>/);
 if(leadMatch){
 try{
