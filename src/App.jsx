@@ -259,47 +259,129 @@ setBusy(false);
 //  HOME
 // 
 function HomePage({ ctx }) {
-  const [hov, setHov] = useState(null);
-  const cards = [
-    { role:"part", emoji:"", title:"Espace Particulier",   sub:"Obtenez des devis gratuits pour vos travaux de rénovation", cta:"Déposer ma demande ", color:"#38bdf8",
-      features:["Devis gratuit & sans engagement","Artisans certifiés RGE","Réponse sous 24h","Suivi de vos demandes"] },
-    { role:"pro",  emoji:"", title:"Espace Professionnel", sub:"Recevez des RDV qualifiés et développez votre activité",    cta:"Accéder à mon espace ", color:"#FF6F00",
-      features:["RDV qualifiés livrés clé en main","Docs & suivi centralisés","Packs 10 / 20 / 50 RDV","Dashboard complet"] },
-  ];
-
-  return (
-    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 16px", position:"relative", overflow:"hidden" }}>
-      <BgFx />
-      <div style={{ zIndex:2, textAlign:"center", marginBottom:50, animation:"fadeUp .5s ease" }}>
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,111,0,0.08)", border:"1px solid rgba(255,111,0,0.2)", borderRadius:99, padding:"5px 16px", marginBottom:18, fontSize:11, color:"#FF6F00", fontWeight:700, letterSpacing:1 }}> PLATEFORME RÉNOVATION N1</div>
-        <h1 style={{ fontSize:"clamp(38px,6vw,64px)", fontWeight:900, color:"#fff", letterSpacing:"-2.5px", lineHeight:1, marginBottom:12 }}>click<span style={{ color:"#FF6F00" }}>&</span>fix</h1>
-        <p style={{ fontSize:15, color:"rgba(255,255,255,0.38)", maxWidth:420, margin:"0 auto", lineHeight:1.65 }}>La plateforme qui connecte particuliers et artisans pour des travaux réussis.</p>
-      </div>
-      <div style={{ zIndex:2, display:"grid", gridTemplateColumns:"1fr 1fr", gap:18, width:"100%", maxWidth:720, animation:"fadeUp .6s ease" }}>
-        {cards.map(c=>(
-          <div key={c.role}
-            style={{ background:hov===c.role?"rgba(255,255,255,0.065)":"rgba(255,255,255,0.03)", border:`1.5px solid ${hov===c.role?c.color:"rgba(255,255,255,0.08)"}`, borderRadius:24, padding:"32px 26px", cursor:"pointer", transition:"all .22s", transform:hov===c.role?"translateY(-5px)":"none", boxShadow:hov===c.role?`0 24px 60px ${c.color}20`:"none" }}
-            onMouseEnter={()=>setHov(c.role)} onMouseLeave={()=>setHov(null)}
-            onClick={()=>ctx.setPage(ctx.sess?.role===c.role?(c.role==="pro"?"pro-dashboard":"part-home"):("login-"+c.role))}>
-            <div style={{ fontSize:46, marginBottom:14 }}>{c.emoji}</div>
-            <h2 style={{ fontSize:20, fontWeight:900, color:"#fff", letterSpacing:"-0.4px", marginBottom:8 }}>{c.title}</h2>
-            <p style={{ fontSize:13, color:"rgba(255,255,255,0.36)", lineHeight:1.65, marginBottom:22 }}>{c.sub}</p>
-            {c.features.map(f=>(
-              <div key={f} style={{ display:"flex", alignItems:"center", gap:9, marginBottom:8, fontSize:13, color:"rgba(255,255,255,0.48)" }}>
-                <span style={{ width:5, height:5, borderRadius:"50%", background:c.color, flexShrink:0 }}/>{f}
-              </div>
-            ))}
-            <div style={{ marginTop:26, background:`linear-gradient(135deg,${c.color},${c.color}bb)`, borderRadius:12, padding:"13px", fontWeight:800, color:"#fff", fontSize:14, textAlign:"center", boxShadow:`0 6px 24px ${c.color}40` }}>{c.cta}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{ zIndex:2, marginTop:32, display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center" }}>
-        {[" 4.9/5  2 400 avis"," Artisans RGE"," Devis gratuit"," Réponse 24h"," Données sécurisées"].map(b=>(
-          <div key={b} style={{ fontSize:12, color:"rgba(255,255,255,0.28)", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:99, padding:"5px 13px" }}>{b}</div>
-        ))}
-      </div>
-    </div>
-  );
+  const [hov, setHov] = useState(null);
+  const [scrollY, setScrollY] = useState(0);
+  const [news, setNews] = useState([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  useEffect(()=>{const h=()=>setScrollY(window.scrollY);window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
+  useEffect(()=>{
+    const cached=localStorage.getItem('cf_news');
+    const cachedTime=localStorage.getItem('cf_news_time');
+    if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<86400000){setNews(JSON.parse(cached));setNewsLoading(false);return;}
+    fetch('/api/ai-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Genere 3 actualites courtes sur la renovation en France en 2025 (aides de l Etat, tendances, conseils). Reponds UNIQUEMENT en JSON valide sans markdown: [{"titre":"...","resume":"...","tag":"..."}]'}],prenom:''})})
+    .then(r=>r.json()).then(d=>{
+      try{
+        const text=d.text||'';
+        const clean=text.replace(/```json|```/g,'').trim();
+        const parsed=JSON.parse(clean);
+        setNews(parsed);
+        localStorage.setItem('cf_news',JSON.stringify(parsed));
+        localStorage.setItem('cf_news_time',Date.now().toString());
+      }catch(e){setNews([{titre:'MaPrimeRenov 2025',resume:'Jusqu a 70% de prise en charge pour vos travaux de renovation energetique.',tag:'Aide de l Etat'},{titre:'Prix moyens travaux',resume:'Renovation salle de bain: 8000-15000 euros. Parquet: 30-80 euros/m2.',tag:'Guide des prix'},{titre:'Bien choisir son artisan',resume:'Verifiez SIRET, assurance decennale et avis avant de signer.',tag:'Conseils'}]);}
+      setNewsLoading(false);
+    }).catch(()=>{setNews([{titre:'MaPrimeRenov 2025',resume:'Jusqu a 70% de prise en charge pour vos travaux de renovation energetique.',tag:'Aide de l Etat'},{titre:'Prix moyens travaux',resume:'Renovation salle de bain: 8000-15000 euros. Parquet: 30-80 euros/m2.',tag:'Guide des prix'},{titre:'Bien choisir son artisan',resume:'Verifiez SIRET, assurance decennale et avis avant de signer.',tag:'Conseils'}]);setNewsLoading(false);});
+  },[]);
+  function go(role){ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
+  return(
+<div style={{fontFamily:"'Outfit',sans-serif",background:'#f5f5f7',color:'#1d1d1f',minHeight:'100vh'}}>
+<nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>20?'rgba(245,245,247,0.92)':'transparent',backdropFilter:scrollY>20?'blur(20px)':'none',borderBottom:scrollY>20?'1px solid rgba(0,0,0,0.08)':'none',transition:'all .3s',padding:'0 48px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+  <span style={{fontSize:19,fontWeight:900,color:'#1d1d1f',letterSpacing:'-0.5px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
+  <div style={{display:'flex',gap:8,alignItems:'center'}}>
+    <button onClick={()=>go('part')} style={{padding:'7px 18px',borderRadius:20,border:'1px solid rgba(0,0,0,0.15)',background:'transparent',color:'#1d1d1f',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:"'Outfit',sans-serif"}}>Particulier</button>
+    <button onClick={()=>go('pro')} style={{padding:'7px 18px',borderRadius:20,border:'none',background:'#FF6F00',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:"'Outfit',sans-serif"}}>Artisan</button>
+  </div>
+</nav>
+<section style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'100px 24px 60px',textAlign:'center',background:'linear-gradient(180deg,#fff 0%,#f5f5f7 100%)'}}>
+  <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,111,0,0.08)',border:'1px solid rgba(255,111,0,0.2)',borderRadius:99,padding:'5px 16px',marginBottom:24,fontSize:11,color:'#FF6F00',fontWeight:700,letterSpacing:1}}>PLATEFORME RENOVATION N1 EN FRANCE</div>
+  <h1 style={{fontSize:'clamp(40px,7vw,80px)',fontWeight:900,letterSpacing:'-3px',lineHeight:1.05,marginBottom:20,maxWidth:800,color:'#1d1d1f'}}>Trouvez <span style={{color:'#FF6F00'}}>l artisan parfait</span><br/>pour vos travaux</h1>
+  <p style={{fontSize:18,color:'#6e6e73',maxWidth:520,lineHeight:1.6,marginBottom:40}}>Click&fix connecte particuliers et artisans qualifies grace a l intelligence artificielle. Rapide, fiable et gratuit.</p>
+  <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
+    <button onClick={()=>go('part')} style={{padding:'15px 32px',borderRadius:30,border:'none',background:'#1d1d1f',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',fontFamily:"'Outfit',sans-serif",boxShadow:'0 4px 20px rgba(0,0,0,0.15)'}}>Deposer une demande</button>
+    <button onClick={()=>go('pro')} style={{padding:'15px 32px',borderRadius:30,border:'2px solid #FF6F00',background:'transparent',color:'#FF6F00',fontSize:16,fontWeight:700,cursor:'pointer',fontFamily:"'Outfit',sans-serif"}}>Je suis artisan</button>
+  </div>
+</section>
+<section style={{padding:'80px 24px',background:'#fff'}}>
+  <div style={{maxWidth:960,margin:'0 auto'}}>
+    <div style={{textAlign:'center',marginBottom:60}}>
+      <h2 style={{fontSize:'clamp(28px,4vw,48px)',fontWeight:900,letterSpacing:'-1.5px',marginBottom:12}}>Comment ca marche ?</h2>
+      <p style={{fontSize:16,color:'#6e6e73'}}>Simple, rapide et efficace</p>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:60}}>
+      <div>
+        <div style={{fontSize:12,fontWeight:700,color:'#FF6F00',letterSpacing:1,marginBottom:24,display:'flex',alignItems:'center',gap:8}}><span style={{width:24,height:24,borderRadius:'50%',background:'rgba(255,111,0,0.1)',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:14}}></span>PARTICULIERS</div>
+        {[['1','Decrivez votre projet','Notre assistant IA collecte toutes les informations de votre projet en quelques minutes.'],['2','Recevez des artisans','Des artisans verifies et qualifies vous sont envoyes sous 24h.'],['3','Confirmez votre RDV','Choisissez votre creneau et suivez depuis votre espace personnel.']].map(([n,t,d])=>(
+          <div key={n} style={{display:'flex',gap:16,marginBottom:28}}>
+            <div style={{width:36,height:36,borderRadius:'50%',background:'#1d1d1f',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:14,flexShrink:0}}>{n}</div>
+            <div><div style={{fontWeight:700,fontSize:16,marginBottom:4,color:'#1d1d1f'}}>{t}</div><div style={{fontSize:14,color:'#6e6e73',lineHeight:1.6}}>{d}</div></div>
+          </div>
+        ))}
+      </div>
+      <div>
+        <div style={{fontSize:12,fontWeight:700,color:'#FF6F00',letterSpacing:1,marginBottom:24,display:'flex',alignItems:'center',gap:8}}><span style={{width:24,height:24,borderRadius:'50%',background:'rgba(255,111,0,0.1)',display:'inline-flex',alignItems:'center',justifyContent:'center',fontSize:14}}></span>ARTISANS</div>
+        {[['1','Creez votre profil','Renseignez vos specialites, votre zone et choisissez votre pack.'],['2','Recevez des leads qualifies','Notre IA dispatche les demandes selon vos competences et votre zone.'],['3','Developpez votre activite','Confirmez vos RDV et gerez tout depuis votre dashboard pro.']].map(([n,t,d])=>(
+          <div key={n} style={{display:'flex',gap:16,marginBottom:28}}>
+            <div style={{width:36,height:36,borderRadius:'50%',background:'#FF6F00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:14,flexShrink:0}}>{n}</div>
+            <div><div style={{fontWeight:700,fontSize:16,marginBottom:4,color:'#1d1d1f'}}>{t}</div><div style={{fontSize:14,color:'#6e6e73',lineHeight:1.6}}>{d}</div></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+<section style={{padding:'80px 24px',background:'#f5f5f7'}}>
+  <div style={{maxWidth:960,margin:'0 auto'}}>
+    <div style={{textAlign:'center',marginBottom:60}}>
+      <h2 style={{fontSize:'clamp(28px,4vw,48px)',fontWeight:900,letterSpacing:'-1.5px',marginBottom:12}}>Pourquoi Click&fix ?</h2>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+      {[['Artisans verifies','SIRET valide et assurance decennale obligatoire pour chaque artisan de la plateforme.',''],['IA de precision','Notre IA analyse chaque demande pour matcher le bon artisan selon ses specialites et sa zone.',''],['Gratuit pour les particuliers','Deposez votre demande sans frais. Seuls les artisans paient un abonnement mensuel.','']].map(([t,d,ico])=>(
+        <div key={t} style={{background:'#fff',borderRadius:20,padding:32,boxShadow:'0 2px 20px rgba(0,0,0,0.05)'}}>
+          <div style={{fontSize:40,marginBottom:16}}>{ico}</div>
+          <div style={{fontWeight:800,fontSize:18,marginBottom:8,color:'#1d1d1f'}}>{t}</div>
+          <div style={{fontSize:14,color:'#6e6e73',lineHeight:1.6}}>{d}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+<section style={{padding:'80px 24px',background:'#fff'}}>
+  <div style={{maxWidth:960,margin:'0 auto'}}>
+    <div style={{textAlign:'center',marginBottom:60}}>
+      <h2 style={{fontSize:'clamp(28px,4vw,48px)',fontWeight:900,letterSpacing:'-1.5px',marginBottom:12}}>Actualites travaux</h2>
+      <p style={{fontSize:16,color:'#6e6e73'}}>Generees par IA — mises a jour quotidiennement</p>
+    </div>
+    {newsLoading?<div style={{textAlign:'center',color:'#6e6e73',padding:40}}>Chargement des actualites...</div>:
+    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+      {news.map((a,i)=>(
+        <div key={i} style={{borderRadius:20,overflow:'hidden',border:'1px solid rgba(0,0,0,0.08)',background:'#f5f5f7'}}>
+          <div style={{height:5,background:'linear-gradient(90deg,#FF6F00,#FBC005)'}}/>
+          <div style={{padding:24}}>
+            <div style={{fontSize:11,fontWeight:700,color:'#FF6F00',letterSpacing:1,marginBottom:10}}>{a.tag}</div>
+            <div style={{fontWeight:800,fontSize:16,marginBottom:8,color:'#1d1d1f'}}>{a.titre}</div>
+            <div style={{fontSize:13,color:'#6e6e73',lineHeight:1.6}}>{a.resume}</div>
+          </div>
+        </div>
+      ))}
+    </div>}
+  </div>
+</section>
+<section style={{padding:'80px 24px',background:'#1d1d1f',textAlign:'center'}}>
+  <h2 style={{fontSize:'clamp(28px,4vw,48px)',fontWeight:900,letterSpacing:'-1.5px',color:'#fff',marginBottom:16}}>Pret a commencer ?</h2>
+  <p style={{fontSize:16,color:'rgba(255,255,255,0.45)',marginBottom:40,maxWidth:480,margin:'0 auto 40px'}}>Rejoignez des milliers de particuliers et artisans qui font confiance a Click&fix</p>
+  <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+    <button onClick={()=>go('part')} style={{padding:'15px 32px',borderRadius:30,border:'none',background:'#FF6F00',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',fontFamily:"'Outfit',sans-serif"}}>Deposer une demande</button>
+    <button onClick={()=>go('pro')} style={{padding:'15px 32px',borderRadius:30,border:'2px solid rgba(255,255,255,0.3)',background:'transparent',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',fontFamily:"'Outfit',sans-serif"}}>Devenir artisan partenaire</button>
+  </div>
+</section>
+<footer style={{background:'#1d1d1f',borderTop:'1px solid rgba(255,255,255,0.06)',padding:'28px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
+  <span style={{fontSize:16,fontWeight:900,color:'#fff'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
+  <div style={{display:'flex',gap:20,fontSize:13,color:'rgba(255,255,255,0.35)'}}>
+    <span>contact@click-fix.fr</span><span>Mentions legales</span><span>CGU</span>
+  </div>
+  <span style={{fontSize:12,color:'rgba(255,255,255,0.18)'}}>2025 Click&fix</span>
+</footer>
+</div>
+);
 }
 
 // 
