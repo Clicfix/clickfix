@@ -320,6 +320,7 @@ if (!f.specialites||f.specialites.length===0) { ctx.notify("Selectionnez au moin
 }
 ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").replace(/\s/g,"")});
 }
+}
   return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:20, position:"relative" }}>
       <BgFx />
@@ -1053,6 +1054,7 @@ function CalendarPicker({ selected, onChange }) {
     return d < minDate;
   }
 
+  function toggleSlot(date, hour) {
     const key = date + "_" + hour;
     const exists = selected.find(s => s.key === key);
     if (exists) {
@@ -1183,8 +1185,8 @@ function CalendarPicker({ selected, onChange }) {
       )}
     </div>
   );
-}
 
+}
 function GStyles() {
   return <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
