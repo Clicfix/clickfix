@@ -320,7 +320,6 @@ if (!f.specialites||f.specialites.length===0) { ctx.notify("Selectionnez au moin
 }
 ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").replace(/\s/g,"")});
 }
-}
   return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:20, position:"relative" }}>
       <BgFx />
@@ -516,7 +515,7 @@ return (
 // 
 function AILeadForm({ctx}){
 const s=ctx.sess;
-const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+(s?.prenom||"")+" ! Je suis votre assistant Click&fix. Decrivez-moi votre projet de travaux en quelques mots."}]);
+const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+(s?.prenom||"")+" ! Decrivez-moi votre projet de travaux."}]);
 const [input,setInput]=useState("");
 const [busy,setBusy]=useState(false);
 const [done,setDone]=useState(false);
@@ -529,9 +528,11 @@ const [addrOk,setAddrOk]=useState(false);
 const today=new Date();
 const days=Array.from({length:14},(_,i)=>{const d=new Date(today);d.setDate(today.getDate()+i+1);return d;});
 const hours=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00"];
-function confirmAddr(){if(!addrOk){alert("Veuillez selectionner une adresse dans la liste");return;}setShowAddr(false);setShowCal(true);setMsgs(prev=>[...prev,{role:"assistant",content:"Adresse validee : "+addrForm.adresse+", "+addrForm.ville+". Choisissez maintenant vos creneaux (minimum 3)."}]);}
-async function submitWithSlots(){if(slots.length<3){alert("Choisissez au moins 3 creneaux");return;}await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,message:""});setDone(true);}
-if(done)return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex",alignItems:"center",justifyContent:"center"}}><BgFx/><div style={{zIndex:2,textAlign:"center",maxWidth:480,padding:20}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><h2 style={{color:"#fff",fontSize:28,fontWeight:900,marginBottom:12}}>Demande envoyee !</h2><p style={{color:"rgba(255,255,255,0.5)",marginBottom:28}}>Nous recherchons les meilleurs artisans. Vous serez contacte sous 24h.</p><BigBtn onClick={()=>ctx.setPage("part-home")}>Voir mes demandes</BigBtn></div></div>);
+function toggleSlot(date,hour){const key=date+"_"+hour;const label=date+" a "+hour;setSlots(prev=>prev.find(sl=>sl.key===key)?prev.filter(sl=>sl.key!==key):[...prev,{key,date,hour,label}]);}
+function confirmAddr(){if(!addrOk){alert("Selectionnez une adresse dans la liste");return;}setShowAddr(false);setShowCal(true);setMsgs(prev=>[...prev,{role:"assistant",content:"Adresse : "+addrForm.adresse+", "+addrForm.ville+". Choisissez vos creneaux (minimum 3)."}]);}
+async function submitWithSlots(){if(slots.length<3){alert("Minimum 3 creneaux");return;}await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,message:""});setDone(true);}
+async function send(){if(!input.trim()||busy)return;const newMsgs=[...msgs,{role:"user",content:input}];setMsgs(newMsgs);setInput("");setBusy(true);try{const r=await fetch("/api/ai-chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:newMsgs,prenom:s?.prenom})});const d=await r.json();const text=d.text||"";const tag="LEAD";const re=new RegExp("<"+tag+">(.*?)<\/"+tag+">","s");const leadMatch=text.match(re);if(leadMatch){try{const lead=JSON.parse(leadMatch[1]);setLeadData(lead);setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! Entrez l adresse exacte du chantier."}]);setShowAddr(true);}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(re,"").trim()}]);}}else{setMsgs(prev=>[...prev,{role:"assistant",content:text}]);}}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:"Erreur. Reessayez."}]);}setBusy(false);}
+if(done)return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex",alignItems:"center",justifyContent:"center"}}><BgFx/><div style={{zIndex:2,textAlign:"center",maxWidth:480,padding:20}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><h2 style={{color:"#fff",fontSize:28,fontWeight:900,marginBottom:12}}>Demande envoyee !</h2><p style={{color:"rgba(255,255,255,0.5)",marginBottom:28}}>Nous recherchons les meilleurs artisans sous 24h.</p><BigBtn onClick={()=>ctx.setPage("part-home")}>Voir mes demandes</BigBtn></div></div>);
 return(
 <div style={{minHeight:"100vh",background:"#07090f",display:"flex",flexDirection:"column"}}>
 <BgFx/>
@@ -549,18 +550,6 @@ return(
 {!showAddr&&!showCal&&<div style={{zIndex:2,padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}><input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ecrivez votre message..." style={{flex:1,background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,outline:"none"}}/><button onClick={send} disabled={busy||!input.trim()} style={{padding:"12px 20px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Envoyer</button></div>}
 </div>
 );
-}
-
-function confirmAddr(){
-if(!addrOk){alert("Veuillez selectionner une adresse dans la liste");return;}
-setShowAddr(false);
-setShowCal(true);
-setMsgs(prev=>[...prev,{role:"assistant",content:"Adresse validee : "+addrForm.adresse+", "+addrForm.ville+". Choisissez maintenant vos creneaux de disponibilite (minimum 3)."}]);
-}
-async function submitWithSlots(){
-if(slots.length<3){alert("Choisissez au moins 3 creneaux");return;}
-await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,message:""});
-setDone(true);
 }
 function LeadForm({ ctx }) {
   const [step,setStep]   = useState(0);
@@ -1064,7 +1053,6 @@ function CalendarPicker({ selected, onChange }) {
     return d < minDate;
   }
 
-  function toggleSlot(date, hour) {
     const key = date + "_" + hour;
     const exists = selected.find(s => s.key === key);
     if (exists) {
