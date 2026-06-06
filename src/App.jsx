@@ -823,7 +823,7 @@ function ProPricing({ ctx }) {
 function ProDashboard({ ctx }) {
   const [tab,setTab]=useState("rdv");
   const s=ctx.sess, rdv=ctx.myLeadsPro, conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
-  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
+  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"confirmes",ico:"",label:"RDV confirmes"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
   useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0])ctx.updateSession({...s,...d[0]});}).catch(()=>{});}},[]);
 
   return (
@@ -910,7 +910,7 @@ function ProDashboard({ ctx }) {
             }
           </>}
 
-          {tab==="docs"&&<>
+          {tab==="confirmes"&&<><ST>RDV confirmes</ST>{rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici."/>:rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(<div key={l.id} style={{...S.leadRow,marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||l.precision}</div><span style={{fontSize:11,padding:"3px 9px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.4)"}}>Confirme</span></div><div style={{display:"grid",gap:6}}>{[["Specialite",l.precision],["Details",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Client",l.client_nom],["Tel",l.client_tel]].map(([k,v])=>v&&<div key={k} style={{display:"flex",gap:8}}><span style={{color:"rgba(255,255,255,0.35)",fontSize:12,minWidth:80}}>{k}</span><span style={{color:"#fff",fontSize:12}}>{v}</span></div>)}</div>{l.creneaux&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(34,197,94,0.1)",color:"#22c55e"}}>{sl.label||sl}</span>)}</div>}</div>))}</>}          {tab==="docs"&&<>
             <ST> Mes Documents</ST>
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
               {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
