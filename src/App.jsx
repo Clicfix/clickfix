@@ -438,7 +438,8 @@ function FaqItem({q,a}){const [open,setOpen]=React.useState(false);return(<div s
 <footer style={{background:'#000',padding:'36px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
   <span style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.3px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
   <div style={{display:'flex',gap:24,fontSize:12,color:'rgba(255,255,255,0.25)'}}>
-    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
+  const [profile,setProfile]=useState(s);
+  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0]){const u={...s,...d[0]};setProfile(u);ctx.updateSession(u);}}).catch(()=>{});}},[]);    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
     <span style={{cursor:'pointer'}}>Mentions légales</span>
     <span style={{cursor:'pointer'}}>CGU</span>
   </div>
@@ -531,7 +532,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 <BgFx/>
 <div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
 <div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
-<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
+<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{profile?.prenom} {s?.nom}</div>
 <button onClick={()=>ctx.setPage("ai-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
 {TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
 <div style={{flex:1}}/>
@@ -647,12 +648,12 @@ function PackWelcome({ ctx }) {
       <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
         <div style={{fontSize:72,marginBottom:16}}>🎉</div>
         <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
-        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{s?.prenom}</strong> !</p>
+        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{profile?.prenom}</strong> !</p>
         <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
         <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
           <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
-          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{s?.pack}</div>
-          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{s?.rdv_restants||0} RDV disponibles</div>
+          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{profile?.pack}</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
         </div>
         <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
           Accéder à mon Dashboard →
@@ -671,12 +672,12 @@ function PackWelcome({ ctx }) {
       <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
         <div style={{fontSize:72,marginBottom:16}}>🎉</div>
         <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
-        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{s?.prenom}</strong> !</p>
+        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{profile?.prenom}</strong> !</p>
         <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
         <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
           <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
-          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{s?.pack}</div>
-          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{s?.rdv_restants||0} RDV disponibles</div>
+          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{profile?.pack}</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
         </div>
         <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
           Accéder à mon Dashboard →
@@ -1030,7 +1031,7 @@ function ProDashboard({ ctx }) {
             <span style={{ fontSize:20 }}></span>
             <span style={{ fontSize:17, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix <span style={{ fontSize:9, background:"rgba(255,111,0,0.15)", color:"#FF6F00", border:"1px solid rgba(255,111,0,0.3)", borderRadius:4, padding:"1px 5px", fontWeight:700, letterSpacing:1 }}>PRO</span></span>
           </div>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{s?.prenom} {s?.nom}</div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{profile?.prenom} {s?.nom}</div>
           <div style={{ fontSize:11, color:"rgba(255,255,255,0.24)", marginTop:1 }}>{s?.entreprise}</div>
         </div>
         <div style={{ padding:"10px 8px", flex:1 }}>
@@ -1058,7 +1059,7 @@ function ProDashboard({ ctx }) {
       <div style={{ flex:1, overflow:"auto", background:"#07090f" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 28px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
           <div>
-            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {s?.prenom} </div>
+            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {profile?.prenom} </div>
             <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
           </div>
           <div style={{ display:"flex", gap:8 }}>
@@ -1073,7 +1074,7 @@ function ProDashboard({ ctx }) {
               <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
               <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
               <StatCard icon="" label="En attente"    val={rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length}    color="#FBC005"/>
-              <StatCard icon="" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
+              <StatCard icon="" label="RDV restants"  val={profile?.rdv_restants||0} color="#38bdf8"/>
             </div>
             <ST> Rendez-vous qualifiés</ST>
             {rdv.length===0
