@@ -522,7 +522,7 @@ const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+(s?.prenom||
 const [input,setInput]=useState("");
 const [busy,setBusy]=useState(false);
 const [showRecap,setShowRecap]=useState(false);
-const [leadData,setLeadData]=useState(null);
+const [done,setDone]=useState(false);const [leadData,setLeadData]=useState(null);
 const [slots,setSlots]=useState([]);
 const [showCal,setShowCal]=useState(false);
 const [showAddr,setShowAddr]=useState(false);
