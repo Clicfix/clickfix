@@ -269,7 +269,7 @@ function HomePage({ ctx }) {
     if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<3600000){setArticles(JSON.parse(cached));setArtLoading(false);return;}
     const queries=['renovation maison France','MaPrimeRenov travaux','plomberie electricite artisan France'];
     const q=queries[new Date().getHours()%3];
-    fetch('https://newsapi.org/v2/everything?q='+encodeURIComponent(q)+'&language=fr&pageSize=6&sortBy=publishedAt&apiKey=21bcbe2b29014aae899dc18103c1c35d')
+    fetch('/api/news')
     .then(r=>r.json()).then(d=>{
       const arts=(d.articles||[]).filter(a=>a.urlToImage&&a.title&&!a.title.includes('[Removed]')).slice(0,3);
       if(arts.length>0){setArticles(arts);localStorage.setItem('cf_articles',JSON.stringify(arts));localStorage.setItem('cf_articles_time',Date.now().toString());}
