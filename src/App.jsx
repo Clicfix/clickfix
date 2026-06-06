@@ -272,7 +272,7 @@ function HomePage({ ctx }) {
     fetch('/api/news')
     .then(r=>r.json()).then(d=>{
       const arts=(d.articles||[]).filter(a=>a.urlToImage&&a.title&&!a.title.includes('[Removed]')).slice(0,3);
-      if(arts.length>0){setArticles(arts);localStorage.setItem('cf_articles',JSON.stringify(arts));localStorage.setItem('cf_articles_time',Date.now().toString());}
+      if(arts.length>0){localStorage.setItem('cf_articles',JSON.stringify(arts));localStorage.setItem('cf_articles_time',Date.now().toString());const offset=(Math.floor(Date.now()/3600000))%Math.max(1,arts.length-2);setArticles(arts.slice(offset,offset+3));}
       setArtLoading(false);
     }).catch(()=>setArtLoading(false));
   },[]);
