@@ -260,142 +260,138 @@ setBusy(false);
 // 
 function HomePage({ ctx }) {
   const [scrollY,setScrollY]=useState(0);
-  const [news,setNews]=useState([]);
-  const [newsLoading,setNewsLoading]=useState(true);
-  const UNSPLASH_KEYS=['renovation','plomberie','electricite'];
+  const [articles,setArticles]=useState([]);
+  const [artLoading,setArtLoading]=useState(true);
   useEffect(()=>{const h=()=>setScrollY(window.scrollY);window.addEventListener('scroll',h);return()=>window.removeEventListener('scroll',h);},[]);
   useEffect(()=>{
-    const cached=localStorage.getItem('cf_news2');
-    const cachedTime=localStorage.getItem('cf_news2_time');
-    if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<86400000){setNews(JSON.parse(cached));setNewsLoading(false);return;}
-    fetch('/api/ai-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Genere 3 actualites sur la renovation en France 2025. Format JSON strict sans markdown: [{"titre":"...","resume":"...","tag":"...","img_keyword":"renovation interior"}]'}],prenom:''})})
+    const cached=localStorage.getItem('cf_articles');
+    const cachedTime=localStorage.getItem('cf_articles_time');
+    if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<3600000){setArticles(JSON.parse(cached));setArtLoading(false);return;}
+    const queries=['renovation maison France','MaPrimeRenov travaux','plomberie electricite artisan France'];
+    const q=queries[new Date().getHours()%3];
+    fetch('https://newsapi.org/v2/everything?q='+encodeURIComponent(q)+'&language=fr&pageSize=6&sortBy=publishedAt&apiKey=21bcbe2b29014aae899dc18103c1c35d')
     .then(r=>r.json()).then(d=>{
-      try{
-        const text=d.text||'';
-        const clean=text.replace(/```json|```/g,'').trim();
-        const arr=JSON.parse(clean);
-        setNews(arr);
-        localStorage.setItem('cf_news2',JSON.stringify(arr));
-        localStorage.setItem('cf_news2_time',Date.now().toString());
-      }catch(e){
-        setNews([{titre:'MaPrimeRenov 2025',resume:'Jusqu a 70% de prise en charge pour isolation, chauffage et fenetres. Simulez vos aides en ligne.',tag:'Aide de l Etat',img_keyword:'home insulation'},{titre:'Renovation : les prix en 2025',resume:'Salle de bain: 8 000-15 000 euros. Parquet: 30-80 euros/m2. Peinture: 15-30 euros/m2.',tag:'Guide des prix',img_keyword:'bathroom renovation'},{titre:'Bien choisir son artisan',resume:'SIRET, assurance decennale, avis clients : les 3 points a verifier avant de signer.',tag:'Conseils',img_keyword:'construction worker'}]);
-      }
-      setNewsLoading(false);
-    }).catch(()=>{setNews([{titre:'MaPrimeRenov 2025',resume:'Jusqu a 70% de prise en charge pour isolation, chauffage et fenetres.',tag:'Aide de l Etat',img_keyword:'home insulation'},{titre:'Prix renovation 2025',resume:'Salle de bain: 8 000-15 000 euros. Parquet: 30-80 euros/m2.',tag:'Guide des prix',img_keyword:'bathroom renovation'},{titre:'Choisir son artisan',resume:'Verifiez SIRET, assurance decennale et avis clients avant de signer.',tag:'Conseils',img_keyword:'construction worker'}]);setNewsLoading(false);});
+      const arts=(d.articles||[]).filter(a=>a.urlToImage&&a.title&&!a.title.includes('[Removed]')).slice(0,3);
+      if(arts.length>0){setArticles(arts);localStorage.setItem('cf_articles',JSON.stringify(arts));localStorage.setItem('cf_articles_time',Date.now().toString());}
+      setArtLoading(false);
+    }).catch(()=>setArtLoading(false));
   },[]);
   function go(role){ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
-  const S={fontFamily:"'Outfit',sans-serif"};
+  const F={fontFamily:"'Inter',sans-serif"};
+  const fallback=[{title:"MaPrimeRenov 2025",description:"Jusqu a 70% de prise en charge pour vos travaux de renovation energetique.",urlToImage:"https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",url:"#",source:{name:"Gouvernement"}},{title:"Prix des travaux en 2025",description:"Renovation salle de bain : 8 000-15 000 euros. Parquet : 30-80 euros/m2.",urlToImage:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",url:"#",source:{name:"Guide travaux"}},{title:"Bien choisir son artisan",description:"Verifiez SIRET, assurance decennale et avis clients avant de signer un devis.",urlToImage:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80",url:"#",source:{name:"Conseils"}}];
+  const arts=articles.length>0?articles:fallback;
   return(
-<div style={{...S,background:'#fff',color:'#1d1d1f',minHeight:'100vh',overflowX:'hidden'}}>
-<nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>40?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.3)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:scrollY>40?'1px solid rgba(0,0,0,0.1)':'none',transition:'all .4s',padding:'0 5%',height:52,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+<div style={{...F,background:'#fff',color:'#1d1d1f',minHeight:'100vh',overflowX:'hidden'}}>
+<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}};@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}"}</style>
+<nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>40?'rgba(255,255,255,0.92)':'rgba(0,0,0,0.15)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:scrollY>40?'1px solid rgba(0,0,0,0.1)':'none',transition:'all .4s',padding:'0 6%',height:54,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
   <span style={{fontSize:18,fontWeight:900,color:scrollY>40?'#1d1d1f':'#fff',letterSpacing:'-0.5px',transition:'color .4s'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
   <div style={{display:'flex',gap:8}}>
-    <button onClick={()=>go('part')} style={{...S,padding:'7px 20px',borderRadius:20,border:'1px solid rgba(255,255,255,0.4)',background:'transparent',color:scrollY>40?'#1d1d1f':'#fff',fontSize:13,fontWeight:600,cursor:'pointer',transition:'all .3s'}}>Particulier</button>
-    <button onClick={()=>go('pro')} style={{...S,padding:'7px 20px',borderRadius:20,border:'none',background:'#FF6F00',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>Artisan</button>
+    <button onClick={()=>go('part')} style={{...F,padding:'7px 20px',borderRadius:20,border:'1.5px solid '+(scrollY>40?'rgba(0,0,0,0.2)':'rgba(255,255,255,0.5)'),background:'transparent',color:scrollY>40?'#1d1d1f':'#fff',fontSize:13,fontWeight:600,cursor:'pointer',transition:'all .3s'}}>Particulier</button>
+    <button onClick={()=>go('pro')} style={{...F,padding:'7px 20px',borderRadius:20,border:'none',background:'#FF6F00',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>Artisan</button>
   </div>
 </nav>
 <section style={{height:'100vh',position:'relative',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
-  <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=1600&q=80" alt="renovation" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',filter:'brightness(0.45)'}}/>
-  <div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.6) 100%)'}}/>
-  <div style={{position:'relative',textAlign:'center',padding:'0 24px',maxWidth:900}}>
-    <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,111,0,0.15)',border:'1px solid rgba(255,111,0,0.4)',borderRadius:99,padding:'5px 16px',marginBottom:24,fontSize:11,color:'#FF6F00',fontWeight:700,letterSpacing:1.5}}>PLATEFORME RENOVATION N°1 EN FRANCE</div>
-    <h1 style={{fontSize:'clamp(44px,7vw,88px)',fontWeight:900,letterSpacing:'-3px',lineHeight:1.0,marginBottom:20,color:'#fff'}}>Trouvez <span style={{color:'#FF6F00'}}>l artisan</span><br/>qu il vous faut</h1>
-    <p style={{fontSize:20,color:'rgba(255,255,255,0.75)',maxWidth:560,margin:'0 auto 44px',lineHeight:1.6}}>Click&fix connecte particuliers et artisans qualifies grace a l intelligence artificielle.</p>
+  <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=1800&q=80" alt="renovation" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',filter:'brightness(0.38)'}}/>
+  <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.65))'}}/>
+  <div style={{position:'relative',textAlign:'center',padding:'0 24px',maxWidth:940}}>
+    <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,111,0,0.18)',border:'1px solid rgba(255,111,0,0.5)',borderRadius:99,padding:'5px 18px',marginBottom:28,fontSize:11,color:'#FF6F00',fontWeight:700,letterSpacing:2}}>PLATEFORME RENOVATION N1 EN FRANCE</div>
+    <h1 style={{fontSize:'clamp(44px,7.5vw,92px)',fontWeight:900,letterSpacing:'-3.5px',lineHeight:1.0,marginBottom:22,color:'#fff'}}>Trouvez <span style={{color:'#FF6F00'}}>l artisan</span><br/>qu il vous faut</h1>
+    <p style={{fontSize:19,color:'rgba(255,255,255,0.7)',maxWidth:540,margin:'0 auto 48px',lineHeight:1.65}}>Click&fix met en relation particuliers et artisans. Rapide, fiable et gratuit.</p>
     <div style={{display:'flex',gap:14,flexWrap:'wrap',justifyContent:'center'}}>
-      <button onClick={()=>go('part')} style={{...S,padding:'16px 36px',borderRadius:30,border:'none',background:'#fff',color:'#1d1d1f',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 24px rgba(0,0,0,0.2)'}}>Deposer une demande</button>
-      <button onClick={()=>go('pro')} style={{...S,padding:'16px 36px',borderRadius:30,border:'2px solid rgba(255,255,255,0.6)',background:'transparent',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer'}}>Je suis artisan</button>
+      <button onClick={()=>go('part')} style={{...F,padding:'16px 38px',borderRadius:30,border:'none',background:'#fff',color:'#1d1d1f',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 30px rgba(0,0,0,0.25)'}}>Deposer une demande</button>
+      <button onClick={()=>go('pro')} style={{...F,padding:'16px 38px',borderRadius:30,border:'2px solid rgba(255,255,255,0.55)',background:'transparent',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer'}}>Je suis artisan</button>
     </div>
   </div>
-  <div style={{position:'absolute',bottom:32,left:'50%',transform:'translateX(-50%)',color:'rgba(255,255,255,0.4)',fontSize:22,animation:'bounce 2s infinite'}}>↓</div>
+  <div style={{position:'absolute',bottom:32,left:'50%',transform:'translateX(-50%)',color:'rgba(255,255,255,0.35)',fontSize:22,animation:'bounce 2s infinite'}}>v</div>
 </section>
-<section style={{padding:'100px 5%',background:'#fff'}}>
+<section style={{padding:'110px 6%',background:'#fff'}}>
   <div style={{maxWidth:1100,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
     <div>
-      <div style={{fontSize:12,fontWeight:700,color:'#FF6F00',letterSpacing:1.5,marginBottom:16}}>POUR LES PARTICULIERS</div>
-      <h2 style={{fontSize:'clamp(32px,4vw,52px)',fontWeight:900,letterSpacing:'-2px',lineHeight:1.1,marginBottom:20}}>Vos travaux,<br/>sans stress</h2>
-      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.7,marginBottom:32}}>Decrivez votre projet a notre assistant IA. Il collecte toutes les informations et envoie votre demande aux meilleurs artisans de votre region sous 24h.</p>
-      {[['Decrivez votre projet','Notre IA pose les bonnes questions selon le type de travaux.'],['Recevez des artisans','Artisans verifies, assures, dans votre zone.'],['Confirmez votre RDV','Choisissez votre creneau. Suivi en temps reel.']].map(([t,d],i)=>(
-        <div key={i} style={{display:'flex',gap:16,marginBottom:20}}>
-          <div style={{width:32,height:32,borderRadius:'50%',background:'#1d1d1f',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:13,flexShrink:0}}>{i+1}</div>
-          <div><div style={{fontWeight:700,fontSize:15,marginBottom:2}}>{t}</div><div style={{fontSize:13,color:'#6e6e73',lineHeight:1.5}}>{d}</div></div>
+      <div style={{fontSize:11,fontWeight:700,color:'#FF6F00',letterSpacing:2,marginBottom:18,textTransform:'uppercase'}}>Pour les particuliers</div>
+      <h2 style={{fontSize:'clamp(32px,4vw,54px)',fontWeight:900,letterSpacing:'-2px',lineHeight:1.08,marginBottom:22}}>Vos travaux,<br/>sans tracas</h2>
+      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.75,marginBottom:36}}>Decrivez votre projet a notre assistant. Il collecte toutes les informations et envoie votre demande aux meilleurs artisans de votre region sous 24h.</p>
+      {[['Decrivez votre projet','Notre assistant pose les bonnes questions selon le type de travaux.'],['Recevez des artisans','Artisans verifies, assures, dans votre zone.'],['Confirmez votre RDV','Choisissez votre creneau. Suivi en temps reel.']].map(([t,d],i)=>(
+        <div key={i} style={{display:'flex',gap:16,marginBottom:22}}>
+          <div style={{width:34,height:34,borderRadius:'50%',background:'#1d1d1f',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:13,flexShrink:0}}>{i+1}</div>
+          <div><div style={{fontWeight:700,fontSize:15,marginBottom:3}}>{t}</div><div style={{fontSize:13,color:'#6e6e73',lineHeight:1.55}}>{d}</div></div>
         </div>
       ))}
-      <button onClick={()=>go('part')} style={{...S,marginTop:16,padding:'14px 28px',borderRadius:24,border:'none',background:'#1d1d1f',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Commencer gratuitement</button>
+      <button onClick={()=>go('part')} style={{...F,marginTop:20,padding:'14px 30px',borderRadius:24,border:'none',background:'#1d1d1f',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Commencer gratuitement</button>
     </div>
-    <div style={{borderRadius:24,overflow:'hidden',boxShadow:'0 30px 80px rgba(0,0,0,0.15)'}}>
-      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80" alt="particulier" style={{width:'100%',height:480,objectFit:'cover',display:'block'}}/>
+    <div style={{borderRadius:28,overflow:'hidden',boxShadow:'0 40px 100px rgba(0,0,0,0.12)'}}>
+      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80" alt="particulier" style={{width:'100%',height:520,objectFit:'cover',display:'block'}}/>
     </div>
   </div>
 </section>
-<section style={{padding:'100px 5%',background:'#1d1d1f'}}>
+<section style={{padding:'110px 6%',background:'#1d1d1f'}}>
   <div style={{maxWidth:1100,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
-    <div style={{borderRadius:24,overflow:'hidden',boxShadow:'0 30px 80px rgba(0,0,0,0.4)'}}>
-      <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80" alt="artisan" style={{width:'100%',height:480,objectFit:'cover',display:'block'}}/>
+    <div style={{borderRadius:28,overflow:'hidden',boxShadow:'0 40px 100px rgba(0,0,0,0.5)'}}>
+      <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=80" alt="artisan" style={{width:'100%',height:520,objectFit:'cover',display:'block'}}/>
     </div>
     <div>
-      <div style={{fontSize:12,fontWeight:700,color:'#FF6F00',letterSpacing:1.5,marginBottom:16}}>POUR LES ARTISANS</div>
-      <h2 style={{fontSize:'clamp(32px,4vw,52px)',fontWeight:900,letterSpacing:'-2px',lineHeight:1.1,marginBottom:20,color:'#fff'}}>Plus de clients,<br/>moins de demarches</h2>
-      <p style={{fontSize:16,color:'rgba(255,255,255,0.5)',lineHeight:1.7,marginBottom:32}}>Recevez des leads ultra-qualifies directement dans votre zone d intervention. Notre IA selectionne uniquement les projets qui correspondent a vos specialites.</p>
-      {[['Profil pro complet','Specialites, zone, documents — tout centralise.'],['Leads qualifies par IA','Fini le demarchage. Les clients viennent a vous.'],['Dashboard de suivi','Confirmez vos RDV et gerez votre activite.']].map(([t,d],i)=>(
-        <div key={i} style={{display:'flex',gap:16,marginBottom:20}}>
-          <div style={{width:32,height:32,borderRadius:'50%',background:'#FF6F00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:13,flexShrink:0}}>{i+1}</div>
-          <div><div style={{fontWeight:700,fontSize:15,marginBottom:2,color:'#fff'}}>{t}</div><div style={{fontSize:13,color:'rgba(255,255,255,0.45)',lineHeight:1.5}}>{d}</div></div>
+      <div style={{fontSize:11,fontWeight:700,color:'#FF6F00',letterSpacing:2,marginBottom:18,textTransform:'uppercase'}}>Pour les artisans</div>
+      <h2 style={{fontSize:'clamp(32px,4vw,54px)',fontWeight:900,letterSpacing:'-2px',lineHeight:1.08,marginBottom:22,color:'#fff'}}>Plus de clients,<br/>moins de demarches</h2>
+      <p style={{fontSize:16,color:'rgba(255,255,255,0.48)',lineHeight:1.75,marginBottom:36}}>Recevez des leads qualifies directement dans votre zone. Nous selectionnons uniquement les projets qui correspondent a vos specialites.</p>
+      {[['Profil professionnel complet','Specialites, zone, documents centralises.'],['Leads qualifies','Les clients viennent a vous. Fini le demarchage.'],['Dashboard de suivi','Confirmez vos RDV et gerez votre activite.']].map(([t,d],i)=>(
+        <div key={i} style={{display:'flex',gap:16,marginBottom:22}}>
+          <div style={{width:34,height:34,borderRadius:'50%',background:'#FF6F00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:13,flexShrink:0}}>{i+1}</div>
+          <div><div style={{fontWeight:700,fontSize:15,marginBottom:3,color:'#fff'}}>{t}</div><div style={{fontSize:13,color:'rgba(255,255,255,0.42)',lineHeight:1.55}}>{d}</div></div>
         </div>
       ))}
-      <button onClick={()=>go('pro')} style={{...S,marginTop:16,padding:'14px 28px',borderRadius:24,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Rejoindre la plateforme</button>
+      <button onClick={()=>go('pro')} style={{...F,marginTop:20,padding:'14px 30px',borderRadius:24,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer'}}>Rejoindre la plateforme</button>
     </div>
   </div>
 </section>
-<section style={{padding:'100px 5%',background:'#f5f5f7'}}>
+<section style={{padding:'110px 6%',background:'#f5f5f7'}}>
   <div style={{maxWidth:1100,margin:'0 auto'}}>
-    <div style={{textAlign:'center',marginBottom:64}}>
-      <h2 style={{fontSize:'clamp(32px,4vw,52px)',fontWeight:900,letterSpacing:'-2px',marginBottom:12}}>Actualites travaux</h2>
-      <p style={{fontSize:16,color:'#6e6e73'}}>Generees par IA — actualisees chaque jour</p>
+    <div style={{marginBottom:64}}>
+      <h2 style={{fontSize:'clamp(32px,4vw,54px)',fontWeight:900,letterSpacing:'-2px',marginBottom:8}}>Actualites travaux</h2>
+      <p style={{fontSize:16,color:'#6e6e73'}}>Les dernieres nouvelles du secteur</p>
     </div>
-    {newsLoading?(
+    {artLoading?(
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}}>
-        {[1,2,3].map(i=><div key={i} style={{borderRadius:20,background:'#e8e8ed',height:360,animation:'pulse 1.5s infinite'}}/>)}
+        {[1,2,3].map(i=><div key={i} style={{borderRadius:20,background:'#e8e8ed',height:380,animation:'pulse 1.5s infinite'}}/>)}
       </div>
     ):(
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}}>
-        {news.map((a,i)=>(
-          <div key={i} style={{borderRadius:20,overflow:'hidden',background:'#fff',boxShadow:'0 4px 24px rgba(0,0,0,0.07)',transition:'transform .3s',cursor:'default'}}>
-            <div style={{height:200,overflow:'hidden',position:'relative'}}>
-              <img src={'https://images.unsplash.com/photo-'+(i===0?'1581858726788-75bc0f6a952d':i===1?'1556909114-f6e7ad7d3136':'1504307651254-35680f356dfd')+'?w=600&q=80'} alt={a.titre} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-              <div style={{position:'absolute',top:12,left:12,background:'rgba(255,111,0,0.9)',color:'#fff',fontSize:10,fontWeight:700,padding:'4px 10px',borderRadius:99,letterSpacing:1}}>{a.tag}</div>
-            </div>
+        {arts.map((a,i)=>(
+          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{borderRadius:20,overflow:'hidden',background:'#fff',boxShadow:'0 4px 24px rgba(0,0,0,0.07)',textDecoration:'none',display:'block'}}>
+            <div style={{height:210,overflow:'hidden'}}><img src={a.urlToImage} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.src='https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80';}}/></div>
             <div style={{padding:24}}>
-              <div style={{fontWeight:800,fontSize:16,marginBottom:8,color:'#1d1d1f',lineHeight:1.3}}>{a.titre}</div>
-              <div style={{fontSize:13,color:'#6e6e73',lineHeight:1.6}}>{a.resume}</div>
+              <div style={{fontSize:10,fontWeight:700,color:'#FF6F00',letterSpacing:1.5,marginBottom:8,textTransform:'uppercase'}}>{a.source&&a.source.name?a.source.name:'Actualite'}</div>
+              <div style={{fontWeight:800,fontSize:15,marginBottom:8,color:'#1d1d1f',lineHeight:1.3}}>{a.title&&a.title.length>75?a.title.slice(0,75)+'...':a.title}</div>
+              <div style={{fontSize:13,color:'#6e6e73',lineHeight:1.6}}>{a.description&&a.description.length>110?a.description.slice(0,110)+'...':a.description}</div>
+              <div style={{fontSize:12,color:'#FF6F00',fontWeight:700,marginTop:14}}>Lire l article</div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     )}
   </div>
 </section>
-<section style={{padding:'100px 5%',background:'#1d1d1f',textAlign:'center'}}>
-  <div style={{maxWidth:700,margin:'0 auto'}}>
-    <h2 style={{fontSize:'clamp(36px,5vw,64px)',fontWeight:900,letterSpacing:'-2.5px',color:'#fff',marginBottom:16,lineHeight:1.05}}>Pret a transformer votre habitat ?</h2>
-    <p style={{fontSize:18,color:'rgba(255,255,255,0.45)',marginBottom:44,lineHeight:1.6}}>Gratuit pour les particuliers. Des artisans verifies sous 24h.</p>
+<section style={{padding:'110px 6%',background:'#1d1d1f',textAlign:'center'}}>
+  <div style={{maxWidth:720,margin:'0 auto'}}>
+    <h2 style={{fontSize:'clamp(36px,5.5vw,72px)',fontWeight:900,letterSpacing:'-3px',color:'#fff',marginBottom:18,lineHeight:1.05}}>Pret a transformer votre habitat ?</h2>
+    <p style={{fontSize:18,color:'rgba(255,255,255,0.4)',marginBottom:48,lineHeight:1.65}}>Gratuit pour les particuliers. Des artisans verifies sous 24h.</p>
     <div style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap'}}>
-      <button onClick={()=>go('part')} style={{...S,padding:'16px 36px',borderRadius:30,border:'none',background:'#FF6F00',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 20px rgba(255,111,0,0.4)'}}>Deposer une demande</button>
-      <button onClick={()=>go('pro')} style={{...S,padding:'16px 36px',borderRadius:30,border:'2px solid rgba(255,255,255,0.25)',background:'transparent',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer'}}>Espace artisan</button>
+      <button onClick={()=>go('part')} style={{...F,padding:'17px 38px',borderRadius:30,border:'none',background:'#FF6F00',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 6px 24px rgba(255,111,0,0.4)'}}>Deposer une demande</button>
+      <button onClick={()=>go('pro')} style={{...F,padding:'17px 38px',borderRadius:30,border:'2px solid rgba(255,255,255,0.22)',background:'transparent',color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer'}}>Espace artisan</button>
     </div>
   </div>
 </section>
-<footer style={{background:'#000',padding:'40px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:16}}>
+<footer style={{background:'#000',padding:'44px 6%',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:16}}>
   <span style={{fontSize:17,fontWeight:900,color:'#fff'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
-  <div style={{display:'flex',gap:24,fontSize:13,color:'rgba(255,255,255,0.3)'}}>
+  <div style={{display:'flex',gap:28,fontSize:13,color:'rgba(255,255,255,0.28)'}}>
     <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
     <span style={{cursor:'pointer'}}>Mentions legales</span>
     <span style={{cursor:'pointer'}}>CGU</span>
   </div>
-  <span style={{fontSize:12,color:'rgba(255,255,255,0.15)'}}>2025 Click&fix. Tous droits reserves.</span>
+  <span style={{fontSize:12,color:'rgba(255,255,255,0.14)'}}>2025 Click&fix. Tous droits reserves.</span>
 </footer>
 </div>
 );
 }
+
 // 
 //  AUTH
 // 
