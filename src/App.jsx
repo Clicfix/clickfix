@@ -371,71 +371,58 @@ function FaqItem({q,a}){const [open,setOpen]=React.useState(false);return(<div s
         {articles.map((a,i)=>(
           <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{borderRadius:16,overflow:'hidden',background:'#f5f5f7',textDecoration:'none',display:'block',transition:'transform .3s'}}>
             <div style={{height:180,overflow:'hidden'}}>
-              <img src={a.urlToImage} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .4s'}} onError={e=>{e.target.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80';}}/>
-            </div>
-            <div style={{padding:20}}>
-              <p style={{fontSize:11,fontWeight:600,color:'#FF6F00',letterSpacing:2,marginBottom:8,textTransform:'uppercase',margin:'0 0 8px'}}>{a.source&&a.source.name?a.source.name:'Actualité'}</p>
-              <p style={{fontWeight:700,fontSize:14,marginBottom:8,color:'#1d1d1f',lineHeight:1.35,margin:'0 0 8px'}}>{a.title&&a.title.length>70?a.title.slice(0,70)+'…':a.title}</p>
-              <p style={{fontSize:12,color:'#6e6e73',lineHeight:1.55,margin:'0 0 14px'}}>{a.description&&a.description.length>100?a.description.slice(0,100)+'…':a.description}</p>
-              <p style={{fontSize:12,color:'#FF6F00',fontWeight:600,margin:0}}>Lire l&apos;article →</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    )}
-  </div>
-</section>
+function PartHome({ctx}){
+const s=ctx.sess;
+const [tab,setTab]=useState("demandes");
+const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed");
+const TABS=[{id:"demandes",ico:"",label:"Mes demandes"},{id:"rdv",ico:"",label:"RDV confirmes"},{id:"profil",ico:"",label:"Mon profil"}];
+return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
+<BgFx/>
+<div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
+<div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
+<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
+<button onClick={()=>ctx.setPage("part-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
+{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
+<div style={{flex:1}}/>
+<button onClick={()=>ctx.logout()} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.25)",fontSize:13,cursor:"pointer",textAlign:"left"}}>Deconnexion</button>
+</div>
+<div style={{flex:1,padding:"32px 24px",zIndex:2,overflowY:"auto"}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:22}}>
+<StatCard icon="" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
+<StatCard icon="" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
+</div>
+{tab==="demandes"&&<div style={S.card}>
+<ST>Mes demandes de devis</ST>
+{ctx.myLeadsPart.length===0
+?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("part-lead")}/>
+:ctx.myLeadsPart.map(l=>(<div key={l.id} style={S.leadRow}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}{l.precision&&<span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}> — {l.precision}</span>}</div>
+<SBadge s={l.statut}/>
+</div>
+<div style={{color:"rgba(255,255,255,0.36)",fontSize:12,marginTop:6,display:"flex",flexWrap:"wrap",gap:12}}>
+{l.budget&&<span> {l.budget}</span>}{l.surface&&<span> {l.surface}</span>}{l.ville&&<span> {l.ville}</span>}
+</div>
+<div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4}}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
+</div>))}
+</div>}
+{tab==="rdv"&&<div style={S.card}>
+<ST>Rendez-vous confirmes</ST>
+{confirmed.length===0
+?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
+:confirmed.map(l=>(<div key={l.id} style={{...S.leadRow,border:"1px solid rgba(34,197,94,0.2)"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
+<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}</div><SBadge s={l.statut}/>
+</div>
+{l.heure&&<div style={{color:"#38bdf8",fontSize:12,marginTop:4}}> {l.heure}</div>}
+{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+</div>))}
+</div>}
+{tab==="profil"&&<PartProfilTab s={s} ctx={ctx}/>}
+</div>
+</div>);
+}
 
-<section style={{padding:'100px 48px',background:'#1d1d1f'}}>
-  <div style={{maxWidth:980,margin:'0 auto'}}>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:2}}>
-      {[['400 000','artisans en France'],['24h','délai d\'intervention moyen'],['0 €','pour les particuliers'],['100%','artisans vérifiés']].map(([n,l],i)=>(
-        <div key={i} style={{padding:'40px 32px',borderRight:i<3?'0.5px solid rgba(255,255,255,0.08)':'none',textAlign:'center'}}>
-          <div style={{fontSize:'clamp(36px,4vw,56px)',fontWeight:800,color:'#fff',letterSpacing:'-2px',marginBottom:8}}>{n}</div>
-          <div style={{fontSize:14,color:'rgba(255,255,255,0.38)',fontWeight:400,lineHeight:1.4}}>{l}</div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-<section style={{padding:'100px 48px',background:'#f5f5f7'}}>
-  <div style={{maxWidth:980,margin:'0 auto'}}>
-    <div style={{marginBottom:64}}>
-      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8}}>Tous nos métiers</h2>
-      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Des professionnels qualifiés pour chaque type de travaux</p>
-    </div>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:'rgba(0,0,0,0.06)',borderRadius:16,overflow:'hidden'}}>
-      {[['Plomberie & Sanitaires','Fuites, installation, salle de bain, chauffe-eau, débouchage'],['Électricité','Tableau, prises, domotique, borne de recharge, alarme'],['Chauffage & Énergie','Chaudière, climatisation, pompe à chaleur, panneaux solaires'],['Menuiserie & Fenêtres','Fenêtres, portes, volets, portail, véranda, escaliers'],['Maçonnerie & Gros œuvre','Construction, extension, démolition, terrassement, ravalement'],['Peinture & Décoration','Peinture, enduit, papier peint, faux plafond, décoration'],['Toiture & Charpente','Toiture, tuiles, zinguerie, étanchéité, Velux, gouttières'],['Isolation & Combles','Isolation combles, murs, sols, VMC, traitement humidité'],['Carrelage & Sol','Parquet, carrelage, béton ciré, vinyle, sous-couche'],['Serrurerie & Sécurité','Serrure, blindage, porte blindée, coffre-fort, dépannage'],['Jardinage & Extérieur','Terrasse, jardin, élagage, paysagisme, allée, clôture'],['Cuisine & Aménagement','Cuisine équipée, dressing, rangements, agencement intérieur']].map(([t,d],i)=>(
-        <div key={i} style={{background:'#fff',padding:'24px 28px'}}>
-          <div style={{fontWeight:700,fontSize:15,marginBottom:6,color:'#1d1d1f'}}>{t}</div>
-          <div style={{fontSize:12,color:'#6e6e73',lineHeight:1.5}}>{d}</div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-<section style={{padding:'100px 48px',background:'#fff'}}>
-  <div style={{maxWidth:700,margin:'0 auto'}}>
-    <div style={{marginBottom:64}}>
-      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8}}>Questions fréquentes</h2>
-      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Tout ce que vous devez savoir</p>
-    </div>
-    {[['Est-ce vraiment gratuit pour les particuliers ?','Oui, totalement gratuit. Déposez votre demande, recevez des artisans vérifiés et confirmez votre RDV sans aucun frais. Click&fix est financé par les abonnements des artisans.'],['Comment sont vérifiés les artisans ?','Chaque artisan doit fournir son numéro SIRET, son attestation d\'assurance décennale et ses justificatifs professionnels. Notre équipe valide chaque dossier manuellement avant activation.'],['Sous quel délai vais-je être contacté ?','Votre demande est envoyée immédiatement aux artisans qualifiés de votre zone. Vous recevez généralement une réponse sous 24h, souvent bien moins.'],['Que faire si l\'artisan ne convient pas ?','Vous n\'êtes jamais engagé avant d\'avoir accepté un devis. Si l\'artisan ne convient pas, nous en envoyons un autre. Votre satisfaction est notre priorité.']].map(([q,a],i)=>(<FaqItem key={i} q={q} a={a}/>))}
-  </div>
-</section>
-
-<section style={{padding:'120px 48px',background:'#1d1d1f',textAlign:'center'}}>
-  <div style={{maxWidth:640,margin:'0 auto'}}>
-    <h2 style={{fontSize:'clamp(32px,4.5vw,60px)',fontWeight:800,letterSpacing:'-2.5px',color:'#fff',marginBottom:16,lineHeight:1.08}}>Prêt à transformer votre habitat ?</h2>
-    <p style={{fontSize:17,color:'rgba(255,255,255,0.38)',marginBottom:44,lineHeight:1.65,fontWeight:300}}>Gratuit pour les particuliers. Des artisans vérifiés sous 24h.</p>
-    <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-      <button onClick={()=>go('part')} style={{...F,padding:'15px 32px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:600,cursor:'pointer'}}>Déposer une demande</button>
-      <button onClick={()=>go('pro')} style={{...F,padding:'15px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.2)',background:'transparent',color:'rgba(255,255,255,0.8)',fontSize:15,fontWeight:500,cursor:'pointer'}}>Espace artisan</button>
-    </div>
-  </div>
-</section>
-
-<footer style={{background:'#000',padding:'36px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
   <span style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.3px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
   <div style={{display:'flex',gap:24,fontSize:12,color:'rgba(255,255,255,0.25)'}}>
   const [profile,setProfile]=useState(s);
@@ -499,6 +486,7 @@ function PackTab({ s, ctx }) {
 function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){onChange(v);if(v.length<2){setSugg([]);return;}fetch("https://geo.api.gouv.fr/communes?nom="+encodeURIComponent(v)+"\&fields=nom,codesPostaux,centre\&limit=5\&boost=population").then(r=>r.json()).then(d=>{setSugg(d||[]);setShow(true);}).catch(()=>{});}function pick(c){const cp=c.codesPostaux?.[0]||"";const lat=c.centre?.coordinates?.[1]||null;const lon=c.centre?.coordinates?.[0]||null;onSelect({ville:c.nom,code_postal:cp,lat,lon});setSugg([]);setShow(false);}return(<div style={{position:"relative",gridColumn:"1/-1"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>{label}</label><input value={value} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: Paris, Lyon, Marseille..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((c,i)=><div key={i} onClick={()=>pick(c)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:14}} onMouseDown={e=>e.preventDefault()}>{c.nom} <span style={{color:"rgba(255,255,255,0.4)",fontSize:12}}>({c.codesPostaux?.[0]})</span></div>)}</div>}</div>);}
 function AddressInput({form,setForm,onValidate}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setForm(f=>({...f,adresse:v}));if(onValidate)onValidate(false);if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5\&type=housenumber").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(f){const p=f.properties;setForm(prev=>({...prev,adresse:p.name||p.label,ville:p.city||"",code_postal:p.postcode||"",lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);if(onValidate)onValidate(true);}return(<div style={{gridColumn:"1/-1",position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse du chantier *</label><input value={form.adresse} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((f,i)=><div key={i} onClick={()=>pick(f)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{f.properties.label}</div>)}</div>}{form.ville&&<div style={{marginTop:6,fontSize:12,color:"rgba(255,255,255,0.4)"}}>{form.ville} {form.code_postal}</div>}</div>);}
 if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
+function PartProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",email:s?.email||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{...S.card,maxWidth:480}}><ST>Mon profil</ST><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Email" v={f.email} set={()=>{}}/></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
 if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
 if (isPro) {
