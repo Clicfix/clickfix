@@ -381,7 +381,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 <div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
 <div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
 <div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
-<button onClick={()=>ctx.setPage("part-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
+<button onClick={()=>ctx.setPage("ai-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
 {TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
 <div style={{flex:1}}/>
 <button onClick={()=>ctx.logout()} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.25)",fontSize:13,cursor:"pointer",textAlign:"left"}}>Deconnexion</button>
@@ -394,7 +394,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 {tab==="demandes"&&<div style={S.card}>
 <ST>Mes demandes de devis</ST>
 {ctx.myLeadsPart.length===0
-?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("part-lead")}/>
+?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("ai-lead")}/>
 :ctx.myLeadsPart.map(l=>(<div key={l.id} style={S.leadRow}>
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
 <div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}{l.precision&&<span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}> — {l.precision}</span>}</div>
@@ -514,6 +514,65 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
           <div style={{ display:isLogin||isAdmin?"block":"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {!isLogin&&!isAdmin&&<><Inp label="Prénom *" v={f.prenom} set={set("prenom")}/><Inp label="Nom *" v={f.nom} set={set("nom")}/></>}
             <div style={{ gridColumn:"1/-1" }}><div><Inp label="Email *" v={f.email} set={set("email")} type="email" autoComplete="new-password"/>{f.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Email invalide</div>}</div></div>
+function AILeadForm({ctx}){
+const s=ctx.sess;
+const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+( s?.prenom||"")+" ! Je suis votre assistant Click&fix. Decrivez-moi votre projet de travaux en quelques mots et je m occupe de trouver les meilleurs artisans pour vous !"}]);
+const [input,setInput]=useState("");
+const [busy,setBusy]=useState(false);
+const [done,setDone]=useState(false);
+async function send(){
+if(!input.trim()||busy)return;
+const newMsgs=[...msgs,{role:"user",content:input}];
+setMsgs(newMsgs);
+setInput("");
+setBusy(true);
+try{
+const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:`Tu es un assistant pour la plateforme Click&fix qui met en relation particuliers et artisans. Ton role est de collecter les informations du projet de travaux du client de facon naturelle et conversationnelle. Tu dois collecter: 1) Type de travaux et specialite exacte (ex: Renovation/Parquet), 2) Adresse du chantier, 3) Surface approximative, 4) Budget estimatif, 5) Disponibilites (au moins 3 creneaux). Quand tu as toutes les infos, reponds avec un JSON valide dans une balise <LEAD> contenant: {"travaux":"...","precision":"...","adresse":"...","ville":"...","surface":"...","budget":"...","slots":[{"key":"date_heure","date":"JJ/MM/AAAA","hour":"HH:MM","label":"JJ/MM/AAAA a HH:MM"}]}. Pose une question a la fois. Sois chaleureux et professionnel. Reponds en francais.`,messages:newMsgs})});
+const d=await r.json();
+const text=d.content?.[0]?.text||"";
+const leadMatch=text.match(/<LEAD>([\s\S]*?)<\/LEAD>/);
+if(leadMatch){
+try{
+const lead=JSON.parse(leadMatch[1]);
+setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! J ai bien note toutes vos informations. Je recherche maintenant les meilleurs artisans disponibles pour vous..."}]);
+await ctx.submitLead({...lead,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:lead.slots,type:lead.travaux,message:""});
+setDone(true);
+}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(/<LEAD>[\s\S]*?<\/LEAD>/,"").trim()}]);}
+}else{
+setMsgs(prev=>[...prev,{role:"assistant",content:text}]);
+}
+}catch(e){
+setMsgs(prev=>[...prev,{role:"assistant",content:"Desolee, une erreur est survenue. Reessayez."}]);
+}
+setBusy(false);
+}
+if(done)return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex",alignItems:"center",justifyContent:"center"}}><BgFx/><div style={{zIndex:2,textAlign:"center",maxWidth:480,padding:20}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><h2 style={{color:"#fff",fontSize:28,fontWeight:900,marginBottom:12}}>Demande envoyee !</h2><p style={{color:"rgba(255,255,255,0.5)",marginBottom:28}}>Nous recherchons les meilleurs artisans pour votre projet. Vous serez contacte sous 24h.</p><BigBtn onClick={()=>ctx.setPage("part-home")}>Voir mes demandes</BigBtn></div></div>);
+return(
+<div style={{minHeight:"100vh",background:"#07090f",display:"flex",flexDirection:"column"}}>
+<BgFx/>
+<div style={{zIndex:2,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+<div style={{display:"flex",alignItems:"center",gap:10}}>
+<button onClick={()=>ctx.setPage("part-home")} style={{background:"transparent",border:"none",color:"rgba(255,255,255,0.4)",fontSize:20,cursor:"pointer"}}>←</button>
+<div style={{color:"#fff",fontWeight:700}}>Assistant Click&fix</div>
+</div>
+<div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
+</div>
+<div style={{flex:1,overflowY:"auto",padding:"20px",display:"flex",flexDirection:"column",gap:12,zIndex:2}}>
+{msgs.map((m,i)=>(
+<div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
+<div style={{maxWidth:"80%",padding:"12px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",background:m.role==="user"?"linear-gradient(135deg,#38bdf8,#0ea5e9)":"rgba(255,255,255,0.07)",color:"#fff",fontSize:14,lineHeight:1.6}}>{m.content}</div>
+</div>
+))}
+{busy&&<div style={{display:"flex",justifyContent:"flex-start"}}><div style={{padding:"12px 16px",borderRadius:"18px 18px 18px 4px",background:"rgba(255,255,255,0.07)",color:"rgba(255,255,255,0.5)",fontSize:14}}>...</div></div>}
+</div>
+<div style={{zIndex:2,padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}>
+<input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ecrivez votre message..." style={{flex:1,background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,outline:"none"}}/>
+<button onClick={send} disabled={busy||!input.trim()} style={{padding:"12px 20px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Envoyer</button>
+</div>
+</div>
+);
+}
+
             {!isLogin&&!isAdmin&&<>
               <div><Inp label="Telephone *" v={f.tel} set={set("tel")} type="tel"/>{f.tel&&!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Ex: 0612345678</div>}</div>
   const [adresseOk,setAdresseOk]=useState(false);
