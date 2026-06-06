@@ -12,27 +12,14 @@ if(t==="checkout.session.completed"){
 const email=obj?.customer_email||obj?.customer_details?.email;
 const pack=AMOUNTS[obj?.amount_total];
 if(email&&pack){
-const profRes=await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email)+"&select=pack,rdv_restants,rdv_total,prenom,packs_history,specialites",{headers:H});
-const profs=await profRes.json();
-const current=profs?.[0];
-const now=new Date().toISOString();
-const renewDate=new Date(Date.now()+30*24*60*60*1000).toISOString();
-const newEntry={name:pack.name,rdv:pack.rdv,prix:pack.prix,date_achat:now,date_renouvellement:pack.abonnement?renewDate:null,abonnement:pack.abonnement,specialites:current?.specialites||[]};
-const history=current?.packs_history||[];
-history.push(newEntry);
-let update={statut_paiement:"actif",packs_history:history};
-if(pack.name==="Decouverte"&&current?.pack&&(current.pack==="Pro"||current.pack==="Elite")){
-update.rdv_restants=(current.rdv_restants||0)+pack.rdv;
-update.rdv_total=(current.rdv_total||0)+pack.rdv;
-}else{
-update.pack=pack.name;
-update.rdv_restants=pack.rdv;
-update.rdv_total=pack.total;
-}
-await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email),{method:"PATCH",headers:H,body:JSON.stringify(update)});
-await fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"pack_active",to:email,data:{prenom:current?.prenom||"",pack_name:pack.name,pack_rdv:pack.rdv,pack_prix:pack.prix,pack_par:pack.par,abonnement:pack.abonnement}})});
+await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email),{method:"PATCH",headers:H,body:JSON.stringify({statut_paiement:"actif",pack:pack.name,rdv_restants:pack.rdv,rdv_total:pack.total})});
+const profRes=await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email)+"&select=prenom",{headers:H});
+const prof=await profRes.json();
+const prenom=prof?.[0]?.prenom||"";
+await fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"pack_active",to:email,data:{prenom,pack_name:pack.name,pack_rdv:pack.rdv,pack_prix:pack.prix,pack_par:pack.par,abonnement:pack.abonnement}})});
 return res.status(200).json({ok:true,email,pack:pack.name});
-}}
+}
+}
 if(t==="customer.subscription.deleted"){
 const em=obj?.customer_email;
 if(em)await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(em),{method:"PATCH",headers:H,body:JSON.stringify({statut_paiement:"expire",pack:null,rdv_restants:0})});

@@ -258,7 +258,7 @@ setBusy(false);
 // 
 //  HOME
 // 
-function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
+function FaqItem({q,a}){const [open,setOpen]=React.useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
   const [scrollY,setScrollY]=useState(0);
   const [articles,setArticles]=useState([]);
   const [artLoading,setArtLoading]=useState(true);
@@ -403,7 +403,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
       <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8}}>Tous nos métiers</h2>
       <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Des professionnels qualifiés pour chaque type de travaux</p>
     </div>
-    <div style={{columns:2,gap:40}}>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:'rgba(0,0,0,0.06)',borderRadius:16,overflow:'hidden'}}>
       {[['Plomberie & Sanitaires','Fuites, installation, salle de bain, chauffe-eau, débouchage'],['Électricité','Tableau, prises, domotique, borne de recharge, alarme'],['Chauffage & Énergie','Chaudière, climatisation, pompe à chaleur, panneaux solaires'],['Menuiserie & Fenêtres','Fenêtres, portes, volets, portail, véranda, escaliers'],['Maçonnerie & Gros œuvre','Construction, extension, démolition, terrassement, ravalement'],['Peinture & Décoration','Peinture, enduit, papier peint, faux plafond, décoration'],['Toiture & Charpente','Toiture, tuiles, zinguerie, étanchéité, Velux, gouttières'],['Isolation & Combles','Isolation combles, murs, sols, VMC, traitement humidité'],['Carrelage & Sol','Parquet, carrelage, béton ciré, vinyle, sous-couche'],['Serrurerie & Sécurité','Serrure, blindage, porte blindée, coffre-fort, dépannage'],['Jardinage & Extérieur','Terrasse, jardin, élagage, paysagisme, allée, clôture'],['Cuisine & Aménagement','Cuisine équipée, dressing, rangements, agencement intérieur']].map(([t,d],i)=>(
         <div key={i} style={{background:'#fff',padding:'24px 28px'}}>
           <div style={{fontWeight:700,fontSize:15,marginBottom:6,color:'#1d1d1f'}}>{t}</div>
