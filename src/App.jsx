@@ -982,8 +982,8 @@ function StatCard({ icon, label, val, color }) {
 }
 
 function SBadge({ s }) {
-  const ok=s==="confirmé";
-  return <span style={{ fontSize:11, fontWeight:700, padding:"3px 9px", borderRadius:99, background:ok?"rgba(34,197,94,0.1)":"rgba(251,192,5,0.1)", color:ok?"#22c55e":"#FBC005", border:`1px solid ${ok?"rgba(34,197,94,0.4)":"rgba(251,192,5,0.4)"}` }}>{ok?" Confirmé":" En attente"}</span>;
+  const ok=s==="confirme"||s==="confirmé"||s==="confirmed";const dispatche=s==="dispatche";
+  return <span style={{ fontSize:11, fontWeight:700, padding:"3px 9px", borderRadius:99, background:ok?"rgba(34,197,94,0.1)":dispatche?"rgba(56,189,248,0.1)":"rgba(251,192,5,0.1)", color:ok?"#22c55e":dispatche?"#38bdf8":"#FBC005", border:`1px solid ${ok?"rgba(34,197,94,0.4)":"rgba(251,192,5,0.4)"}` }}>{ok?"Confirmé":dispatche?"Artisan trouvé":"En attente"}</span>;
 }
 
 function ST({ children }) { return <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,0.3)", letterSpacing:1, textTransform:"uppercase", marginBottom:14 }}>{children}</div>; }
