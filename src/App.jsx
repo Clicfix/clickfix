@@ -258,7 +258,7 @@ setBusy(false);
 // 
 //  HOME
 // 
-function FaqItem({q,a}){const [open,setOpen]=React.useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
+function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
   const [scrollY,setScrollY]=useState(0);
   const [articles,setArticles]=useState([]);
   const [artLoading,setArtLoading]=useState(true);
