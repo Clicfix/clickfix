@@ -375,7 +375,7 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 //  PARTICULIER HOME
 // 
 function PartHome({ctx}){
-const s=ctx.sess;
+const [selLead,setSelLead]=useState(null);const s=ctx.sess;
 const [tab,setTab]=useState("demandes");
 const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed");
 const TABS=[{id:"demandes",ico:"",label:"Mes demandes"},{id:"rdv",ico:"",label:"RDV confirmes"},{id:"profil",ico:"",label:"Mon profil"}];
@@ -398,7 +398,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 <ST>Mes demandes de devis</ST>
 {ctx.myLeadsPart.length===0
 ?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("ai-lead")}/>
-:ctx.myLeadsPart.map(l=>(<div key={l.id} style={S.leadRow}>
+:ctx.myLeadsPart.map(l=>(<div key={l.id} onClick={()=>setSelLead(selLead?.id===l.id?null:l)} style={{...S.leadRow,cursor:"pointer"}}>
 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
 <div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}{l.precision&&<span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}> — {l.precision}</span>}</div>
 <SBadge s={l.statut}/>
@@ -407,7 +407,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 {l.budget&&<span> {l.budget}</span>}{l.surface&&<span> {l.surface}</span>}{l.ville&&<span> {l.ville}</span>}
 </div>
 <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4}}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
-</div>))}
+{selLead?.id===l.id&&<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.07)",display:"grid",gap:6}}>{[["Specialite",l.precision],["Details",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville+" "+l.code_postal],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&<div key={k} style={{display:"flex",gap:8}}><span style={{color:"rgba(255,255,255,0.35)",fontSize:12,minWidth:90,flexShrink:0}}>{k}</span><span style={{color:"#fff",fontSize:12}}>{v}</span></div>)}</div>}</div>))}
 </div>}
 {tab==="rdv"&&<div style={S.card}>
 <ST>Rendez-vous confirmes</ST>
