@@ -50,7 +50,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 //  ROOT APP
 // 
 export default function App() {
-  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
+  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);if(params.get("welcome")==="1"&&s)return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess"));
   useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
@@ -251,6 +251,7 @@ setBusy(false);
       {page==="pro-docs"      && <ProDocs      ctx={ctx} />}
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
       {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
+      {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
       {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
     </div>
   );
@@ -637,6 +638,54 @@ function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useStat
 function AddressInput({form,setForm,onValidate}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setForm(f=>({...f,adresse:v}));if(onValidate)onValidate(false);if(onValidate)onValidate(false);if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5\&type=housenumber").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(f){const p=f.properties;setForm(prev=>({...prev,adresse:p.name||p.label,ville:p.city||"",code_postal:p.postcode||"",lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);if(onValidate)onValidate(true);}return(<div style={{gridColumn:"1/-1",position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse du chantier *</label><input value={form.adresse} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((f,i)=><div key={i} onClick={()=>pick(f)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{f.properties.label}</div>)}</div>}{form.ville&&<div style={{marginTop:6,fontSize:12,color:"rgba(255,255,255,0.4)"}}>{form.ville} {form.code_postal}</div>}</div>);}
 function ProAddressInput({f,setF}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setF(p=>({...p,ville_intervention:v,lat:null,lon:null}));if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(ft){const p=ft.properties;setF(prev=>({...prev,ville_intervention:p.city||p.name,lat:ft.geometry?.coordinates?.[1]||null,lon:ft.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);}return(<div style={{position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse entreprise *</label><input value={f.ville_intervention||""} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((ft,i)=><div key={i} onClick={()=>pick(ft)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{ft.properties.label}</div>)}</div>}{f.ville_intervention&&f.lat&&<div style={{marginTop:6,fontSize:12,color:"#22c55e"}}>Adresse validee</div>}</div>);}
 function PartProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",email:s?.email||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{...S.card,maxWidth:480}}><ST>Mon profil</ST><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Email" v={f.email} set={()=>{}}/></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
+
+function PackWelcome({ ctx }) {
+  const s=ctx.sess;
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
+      <BgFx/>
+      <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
+        <div style={{fontSize:72,marginBottom:16}}>🎉</div>
+        <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
+        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{s?.prenom}</strong> !</p>
+        <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
+        <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
+          <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
+          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{s?.pack}</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{s?.rdv_restants||0} RDV disponibles</div>
+        </div>
+        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
+          Accéder à mon Dashboard →
+        </BigBtn>
+      </div>
+    </div>
+  );
+}
+
+
+function PackWelcome({ ctx }) {
+  const s=ctx.sess;
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
+      <BgFx/>
+      <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
+        <div style={{fontSize:72,marginBottom:16}}>🎉</div>
+        <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
+        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{s?.prenom}</strong> !</p>
+        <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
+        <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
+          <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
+          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{s?.pack}</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{s?.rdv_restants||0} RDV disponibles</div>
+        </div>
+        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
+          Accéder à mon Dashboard →
+        </BigBtn>
+      </div>
+    </div>
+  );
+}
+
 function ArtisanInfo({ id }) {
 const [pro,setPro] = useState(null);
 useEffect(()=>{
