@@ -534,7 +534,9 @@ function confirmAddr(){if(!addrOk){alert("Selectionnez une adresse dans la liste
 async function submitWithSlots(){if(slots.length<3){alert("Minimum 3 creneaux");return;}await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,message:""});setDone(true);}
 async function send(){if(!input.trim()||busy)return;const newMsgs=[...msgs,{role:"user",content:input}];setMsgs(newMsgs);setInput("");setBusy(true);try{const r=await fetch("/api/ai-chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:newMsgs,prenom:s?.prenom})});const d=await r.json();const text=d.text||"";const tag="LEAD";const re=new RegExp("<"+tag+">(.*?)<\/"+tag+">","s");const leadMatch=text.match(re);if(leadMatch){try{const lead=JSON.parse(leadMatch[1]);setLeadData(lead);setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! Entrez l adresse exacte du chantier."}]);setShowAddr(true);}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(re,"").trim()}]);}}else{setMsgs(prev=>[...prev,{role:"assistant",content:text}]);}}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:"Erreur. Reessayez."}]);}setBusy(false);}
 async function submitWithSlots(){if(slots.length<3){alert("Minimum 3 creneaux");return;}setShowCal(false);setShowRecap(true);}
-async function confirmAndSend(){await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,nb_artisans:leadData.nb_artisans||3,details:leadData.details||"",message:""});setDone(true);}return(
+async function confirmAndSend(){await ctx.submitLead({...leadData,...addrForm,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:slots,type:leadData.travaux,nb_artisans:leadData.nb_artisans||3,details:leadData.details||"",message:""});setDone(true);}
+return(
+
 <div style={{minHeight:"100vh",background:"#07090f",display:"flex",flexDirection:"column"}}>
 <BgFx/>
 <div style={{zIndex:2,display:"flex",alignItems:"center",gap:10,padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
