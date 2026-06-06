@@ -496,6 +496,7 @@ function PackTab({ s, ctx }) {
   );
 }
 
+function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){onChange(v);if(v.length<2){setSugg([]);return;}fetch("https://geo.api.gouv.fr/communes?nom="+encodeURIComponent(v)+"\&fields=nom,codesPostaux,centre\&limit=5\&boost=population").then(r=>r.json()).then(d=>{setSugg(d||[]);setShow(true);}).catch(()=>{});}function pick(c){const cp=c.codesPostaux?.[0]||"";const lat=c.centre?.coordinates?.[1]||null;const lon=c.centre?.coordinates?.[0]||null;onSelect({ville:c.nom,code_postal:cp,lat,lon});setSugg([]);setShow(false);}return(<div style={{position:"relative",gridColumn:"1/-1"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>{label}</label><input value={value} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: Paris, Lyon, Marseille..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((c,i)=><div key={i} onClick={()=>pick(c)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:14}} onMouseDown={e=>e.preventDefault()}>{c.nom} <span style={{color:"rgba(255,255,255,0.4)",fontSize:12}}>({c.codesPostaux?.[0]})</span></div>)}</div>}</div>);}
 if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
 if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
@@ -688,7 +689,6 @@ function PackWelcome({ ctx }) {
         <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
         <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
           <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
-          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{profile?.pack}</div>
           <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
         </div>
         <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
