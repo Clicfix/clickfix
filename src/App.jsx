@@ -267,7 +267,7 @@ function HomePage({ ctx }) {
     window.addEventListener('scroll',h);
     return()=>window.removeEventListener('scroll',h);
   },[]);
-  useEffect(()=>{
+  useEffect(()=>{const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));return()=>obs.disconnect();},[]);  useEffect(()=>{
     const cached=localStorage.getItem('cf_articles');
     const cachedTime=localStorage.getItem('cf_articles_time');
     if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<3600000){
@@ -291,7 +291,7 @@ function HomePage({ ctx }) {
   const F={fontFamily:"'Inter',sans-serif"};
   return(
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
-<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');html{scroll-behavior:smooth}@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}.hero-btn:hover{transform:scale(1.03);transition:transform .2s}"}</style>
+<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');html{scroll-behavior:smooth}@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.4,0,.2,1),transform .8s cubic-bezier(.4,0,.2,1)}.reveal.visible{opacity:1;transform:translateY(0)}.hero-btn:hover{transform:scale(1.03);transition:transform .2s}"}</style>
 
 <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>50?'rgba(255,255,255,0.85)':'transparent',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderBottom:scrollY>50?'0.5px solid rgba(0,0,0,0.12)':'none',transition:'all .5s cubic-bezier(.4,0,.2,1)',padding:'0 48px',height:48,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
   <span style={{fontSize:17,fontWeight:800,color:scrollY>50?'#1d1d1f':'#fff',letterSpacing:'-0.3px',transition:'color .5s'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
@@ -316,7 +316,7 @@ function HomePage({ ctx }) {
 </section>
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
-  <div style={{maxWidth:980,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:96,alignItems:'center'}}>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:96,alignItems:"center"}}>
     <div>
       <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Particuliers</p>
       <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Vos travaux,<br/>sans le stress</h2>
@@ -330,15 +330,15 @@ function HomePage({ ctx }) {
       <button onClick={()=>go('part')} style={{...F,marginTop:24,padding:'13px 28px',borderRadius:980,border:'none',background:'#1d1d1f',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Commencer gratuitement →</button>
     </div>
     <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.1)'}}>
-      <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=900&q=85" alt="renovation interieure" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85" alt="renovation interieure" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
     </div>
   </div>
 </section>
 
 <section style={{padding:'120px 48px',background:'#f5f5f7'}}>
-  <div style={{maxWidth:980,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:96,alignItems:'center'}}>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:96,alignItems:"center"}}>
     <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.12)'}}>
-      <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=900&q=85" alt="artisan professionnel" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
+      <img src="https://images.unsplash.com/photo-1588854337221-4cf9fa96059c?w=900&q=85" alt="artisan professionnel" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
     </div>
     <div>
       <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Artisans</p>
