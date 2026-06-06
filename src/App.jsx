@@ -460,6 +460,42 @@ function submit() {
 if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
 if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
 else {
+function PackTab({ s, ctx }) {
+  const [sel,setSel]=useState(null);
+  const history=(s?.packs_history||[]).slice().reverse();
+  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
+  return (
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+        <div style={{color:"#fff",fontWeight:800,fontSize:18}}>Mon Pack</div>
+        <button onClick={()=>hasMonthly?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
+      </div>
+      {history.length===0&&<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:32,textAlign:"center",color:"rgba(255,255,255,0.3)"}}>Aucun pack actif. <span style={{color:"#FF6F00",cursor:"pointer"}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack</span></div>}
+      {history.map((p,i)=>(
+        <div key={i} onClick={()=>setSel(sel===i?null:i)} style={{background:"rgba(255,111,0,0.07)",border:"1px solid "+(sel===i?"#FF6F00":"rgba(255,111,0,0.2)"),borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{color:"#FF6F00",fontWeight:800,fontSize:15}}>{p.name}</div>
+              <div style={{color:"rgba(255,255,255,0.4)",fontSize:12,marginTop:2}}>{p.rdv} RDV · {p.prix} EUR · {new Date(p.date_achat).toLocaleDateString("fr-FR")}</div>
+            </div>
+            <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.abonnement?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.abonnement?"#FF6F00":"#38bdf8"}}>{p.abonnement?"Mensuel":"Unique"}</div>
+          </div>
+          {sel===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>RDV inclus</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.rdv}</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Prix</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.prix} EUR</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Date achat</div><div style={{color:"#fff",fontWeight:700,fontSize:13}}>{new Date(p.date_achat).toLocaleDateString("fr-FR")}</div></div>
+              {p.date_renouvellement&&<div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Renouvellement</div><div style={{color:"#FF6F00",fontWeight:700,fontSize:13}}>{new Date(p.date_renouvellement).toLocaleDateString("fr-FR")}</div></div>}
+            </div>
+            {p.specialites&&p.specialites.length>0&&<div style={{marginTop:8}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginBottom:6}}>Specialites</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{p.specialites.map(sp=><span key={sp} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}</span>)}</div></div>}
+          </div>}
+        </div>
+      ))}
+      {hasMonthly&&<div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
+    </>
+  );
+}
+
 if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
 if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
@@ -849,274 +885,6 @@ if (!form.code_postal.trim()) errors.push("Code postal manquant");
           <div style={{ flex:1, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
             <div style={{ width:`${(step/(STEPS.length-1))*100}%`, height:"100%", background:"linear-gradient(90deg,#38bdf8,#0ea5e9)", borderRadius:99, transition:"width .4s" }}/>
           </div>
-          {tab==="pack"&&<>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-              <ST style={{margin:0}}>Mon Pack</ST>
-              <button onClick={()=>s?.pack&&(s.pack==="Pro"||s.pack==="Elite")?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
-            </div>
-            {s?.pack
-              ? <>
-                  {[{name:s.pack,rdv:s.rdv_restants,total:s.rdv_total,monthly:s.pack==="Pro"||s.pack==="Elite"}].map((p,i)=>(
-                    <div key={i} style={{background:"rgba(255,111,0,0.07)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
-                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                        <div>
-                          <div style={{color:"#FF6F00",fontWeight:800,fontSize:16}}>{p.name}</div>
-                          <div style={{color:"rgba(255,255,255,0.4)",fontSize:12,marginTop:2}}>{p.rdv||0} / {p.total||0} RDV restants</div>
-                        </div>
-                        <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.monthly?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.monthly?"#FF6F00":"#38bdf8",border:`1px solid ${p.monthly?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}`}}>{p.monthly?"Mensuel":"Unique"}</div>
-                      </div>
-                      <div style={{height:4,background:"rgba(255,255,255,0.07)",borderRadius:99,marginTop:10}}>
-                        <div style={{width:`${p.total>0?Math.min(100,(p.rdv/p.total)*100):0}%`,height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99}}/>
-                      </div>
-                    </div>
-                  ))}
-                  {(s.pack==="Pro"||s.pack==="Elite")&&<div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
-                </>
-              : <Empty icon="" title="Aucun pack actif" sub="Choisissez un pack pour recevoir des RDV." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
-            }
-          </>}
-              ))}
-              {(ans.type||[]).length>0&&<div style={{fontSize:12,color:"#22c55e",marginTop:8}}>{(ans.type||[]).length} specialite(s) choisie(s)</div>}
-            </div>
-          )}
-          {cur.type==="categories" && (
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
-              {TRAVAUX_CATS.map(cat=>{const active=ans.categorie===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,categorie:cat.label,catId:cat.id,type:[],precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
-                <img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-                <div style={{position:"absolute",inset:0,background:active?"rgba(255,111,0,0.55)":"rgba(0,0,0,0.45)"}}/>
-                <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"6px 4px",color:"#fff",fontSize:10,fontWeight:700,textAlign:"center"}}>{cat.label}</div>
-                {active&&<div style={{position:"absolute",top:4,right:4,width:18,height:18,background:"#FF6F00",borderRadius:"50%",fontSize:10,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}>+</div>}
-              </button>);})}
-            </div>
-          )}
-          {cur.type==="subcategories" && (
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
-              {(TRAVAUX_CATS.find(c=>c.label===ans.categorie)?.subs||[]).map(sub=>{const active=ans.precision===sub;return(<button key={sub} onClick={()=>setAns({...ans,precision:sub})} style={{background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)",border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),borderRadius:12,padding:"14px 12px",cursor:"pointer",textAlign:"left",color:active?"#FF6F00":"rgba(255,255,255,0.7)",fontSize:13,fontWeight:active?700:400}}>{sub}</button>);})}
-            </div>
-          )}
-          {cur.type==="input" && (
-            <div style={{marginBottom:22}}><input type="number" min="0" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>
-          )}
-          {cur.type==="calendar" && (
-            <CalendarPicker selected={ans.slots||[]} onChange={slots=>setAns({...ans,slots})} />
-          )}
-        {(cur.type==="multi" || cur.type==="single") && cur.type !== "input" && cur.type !== "categories" && cur.type !== "subcategories" && (
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:22 }}>
-              {cur.opts.map(opt=>{
-                const active=cur.type==="multi"?(ans[cur.id]||[]).includes(opt.label):ans[cur.id]===opt.label;
-                return (
-                  <button key={opt.label} onClick={()=>sel(opt.label)} style={{ background:active?"rgba(56,189,248,0.1)":"rgba(255,255,255,0.03)", border:`1.5px solid ${active?"#38bdf8":"rgba(255,255,255,0.08)"}`, borderRadius:12, padding:"14px 12px", cursor:"pointer", textAlign:"left", position:"relative", transition:"all .15s" }}>
-                    <div style={{ fontSize:22, marginBottom:6 }}>{opt.icon}</div>
-                    <div style={{ fontSize:13, color:"#fff", fontWeight:600, lineHeight:1.3 }}>{opt.label}</div>
-                    {active&&<span style={{ position:"absolute", top:8, right:8, width:18, height:18, background:"#38bdf8", borderRadius:"50%", fontSize:10, color:"#fff", fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center" }}></span>}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          {cur.type==="form" && (
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:22 }}>
-              {[["prenom","Prénom *","text"],["nom","Nom *","text"],["email","Email *","email"],["tel","Téléphone *","tel"]].map(([k,l,t])=>(
-                <Inp key={k} label={l} v={form[k]} set={e=>setForm({...form,[k]:e.target.value})} type={t}/>
-              ))}
-              <AddressInput form={form} setForm={setForm} onValidate={setAdresseOk}/>
-              <div style={{ gridColumn:"1/-1" }}>
-                <label style={S.lbl}>Message (optionnel)</label>
-                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Décrivez votre projet..." style={{ ...S.inp, height:72, resize:"vertical" }}/>
-              </div>
-            </div>
-          )}
-          <BigBtn style={{ background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844", opacity:canNext()?1:.4 }} disabled={!canNext()||sending} onClick={next}>
-            {sending?"Envoi en cours...":step===STEPS.length-1?" Envoyer ma demande":"Continuer "}
-          </BigBtn>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 
-//  PRO DOCS
-// 
-function ProDocs({ ctx }) {
-  return (
-    <Shell ctx={ctx} color="#FF6F00" title="Documents requis">
-      <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, lineHeight:1.75, marginBottom:24 }}>
-        Déposez vos justificatifs pour activer votre compte partenaire. Fichiers stockés de façon sécurisée. 
-      </p>
-      <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:22 }}>
-        {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
-      </div>
-      <BigBtn style={{ opacity:ctx.docsOk?1:.4 }} disabled={!ctx.docsOk} onClick={()=>ctx.setPage("pro-pricing")}>
-        {ctx.docsOk?"Choisir mon pack ":" Documents obligatoires manquants"}
-      </BigBtn>
-    </Shell>
-  );
-}
-
-function DocRow({ doc, status, onUpload }) {
-  const ref = useRef();
-  return (
-    <div style={{ display:"flex", alignItems:"center", gap:14, background:status?"rgba(34,197,94,0.05)":"rgba(255,255,255,0.03)", border:`1px solid ${status?"#22c55e":doc.oblig?"rgba(255,111,0,0.2)":"rgba(255,255,255,0.07)"}`, borderRadius:14, padding:"14px 16px", transition:"all .2s" }}>
-      <span style={{ fontSize:24 }}>{doc.icon}</span>
-      <div style={{ flex:1 }}>
-        <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:2 }}>
-          <span style={{ color:"#fff", fontWeight:700, fontSize:14 }}>{doc.label}</span>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:99, background:doc.oblig?"rgba(255,111,0,0.1)":"rgba(255,255,255,0.05)", color:doc.oblig?"#FF6F00":"rgba(255,255,255,0.3)", border:`1px solid ${doc.oblig?"rgba(255,111,0,0.2)":"rgba(255,255,255,0.07)"}` }}>{doc.oblig?"Obligatoire":"Facultatif"}</span>
-        </div>
-        <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{doc.desc}</div>
-      </div>
-      {status
-        ? <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}> Déposé</span>
-        : <><input ref={ref} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={e=>e.target.files[0]&&onUpload(doc.id,e.target.files[0])}/><button style={S.smBtn} onClick={()=>ref.current?.click()}> Déposer</button></>
-      }
-    </div>
-  );
-}
-
-// 
-//  PRO PRICING
-// 
-function ProPricing({ ctx }) {
-  const [hov,setHov]=useState(null);
-  const s=ctx.sess;
-  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite"||s.pack==="pro"||s.pack==="elite");
-  return (
-    <Shell ctx={ctx} color="#FF6F00" title="Choisissez votre pack" maxW={940}>
-      <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, textAlign:"center", marginBottom:34, lineHeight:1.7 }}>
-        RDV qualifiés livrés dans votre espace sous 48h. Sans abonnement, sans engagement.
-      </p>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18, marginBottom:28 }}>
-        {PACKS.map(p=>(
-          <div key={p.id} onMouseEnter={()=>setHov(p.id)} onMouseLeave={()=>setHov(null)}
-            style={{ position:"relative", background:hov===p.id?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)", border:`1.5px solid ${hov===p.id||p.best?p.couleur:"rgba(255,255,255,0.08)"}`, borderRadius:22, padding:"28px 22px", display:"flex", flexDirection:"column", transition:"all .22s", transform:hov===p.id?"translateY(-5px)":"none", boxShadow:hov===p.id?`0 24px 60px ${p.couleur}25`:"none" }}>
-            {p.best&&<div style={{ position:"absolute", top:-13, left:"50%", transform:"translateX(-50%)", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, color:"#fff", fontSize:11, fontWeight:800, padding:"4px 14px", borderRadius:99, letterSpacing:.5, whiteSpace:"nowrap", boxShadow:`0 4px 16px ${p.couleur}55` }}> Plus populaire</div>}
-            <div style={{ color:p.couleur, fontWeight:800, fontSize:12, letterSpacing:2, textTransform:"uppercase", marginBottom:6 }}>{p.name}</div>
-            <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12, marginBottom:18 }}>{p.tagline}</div>
-            <div style={{ display:"flex", alignItems:"flex-end", gap:4, marginBottom:2 }}>
-              <span style={{ fontSize:44, fontWeight:900, color:"#fff", lineHeight:1 }}>{p.prix.toLocaleString("fr-FR")}</span>
-              <span style={{ color:"rgba(255,255,255,0.35)", marginBottom:7, fontSize:16 }}>€</span>
-            </div>
-            <div style={{ color:p.couleur, fontSize:12, fontWeight:700, marginBottom:8 }}>{p.par}</div>
-            <div style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, display:"inline-block", marginBottom:16, background:p.abonnement?"rgba(255,111,0,0.1)":"rgba(56,189,248,0.1)", color:p.abonnement?"#FF6F00":"#38bdf8", border:`1px solid ${p.abonnement?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}` }}>{p.abonnement?" Abonnement mensuel":" Paiement unique"}</div>
-            <div style={{ background:`${p.couleur}18`, border:`1px solid ${p.couleur}33`, borderRadius:12, padding:"10px", textAlign:"center", marginBottom:22 }}>
-              <span style={{ fontSize:34, fontWeight:900, color:p.couleur }}>{p.rdv}</span>
-              <span style={{ color:"rgba(255,255,255,0.4)", fontSize:13 }}> rendez-vous</span>
-            </div>
-            {p.features.map(f=>(
-              <div key={f} style={{ display:"flex", gap:8, marginBottom:8, fontSize:13, color:"rgba(255,255,255,0.5)" }}>
-                <span style={{ color:p.couleur, flexShrink:0 }}></span>{f}
-              </div>
-            ))}
-            {hasMonthly&&p.id!=="decouverte" ? <button disabled style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,color:"rgba(255,255,255,0.3)",fontWeight:800,fontSize:14,cursor:"not-allowed",fontFamily:"Outfit,sans-serif" }}>Pack actif</button> : <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"Outfit,sans-serif",boxShadow:`0 4px 24px ${p.couleur}44`,letterSpacing:.3 }}>{p.id==="decouverte"&&hasMonthly?"+ Ajouter 5 RDV":"Choisir ce pack"}</button>}
-          </div>
-        ))}
-      </div>
-      <div style={{ textAlign:"center", color:"rgba(255,255,255,0.2)", fontSize:12 }}> Paiement sécurisé   Satisfait ou remboursé 7 jours   Support dédié</div>
-    </Shell>
-  );
-}
-
-// 
-//  PRO DASHBOARD
-// 
-function ProDashboard({ ctx }) {
-  const [tab,setTab]=useState("rdv");
-  const s=ctx.sess, rdv=ctx.myLeadsPro, conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
-  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"confirmes",ico:"",label:"RDV confirmes"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
-  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0])ctx.updateSession({...s,...d[0]});}).catch(()=>{});}},[]);
-
-  return (
-    <div style={{ display:"flex", minHeight:"100vh" }}>
-      <div style={{ width:232, background:"rgba(255,255,255,0.025)", borderRight:"1px solid rgba(255,255,255,0.055)", display:"flex", flexDirection:"column", flexShrink:0 }}>
-        <div style={{ padding:"24px 18px 16px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
-            <span style={{ fontSize:20 }}></span>
-            <span style={{ fontSize:17, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix <span style={{ fontSize:9, background:"rgba(255,111,0,0.15)", color:"#FF6F00", border:"1px solid rgba(255,111,0,0.3)", borderRadius:4, padding:"1px 5px", fontWeight:700, letterSpacing:1 }}>PRO</span></span>
-          </div>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{profile?.prenom} {s?.nom}</div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,0.24)", marginTop:1 }}>{s?.entreprise}</div>
-        </div>
-        <div style={{ padding:"10px 8px", flex:1 }}>
-          {TABS.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", textAlign:"left", padding:"10px 12px", background:tab===t.id?"rgba(255,111,0,0.12)":"transparent", border:"none", borderRadius:10, color:tab===t.id?"#FF6F00":"rgba(255,255,255,0.4)", fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:600, cursor:"pointer", marginBottom:3, transition:"all .15s" }}>
-              <span>{t.ico}</span>{t.label}
-            </button>
-          ))}
-        </div>
-        {s?.pack&&(
-          <div style={{ margin:"0 8px 8px", background:"rgba(255,111,0,0.07)", border:"1px solid rgba(255,111,0,0.17)", borderRadius:12, padding:13 }}>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,0.28)", letterSpacing:1, marginBottom:3 }}>PACK ACTIF</div>
-            <div style={{ fontSize:15, fontWeight:900, color:"#FF6F00" }}>{s.pack.name}</div>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", marginTop:1 }}>{s.rdv_restants||0}/{s.rdv_total||0} RDV</div>
-            <div style={{ marginTop:7, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
-              <div style={{ width:`${s.rdv_total>0?((s.rdv_restants||0)/s.rdv_total)*100:0}%`, height:"100%", background:"linear-gradient(90deg,#FF6F00,#FBC005)", borderRadius:99 }}/>
-            </div>
-          </div>
-        )}
-        <div style={{ padding:"0 8px 14px" }}>
-          <button onClick={ctx.logout} style={{ width:"100%", padding:"9px", background:"transparent", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, color:"rgba(255,255,255,0.22)", fontFamily:"'Outfit',sans-serif", fontSize:12, cursor:"pointer" }}> Déconnexion</button>
-        </div>
-      </div>
-
-      <div style={{ flex:1, overflow:"auto", background:"#07090f" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 28px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
-          <div>
-            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {profile?.prenom} </div>
-            <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-          </div>
-          <div style={{ display:"flex", gap:8 }}>
-            {!ctx.docsOk&&<button style={S.smBtn} onClick={()=>setTab("docs")}> Documents</button>}
-            {!s?.pack&&<button style={S.smBtn} onClick={()=>ctx.setPage("pro-pricing")}> Acheter un pack</button>}
-          </div>
-        </div>
-
-        <div style={{ padding:"24px 28px" }}>
-          {tab==="rdv"&&<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
-              <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
-              <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
-              <StatCard icon="" label="En attente"    val={rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length}    color="#FBC005"/>
-              <StatCard icon="" label="RDV restants"  val={profile?.rdv_restants||0} color="#38bdf8"/>
-            </div>
-            <ST> Rendez-vous qualifiés</ST>
-            {rdv.length===0
-              ? <Empty icon="" title="Aucun RDV pour l'instant" sub="Activez un pack pour recevoir vos premiers RDV qualifiés sous 48h." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
-              : rdv.map(l=>(
-                <div key={l.id} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"16px 18px", marginBottom:10 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7, flexWrap:"wrap" }}>
-                        <span style={{ color:"#fff", fontWeight:800, fontSize:16 }}>{l.client_nom}</span>
-                        <SBadge s={l.statut}/>
-                      </div>
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:14, fontSize:12, color:"rgba(255,255,255,0.4)" }}>
-                        {l.created_at&&<span> {new Date(l.created_at).toLocaleDateString("fr-FR")}</span>}
-                        {l.adresse&&<span> {l.adresse}</span>}
-                        {l.travaux&&<span> {l.travaux}</span>}
-                        {l.budget&&<span> {l.budget}</span>}
-                      </div>
-                      {l.note&&<div style={{ marginTop:6, fontSize:12, color:"rgba(255,165,0,.65)", fontStyle:"italic" }}> {l.note}</div>}
-                    </div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                      {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}> {l.client_tel}</a>}
-                      {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}> Email</a>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}> Confirmer</button>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}> Refuser</button>}
-                    </div>
-                  </div>
-                </div>
-              ))
-            }
-          </>}
-
-          {tab==="confirmes"&&<><ST>RDV confirmes</ST>{rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici."/>:rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(<div key={l.id} style={{...S.leadRow,marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||l.precision}</div><span style={{fontSize:11,padding:"3px 9px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.4)"}}>Confirme</span></div><div style={{display:"grid",gap:6}}>{[["Specialite",l.precision],["Details",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Client",l.client_nom],["Tel",l.client_tel]].map(([k,v])=>v&&<div key={k} style={{display:"flex",gap:8}}><span style={{color:"rgba(255,255,255,0.35)",fontSize:12,minWidth:80}}>{k}</span><span style={{color:"#fff",fontSize:12}}>{v}</span></div>)}</div>{l.creneaux&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(34,197,94,0.1)",color:"#22c55e"}}>{sl.label||sl}</span>)}</div>}</div>))}</>}          {tab==="docs"&&<>
-            <ST> Mes Documents</ST>
-            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
-            </div>
-          </>}
-
           {tab==="pack"&&<PackTab s={s} ctx={ctx}/>}
           {tab==="profil"&&<ProfilTab s={s} ctx={ctx}/>}
         </div>
