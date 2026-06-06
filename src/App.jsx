@@ -529,7 +529,7 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
             {!isLogin&&!isAdmin&&<>
               <div><Inp label="Telephone *" v={f.tel} set={set("tel")} type="tel"/>{f.tel&&!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Ex: 0612345678</div>}</div>
   const [adresseOk,setAdresseOk]=useState(false);
-              <div style={{ gridColumn:"1/-1" }}>
+  const [done,setDone]=useState(false);              <div style={{ gridColumn:"1/-1" }}>
                 <label style={S.lbl}>Rayon d intervention *</label>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:8}}>
                   {["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{
