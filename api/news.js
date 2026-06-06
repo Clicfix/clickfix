@@ -2,32 +2,26 @@ export default async function handler(req,res){
 res.setHeader('Access-Control-Allow-Origin','*');
 if(req.method!=='GET')return res.status(405).end();
 const feeds=[
-  'https://www.seloger.com/rss/actualites.xml',
-  'https://www.journaldunet.com/patrimoine/rss/',
-  'https://www.batirama.com/feed.xml',
-  'https://www.lebatimentnumerique.fr/feed',
-  'https://www.batinfo.com/feed/'
+  'https://www.lemonde.fr/immobilier/rss_full.xml',
+  'https://www.challenges.fr/rss/immobilier',
+  'https://batirama.com/feed.xml'
 ];
 const results=[];
 for(const url of feeds){
   if(results.length>=3)break;
   try{
-    const apiUrl='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url)+'&count=5';
-    const r=await fetch(apiUrl,{headers:{'User-Agent':'Mozilla/5.0'}});
-    const d=await r.json();
-    if(d.status==='ok'&&d.items?.length>0){
-      for(const item of d.items){
-        if(results.length>=3)break;
-        const img=item.thumbnail||item.enclosure?.link||d.feed?.image||null;
-        if(item.title&&!results.find(x=>x.title===item.title)){
-          results.push({
-            title:item.title,
-            description:(item.description||'').replace(/<[^>]*>/g,'').slice(0,150),
-            urlToImage:img||'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80',
-            url:item.link,
-            source:{name:d.feed?.title||'Actualite'}
-          });
-        }
+    const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0 (compatible; Googlebot/2.1)','Accept':'application/rss+xml,application/xml'}});
+    const xml=await r.text();
+    const items=xml.split('<item>').slice(1);
+    for(const item of items){
+      if(results.length>=3)break;
+      const title=(item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)||item.match(/<title>(.*?)<\/title>/))?.[1]||'';
+      const desc=(item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)||item.match(/<description>(.*?)<\/description>/))?.[1]?.replace(/<[^>]*>/g,'').slice(0,150)||'';
+      const link=(item.match(/<link>(.*?)<\/link>/)||item.match(/<link href="(.*?)"/))?.[1]||'';
+      const img=(item.match(/<media:content[^>]*url="([^"]*)"/)|| item.match(/<enclosure[^>]*url="([^"]*)"/)|| item.match(/<media:thumbnail[^>]*url="([^"]*)"/)||[null,''])?.[1]||'';
+      const source=url.includes('lemonde')?'Le Monde':url.includes('challenges')?'Challenges':'Batirama';
+      if(title&&link&&!results.find(x=>x.title===title)){
+        results.push({title,description:desc,urlToImage:img||'https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=600&q=80',url:link,source:{name:source}});
       }
     }
   }catch(e){}
