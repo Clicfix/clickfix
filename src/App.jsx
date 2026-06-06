@@ -50,7 +50,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 //  ROOT APP
 // 
 export default function App() {
-  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);if(params.get("welcome")==="1"&&s)return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
+  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess"));
   useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
@@ -252,7 +252,6 @@ setBusy(false);
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
       {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
       {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
-      {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
     </div>
   );
 }
@@ -371,62 +370,74 @@ function FaqItem({q,a}){const [open,setOpen]=React.useState(false);return(<div s
         {articles.map((a,i)=>(
           <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{borderRadius:16,overflow:'hidden',background:'#f5f5f7',textDecoration:'none',display:'block',transition:'transform .3s'}}>
             <div style={{height:180,overflow:'hidden'}}>
-function PartHome({ctx}){
-const s=ctx.sess;
-const [tab,setTab]=useState("demandes");
-const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed");
-const TABS=[{id:"demandes",ico:"",label:"Mes demandes"},{id:"rdv",ico:"",label:"RDV confirmes"},{id:"profil",ico:"",label:"Mon profil"}];
-return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
-<BgFx/>
-<div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
-<div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
-<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
-<button onClick={()=>ctx.setPage("ai-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
-{TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
-<div style={{flex:1}}/>
-<button onClick={()=>ctx.logout()} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.25)",fontSize:13,cursor:"pointer",textAlign:"left"}}>Deconnexion</button>
-</div>
-<div style={{flex:1,padding:"32px 24px",zIndex:2,overflowY:"auto"}}>
-<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:22}}>
-<StatCard icon="" label="Mes demandes" val={ctx.myLeadsPart.length} color="#38bdf8"/>
-<StatCard icon="" label="RDV confirmes" val={confirmed.length} color="#22c55e"/>
-</div>
-{tab==="demandes"&&<div style={S.card}>
-<ST>Mes demandes de devis</ST>
-{ctx.myLeadsPart.length===0
-?<Empty icon="" title="Aucune demande" sub="Deposez votre premier projet." cta="Deposer une demande" onCta={()=>ctx.setPage("ai-lead")}/>
-:ctx.myLeadsPart.map(l=>(<div key={l.id} style={S.leadRow}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}{l.precision&&<span style={{color:"rgba(255,255,255,0.4)",fontSize:13}}> — {l.precision}</span>}</div>
-<SBadge s={l.statut}/>
-</div>
-<div style={{color:"rgba(255,255,255,0.36)",fontSize:12,marginTop:6,display:"flex",flexWrap:"wrap",gap:12}}>
-{l.budget&&<span> {l.budget}</span>}{l.surface&&<span> {l.surface}</span>}{l.ville&&<span> {l.ville}</span>}
-</div>
-<div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4}}>{new Date(l.created_at).toLocaleDateString("fr-FR")}</div>
-</div>))}
-</div>}
-{tab==="rdv"&&<div style={S.card}>
-<ST>Rendez-vous confirmes</ST>
-{confirmed.length===0
-?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici avec les coordonnees de l artisan."/>
-:confirmed.map(l=>(<div key={l.id} style={{...S.leadRow,border:"1px solid rgba(34,197,94,0.2)"}}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
-<div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||""}</div><SBadge s={l.statut}/>
-</div>
-{l.heure&&<div style={{color:"#38bdf8",fontSize:12,marginTop:4}}> {l.heure}</div>}
-{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
-</div>))}
-</div>}
-{tab==="profil"&&<PartProfilTab s={s} ctx={ctx}/>}
-</div>
-</div>);
-}
+              <img src={a.urlToImage} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .4s'}} onError={e=>{e.target.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80';}}/>
+            </div>
+            <div style={{padding:20}}>
+              <p style={{fontSize:11,fontWeight:600,color:'#FF6F00',letterSpacing:2,marginBottom:8,textTransform:'uppercase',margin:'0 0 8px'}}>{a.source&&a.source.name?a.source.name:'Actualité'}</p>
+              <p style={{fontWeight:700,fontSize:14,marginBottom:8,color:'#1d1d1f',lineHeight:1.35,margin:'0 0 8px'}}>{a.title&&a.title.length>70?a.title.slice(0,70)+'…':a.title}</p>
+              <p style={{fontSize:12,color:'#6e6e73',lineHeight:1.55,margin:'0 0 14px'}}>{a.description&&a.description.length>100?a.description.slice(0,100)+'…':a.description}</p>
+              <p style={{fontSize:12,color:'#FF6F00',fontWeight:600,margin:0}}>Lire l&apos;article →</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
 
+<section style={{padding:'100px 48px',background:'#1d1d1f'}}>
+  <div style={{maxWidth:980,margin:'0 auto'}}>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:2}}>
+      {[['400 000','artisans en France'],['24h','délai d\'intervention moyen'],['0 €','pour les particuliers'],['100%','artisans vérifiés']].map(([n,l],i)=>(
+        <div key={i} style={{padding:'40px 32px',borderRight:i<3?'0.5px solid rgba(255,255,255,0.08)':'none',textAlign:'center'}}>
+          <div style={{fontSize:'clamp(36px,4vw,56px)',fontWeight:800,color:'#fff',letterSpacing:'-2px',marginBottom:8}}>{n}</div>
+          <div style={{fontSize:14,color:'rgba(255,255,255,0.38)',fontWeight:400,lineHeight:1.4}}>{l}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+<section style={{padding:'100px 48px',background:'#f5f5f7'}}>
+  <div style={{maxWidth:980,margin:'0 auto'}}>
+    <div style={{marginBottom:64}}>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8}}>Tous nos métiers</h2>
+      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Des professionnels qualifiés pour chaque type de travaux</p>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:'rgba(0,0,0,0.06)',borderRadius:16,overflow:'hidden'}}>
+      {[['Plomberie & Sanitaires','Fuites, installation, salle de bain, chauffe-eau, débouchage'],['Électricité','Tableau, prises, domotique, borne de recharge, alarme'],['Chauffage & Énergie','Chaudière, climatisation, pompe à chaleur, panneaux solaires'],['Menuiserie & Fenêtres','Fenêtres, portes, volets, portail, véranda, escaliers'],['Maçonnerie & Gros œuvre','Construction, extension, démolition, terrassement, ravalement'],['Peinture & Décoration','Peinture, enduit, papier peint, faux plafond, décoration'],['Toiture & Charpente','Toiture, tuiles, zinguerie, étanchéité, Velux, gouttières'],['Isolation & Combles','Isolation combles, murs, sols, VMC, traitement humidité'],['Carrelage & Sol','Parquet, carrelage, béton ciré, vinyle, sous-couche'],['Serrurerie & Sécurité','Serrure, blindage, porte blindée, coffre-fort, dépannage'],['Jardinage & Extérieur','Terrasse, jardin, élagage, paysagisme, allée, clôture'],['Cuisine & Aménagement','Cuisine équipée, dressing, rangements, agencement intérieur']].map(([t,d],i)=>(
+        <div key={i} style={{background:'#fff',padding:'24px 28px'}}>
+          <div style={{fontWeight:700,fontSize:15,marginBottom:6,color:'#1d1d1f'}}>{t}</div>
+          <div style={{fontSize:12,color:'#6e6e73',lineHeight:1.5}}>{d}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+<section style={{padding:'100px 48px',background:'#fff'}}>
+  <div style={{maxWidth:700,margin:'0 auto'}}>
+    <div style={{marginBottom:64}}>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8}}>Questions fréquentes</h2>
+      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Tout ce que vous devez savoir</p>
+    </div>
+    {[['Est-ce vraiment gratuit pour les particuliers ?','Oui, totalement gratuit. Déposez votre demande, recevez des artisans vérifiés et confirmez votre RDV sans aucun frais. Click&fix est financé par les abonnements des artisans.'],['Comment sont vérifiés les artisans ?','Chaque artisan doit fournir son numéro SIRET, son attestation d\'assurance décennale et ses justificatifs professionnels. Notre équipe valide chaque dossier manuellement avant activation.'],['Sous quel délai vais-je être contacté ?','Votre demande est envoyée immédiatement aux artisans qualifiés de votre zone. Vous recevez généralement une réponse sous 24h, souvent bien moins.'],['Que faire si l\'artisan ne convient pas ?','Vous n\'êtes jamais engagé avant d\'avoir accepté un devis. Si l\'artisan ne convient pas, nous en envoyons un autre. Votre satisfaction est notre priorité.']].map(([q,a],i)=>(<FaqItem key={i} q={q} a={a}/>))}
+  </div>
+</section>
+
+<section style={{padding:'120px 48px',background:'#1d1d1f',textAlign:'center'}}>
+  <div style={{maxWidth:640,margin:'0 auto'}}>
+    <h2 style={{fontSize:'clamp(32px,4.5vw,60px)',fontWeight:800,letterSpacing:'-2.5px',color:'#fff',marginBottom:16,lineHeight:1.08}}>Prêt à transformer votre habitat ?</h2>
+    <p style={{fontSize:17,color:'rgba(255,255,255,0.38)',marginBottom:44,lineHeight:1.65,fontWeight:300}}>Gratuit pour les particuliers. Des artisans vérifiés sous 24h.</p>
+    <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+      <button onClick={()=>go('part')} style={{...F,padding:'15px 32px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:600,cursor:'pointer'}}>Déposer une demande</button>
+      <button onClick={()=>go('pro')} style={{...F,padding:'15px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.2)',background:'transparent',color:'rgba(255,255,255,0.8)',fontSize:15,fontWeight:500,cursor:'pointer'}}>Espace artisan</button>
+    </div>
+  </div>
+</section>
+
+<footer style={{background:'#000',padding:'36px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
   <span style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.3px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
   <div style={{display:'flex',gap:24,fontSize:12,color:'rgba(255,255,255,0.25)'}}>
-  const [profile,setProfile]=useState(s);
-  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0]){const u={...s,...d[0]};setProfile(u);ctx.updateSession(u);}}).catch(()=>{});}},[]);    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
+    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
     <span style={{cursor:'pointer'}}>Mentions légales</span>
     <span style={{cursor:'pointer'}}>CGU</span>
   </div>
@@ -447,46 +458,7 @@ function submit() {
 if (isLogin && !isAdmin) { ctx.login(f.email,f.pass,role); return; }
 if (isAdmin && isLogin) { ctx.login(f.email,f.pass,"admin"); return; }
 else {
-function PackTab({ s, ctx }) {
-  const [sel,setSel]=useState(null);
-  const history=(s?.packs_history||[]).slice().reverse();
-  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
-  return (
-    <>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-        <div style={{color:"#fff",fontWeight:800,fontSize:18}}>Mon Pack</div>
-        <button onClick={()=>hasMonthly?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
-      </div>
-      {history.length===0&&<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:32,textAlign:"center",color:"rgba(255,255,255,0.3)"}}>Aucun pack actif. <span style={{color:"#FF6F00",cursor:"pointer"}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack</span></div>}
-      {history.map((p,i)=>(
-        <div key={i} onClick={()=>setSel(sel===i?null:i)} style={{background:"rgba(255,111,0,0.07)",border:"1px solid "+(sel===i?"#FF6F00":"rgba(255,111,0,0.2)"),borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div>
-              <div style={{color:"#FF6F00",fontWeight:800,fontSize:15}}>{p.name}</div>
-              <div style={{color:"rgba(255,255,255,0.4)",fontSize:12,marginTop:2}}>{p.rdv} RDV · {p.prix} EUR · {new Date(p.date_achat).toLocaleDateString("fr-FR")}</div>
-            </div>
-            <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.abonnement?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.abonnement?"#FF6F00":"#38bdf8"}}>{p.abonnement?"Mensuel":"Unique"}</div>
-          </div>
-          {sel===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>RDV inclus</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.rdv}</div></div>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Prix</div><div style={{color:"#fff",fontWeight:700,fontSize:16}}>{p.prix} EUR</div></div>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Date achat</div><div style={{color:"#fff",fontWeight:700,fontSize:13}}>{new Date(p.date_achat).toLocaleDateString("fr-FR")}</div></div>
-              {p.date_renouvellement&&<div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11}}>Renouvellement</div><div style={{color:"#FF6F00",fontWeight:700,fontSize:13}}>{new Date(p.date_renouvellement).toLocaleDateString("fr-FR")}</div></div>}
-            </div>
-            {p.specialites&&p.specialites.length>0&&<div style={{marginTop:8}}><div style={{color:"rgba(255,255,255,0.35)",fontSize:11,marginBottom:6}}>Specialites</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{p.specialites.map(sp=><span key={sp} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}</span>)}</div></div>}
-          </div>}
-        </div>
-      ))}
-      {hasMonthly&&<div style={{fontSize:12,color:"rgba(255,255,255,0.25)",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
-    </>
-  );
-}
-
-function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){onChange(v);if(v.length<2){setSugg([]);return;}fetch("https://geo.api.gouv.fr/communes?nom="+encodeURIComponent(v)+"\&fields=nom,codesPostaux,centre\&limit=5\&boost=population").then(r=>r.json()).then(d=>{setSugg(d||[]);setShow(true);}).catch(()=>{});}function pick(c){const cp=c.codesPostaux?.[0]||"";const lat=c.centre?.coordinates?.[1]||null;const lon=c.centre?.coordinates?.[0]||null;onSelect({ville:c.nom,code_postal:cp,lat,lon});setSugg([]);setShow(false);}return(<div style={{position:"relative",gridColumn:"1/-1"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>{label}</label><input value={value} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: Paris, Lyon, Marseille..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((c,i)=><div key={i} onClick={()=>pick(c)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:14}} onMouseDown={e=>e.preventDefault()}>{c.nom} <span style={{color:"rgba(255,255,255,0.4)",fontSize:12}}>({c.codesPostaux?.[0]})</span></div>)}</div>}</div>);}
-function AddressInput({form,setForm,onValidate}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setForm(f=>({...f,adresse:v}));if(onValidate)onValidate(false);if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5\&type=housenumber").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(f){const p=f.properties;setForm(prev=>({...prev,adresse:p.name||p.label,ville:p.city||"",code_postal:p.postcode||"",lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);if(onValidate)onValidate(true);}return(<div style={{gridColumn:"1/-1",position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse du chantier *</label><input value={form.adresse} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((f,i)=><div key={i} onClick={()=>pick(f)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{f.properties.label}</div>)}</div>}{form.ville&&<div style={{marginTop:6,fontSize:12,color:"rgba(255,255,255,0.4)"}}>{form.ville} {form.code_postal}</div>}</div>);}
 if (!f.prenom||!f.nom||!f.email||!f.pass) { ctx.notify("Remplissez tous les champs *","err"); return; }
-function PartProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",email:s?.email||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{...S.card,maxWidth:480}}><ST>Mon profil</ST><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Email" v={f.email} set={()=>{}}/></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) { ctx.notify("Email invalide","err"); return; }
 if (f.pass.length < 8) { ctx.notify("Mot de passe minimum 8 caracteres","err"); return; }
 if (isPro) {
@@ -514,69 +486,10 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
           <div style={{ display:isLogin||isAdmin?"block":"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {!isLogin&&!isAdmin&&<><Inp label="Prénom *" v={f.prenom} set={set("prenom")}/><Inp label="Nom *" v={f.nom} set={set("nom")}/></>}
             <div style={{ gridColumn:"1/-1" }}><div><Inp label="Email *" v={f.email} set={set("email")} type="email" autoComplete="new-password"/>{f.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Email invalide</div>}</div></div>
-function AILeadForm({ctx}){
-const s=ctx.sess;
-const [msgs,setMsgs]=useState([{role:"assistant",content:"Bonjour "+( s?.prenom||"")+" ! Je suis votre assistant Click&fix. Decrivez-moi votre projet de travaux en quelques mots et je m occupe de trouver les meilleurs artisans pour vous !"}]);
-const [input,setInput]=useState("");
-const [busy,setBusy]=useState(false);
-const [done,setDone]=useState(false);
-async function send(){
-if(!input.trim()||busy)return;
-const newMsgs=[...msgs,{role:"user",content:input}];
-setMsgs(newMsgs);
-setInput("");
-setBusy(true);
-try{
-const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:`Tu es un assistant pour la plateforme Click&fix qui met en relation particuliers et artisans. Ton role est de collecter les informations du projet de travaux du client de facon naturelle et conversationnelle. Tu dois collecter: 1) Type de travaux et specialite exacte (ex: Renovation/Parquet), 2) Adresse du chantier, 3) Surface approximative, 4) Budget estimatif, 5) Disponibilites (au moins 3 creneaux). Quand tu as toutes les infos, reponds avec un JSON valide dans une balise <LEAD> contenant: {"travaux":"...","precision":"...","adresse":"...","ville":"...","surface":"...","budget":"...","slots":[{"key":"date_heure","date":"JJ/MM/AAAA","hour":"HH:MM","label":"JJ/MM/AAAA a HH:MM"}]}. Pose une question a la fois. Sois chaleureux et professionnel. Reponds en francais.`,messages:newMsgs})});
-const d=await r.json();
-const text=d.content?.[0]?.text||"";
-const leadMatch=text.match(/<LEAD>([\s\S]*?)<\/LEAD>/);
-if(leadMatch){
-try{
-const lead=JSON.parse(leadMatch[1]);
-setMsgs(prev=>[...prev,{role:"assistant",content:"Parfait ! J ai bien note toutes vos informations. Je recherche maintenant les meilleurs artisans disponibles pour vous..."}]);
-await ctx.submitLead({...lead,prenom:s?.prenom,nom:s?.nom,email:s?.email,tel:s?.tel,creneaux:lead.slots,type:lead.travaux,message:""});
-setDone(true);
-}catch(e){setMsgs(prev=>[...prev,{role:"assistant",content:text.replace(/<LEAD>[\s\S]*?<\/LEAD>/,"").trim()}]);}
-}else{
-setMsgs(prev=>[...prev,{role:"assistant",content:text}]);
-}
-}catch(e){
-setMsgs(prev=>[...prev,{role:"assistant",content:"Desolee, une erreur est survenue. Reessayez."}]);
-}
-setBusy(false);
-}
-if(done)return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex",alignItems:"center",justifyContent:"center"}}><BgFx/><div style={{zIndex:2,textAlign:"center",maxWidth:480,padding:20}}><div style={{fontSize:60,marginBottom:16}}>🎉</div><h2 style={{color:"#fff",fontSize:28,fontWeight:900,marginBottom:12}}>Demande envoyee !</h2><p style={{color:"rgba(255,255,255,0.5)",marginBottom:28}}>Nous recherchons les meilleurs artisans pour votre projet. Vous serez contacte sous 24h.</p><BigBtn onClick={()=>ctx.setPage("part-home")}>Voir mes demandes</BigBtn></div></div>);
-return(
-<div style={{minHeight:"100vh",background:"#07090f",display:"flex",flexDirection:"column"}}>
-<BgFx/>
-<div style={{zIndex:2,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-<div style={{display:"flex",alignItems:"center",gap:10}}>
-<button onClick={()=>ctx.setPage("part-home")} style={{background:"transparent",border:"none",color:"rgba(255,255,255,0.4)",fontSize:20,cursor:"pointer"}}>←</button>
-<div style={{color:"#fff",fontWeight:700}}>Assistant Click&fix</div>
-</div>
-<div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
-</div>
-<div style={{flex:1,overflowY:"auto",padding:"20px",display:"flex",flexDirection:"column",gap:12,zIndex:2}}>
-{msgs.map((m,i)=>(
-<div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
-<div style={{maxWidth:"80%",padding:"12px 16px",borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",background:m.role==="user"?"linear-gradient(135deg,#38bdf8,#0ea5e9)":"rgba(255,255,255,0.07)",color:"#fff",fontSize:14,lineHeight:1.6}}>{m.content}</div>
-</div>
-))}
-{busy&&<div style={{display:"flex",justifyContent:"flex-start"}}><div style={{padding:"12px 16px",borderRadius:"18px 18px 18px 4px",background:"rgba(255,255,255,0.07)",color:"rgba(255,255,255,0.5)",fontSize:14}}>...</div></div>}
-</div>
-<div style={{zIndex:2,padding:"16px 20px",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",gap:10}}>
-<input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ecrivez votre message..." style={{flex:1,background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"12px 16px",color:"#fff",fontSize:14,outline:"none"}}/>
-<button onClick={send} disabled={busy||!input.trim()} style={{padding:"12px 20px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Envoyer</button>
-</div>
-</div>
-);
-}
-
             {!isLogin&&!isAdmin&&<>
               <div><Inp label="Telephone *" v={f.tel} set={set("tel")} type="tel"/>{f.tel&&!/^0[0-9]{9}$/.test(f.tel.replace(/\s/g,""))&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>Ex: 0612345678</div>}</div>
-  const [adresseOk,setAdresseOk]=useState(false);
-  const [done,setDone]=useState(false);              <div style={{ gridColumn:"1/-1" }}>
+              {isPro&&<><Inp label="Nom entreprise *" v={f.entreprise} set={set("entreprise")}/><div style={{ gridColumn:"1/-1" }}><div><Inp label="N SIRET *" v={f.siret} set={set("siret")}/>{f.siret&&!/^[0-9]{14}$/.test(f.siret.replace(/\s/g,""))&&<div style={{fontSize:11,color:"#ef4444",marginTop:3}}>14 chiffres requis</div>}</div></div><ProAddressInput f={f} setF={setF}/>
+              <div style={{ gridColumn:"1/-1" }}>
                 <label style={S.lbl}>Rayon d intervention *</label>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:8}}>
                   {["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{
@@ -617,7 +530,7 @@ return(<div style={{minHeight:"100vh",background:"#07090f",display:"flex"}}>
 <BgFx/>
 <div style={{width:220,minHeight:"100vh",background:"rgba(255,255,255,0.02)",borderRight:"1px solid rgba(255,255,255,0.06)",padding:"28px 16px",zIndex:2,flexShrink:0,display:"flex",flexDirection:"column"}}>
 <div style={{color:"#38bdf8",fontWeight:900,fontSize:18,marginBottom:6}}>Click&fix</div>
-<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{profile?.prenom} {s?.nom}</div>
+<div style={{color:"rgba(255,255,255,0.35)",fontSize:12,marginBottom:28}}>{s?.prenom} {s?.nom}</div>
 <button onClick={()=>ctx.setPage("ai-lead")} style={{width:"100%",padding:"11px 14px",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20}}>+ Nouvelle demande</button>
 {TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.12)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.4)",fontWeight:tab===t.id?700:400,fontSize:13,cursor:"pointer",marginBottom:4,textAlign:"left"}}><span>{t.ico}</span>{t.label}</button>)}
 <div style={{flex:1}}/>
@@ -724,52 +637,6 @@ function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useStat
 function AddressInput({form,setForm,onValidate}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setForm(f=>({...f,adresse:v}));if(onValidate)onValidate(false);if(onValidate)onValidate(false);if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5\&type=housenumber").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(f){const p=f.properties;setForm(prev=>({...prev,adresse:p.name||p.label,ville:p.city||"",code_postal:p.postcode||"",lat:f.geometry?.coordinates?.[1]||null,lon:f.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);if(onValidate)onValidate(true);}return(<div style={{gridColumn:"1/-1",position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse du chantier *</label><input value={form.adresse} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((f,i)=><div key={i} onClick={()=>pick(f)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{f.properties.label}</div>)}</div>}{form.ville&&<div style={{marginTop:6,fontSize:12,color:"rgba(255,255,255,0.4)"}}>{form.ville} {form.code_postal}</div>}</div>);}
 function ProAddressInput({f,setF}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){setF(p=>({...p,ville_intervention:v,lat:null,lon:null}));if(v.length<3){setSugg([]);return;}fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(v)+"\&limit=5").then(r=>r.json()).then(d=>{setSugg(d?.features||[]);setShow(true);}).catch(()=>{});}function pick(ft){const p=ft.properties;setF(prev=>({...prev,ville_intervention:p.city||p.name,lat:ft.geometry?.coordinates?.[1]||null,lon:ft.geometry?.coordinates?.[0]||null}));setSugg([]);setShow(false);}return(<div style={{position:"relative"}}><label style={{display:"block",fontSize:12,color:"rgba(255,255,255,0.38)",marginBottom:5,fontWeight:600}}>Adresse entreprise *</label><input value={f.ville_intervention||""} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"14px 16px",color:"#fff",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: 12 rue de la Paix, Paris..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((ft,i)=><div key={i} onClick={()=>pick(ft)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#fff",fontSize:13}} onMouseDown={e=>e.preventDefault()}>{ft.properties.label}</div>)}</div>}{f.ville_intervention&&f.lat&&<div style={{marginTop:6,fontSize:12,color:"#22c55e"}}>Adresse validee</div>}</div>);}
 function PartProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",email:s?.email||""});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{...S.card,maxWidth:480}}><ST>Mon profil</ST><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:18}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Email" v={f.email} set={()=>{}}/></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
-
-function PackWelcome({ ctx }) {
-  const s=ctx.sess;
-  return (
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
-      <BgFx/>
-      <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
-        <div style={{fontSize:72,marginBottom:16}}>🎉</div>
-        <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
-        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{profile?.prenom}</strong> !</p>
-        <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
-              <AddressInput form={form} setForm={setForm} onValidate={setAdresseOk}/>
-          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
-        </div>
-        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
-          Accéder à mon Dashboard →
-        </BigBtn>
-      </div>
-    </div>
-  );
-}
-
-
-function PackWelcome({ ctx }) {
-  const s=ctx.sess;
-  return (
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
-      <BgFx/>
-      <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
-        <div style={{fontSize:72,marginBottom:16}}>🎉</div>
-        <h1 style={{color:"#fff",fontSize:32,fontWeight:900,margin:"0 0 12px"}}>Tout est prêt !</h1>
-        <p style={{color:"rgba(255,255,255,0.6)",fontSize:16,lineHeight:1.7,marginBottom:8}}>Bienvenue <strong style={{color:"#FF6F00"}}>{profile?.prenom}</strong> !</p>
-        <p style={{color:"rgba(255,255,255,0.5)",fontSize:14,lineHeight:1.7,marginBottom:28}}>Votre pack est actif. Vous allez bientôt recevoir vos premiers RDV qualifiés directement dans votre espace.</p>
-        <div style={{background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:12,padding:"16px 20px",marginBottom:28}}>
-          <div style={{color:"#FF6F00",fontSize:13,fontWeight:700,marginBottom:4}}>PACK ACTIF</div>
-          <div style={{color:"#fff",fontSize:22,fontWeight:900}}>{profile?.pack}</div>
-          <div style={{color:"rgba(255,255,255,0.4)",fontSize:13,marginTop:4}}>{profile?.rdv_restants||0} RDV disponibles</div>
-        </div>
-        <BigBtn style={{background:"linear-gradient(135deg,#FF6F00,#FBC005)",boxShadow:"0 4px 24px rgba(255,111,0,0.4)"}} onClick={()=>{window.history.replaceState({},"","/");ctx.setPage("pro-dashboard");}}>
-          Accéder à mon Dashboard →
-        </BigBtn>
-      </div>
-    </div>
-  );
-}
-
 function ArtisanInfo({ id }) {
 const [pro,setPro] = useState(null);
 useEffect(()=>{
@@ -932,6 +799,271 @@ if (!form.code_postal.trim()) errors.push("Code postal manquant");
           <div style={{ flex:1, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
             <div style={{ width:`${(step/(STEPS.length-1))*100}%`, height:"100%", background:"linear-gradient(90deg,#38bdf8,#0ea5e9)", borderRadius:99, transition:"width .4s" }}/>
           </div>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,0.24)", whiteSpace:"nowrap" }}>{step+1}/{STEPS.length}</span>
+        </div>
+        <div style={S.card}>
+          <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", letterSpacing:"-0.5px", marginBottom:6 }}>{cur.title}</h2>
+          <p style={{ fontSize:13, color:"rgba(255,255,255,0.36)", marginBottom:22 }}>{cur.sub}</p>
+          {cur.type==="specialites_cats" && (
+            <div style={{maxHeight:400,overflowY:"auto",paddingRight:4}}>
+              {SPECIALITES_CATEGORIES.filter(cat=>!ans?.catId||cat.cat===CAT_MAPPING[ans.catId]).map(cat=>(
+                <div key={cat.cat} style={{marginBottom:14}}>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,0.35)",fontWeight:700,letterSpacing:1,marginBottom:6}}>{cat.cat}</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                    {cat.items.map(item=>{
+                      const active=(ans.type||[]).includes(item);
+                      return <button key={item} type="button" onClick={()=>{
+                        const prev=ans.type||[];
+                        const next=active?prev.filter(x=>x!==item):[...prev,item];
+                        setAns({...ans,type:next});
+                      }} style={{padding:"6px 12px",borderRadius:8,border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.02)",color:active?"#FF6F00":"rgba(255,255,255,0.5)",fontSize:12,cursor:"pointer",fontWeight:active?700:400}}>
+                        {item}
+                      </button>;
+                    })}
+                  </div>
+                </div>
+              ))}
+              {(ans.type||[]).length>0&&<div style={{fontSize:12,color:"#22c55e",marginTop:8}}>{(ans.type||[]).length} specialite(s) choisie(s)</div>}
+            </div>
+          )}
+          {cur.type==="categories" && (
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:22}}>
+              {TRAVAUX_CATS.map(cat=>{const active=ans.categorie===cat.label;return(<button key={cat.id} onClick={()=>setAns({...ans,categorie:cat.label,catId:cat.id,type:[],precision:null})} style={{position:"relative",borderRadius:12,overflow:"hidden",aspectRatio:"1",border:"2.5px solid "+(active?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}>
+                <img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+                <div style={{position:"absolute",inset:0,background:active?"rgba(255,111,0,0.55)":"rgba(0,0,0,0.45)"}}/>
+                <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"6px 4px",color:"#fff",fontSize:10,fontWeight:700,textAlign:"center"}}>{cat.label}</div>
+                {active&&<div style={{position:"absolute",top:4,right:4,width:18,height:18,background:"#FF6F00",borderRadius:"50%",fontSize:10,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}>+</div>}
+              </button>);})}
+            </div>
+          )}
+          {cur.type==="subcategories" && (
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
+              {(TRAVAUX_CATS.find(c=>c.label===ans.categorie)?.subs||[]).map(sub=>{const active=ans.precision===sub;return(<button key={sub} onClick={()=>setAns({...ans,precision:sub})} style={{background:active?"rgba(255,111,0,0.15)":"rgba(255,255,255,0.03)",border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),borderRadius:12,padding:"14px 12px",cursor:"pointer",textAlign:"left",color:active?"#FF6F00":"rgba(255,255,255,0.7)",fontSize:13,fontWeight:active?700:400}}>{sub}</button>);})}
+            </div>
+          )}
+          {cur.type==="input" && (
+            <div style={{marginBottom:22}}><input type="number" min="0" placeholder={cur.placeholder||""} value={ans[cur.id]||""} onChange={e=>setAns({...ans,[cur.id]:e.target.value})} style={{background:"rgba(255,255,255,0.05)",border:"1.5px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"16px 18px",color:"#fff",fontSize:18,width:"100%",outline:"none"}}/></div>
+          )}
+          {cur.type==="calendar" && (
+            <CalendarPicker selected={ans.slots||[]} onChange={slots=>setAns({...ans,slots})} />
+          )}
+        {(cur.type==="multi" || cur.type==="single") && cur.type !== "input" && cur.type !== "categories" && cur.type !== "subcategories" && (
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:22 }}>
+              {cur.opts.map(opt=>{
+                const active=cur.type==="multi"?(ans[cur.id]||[]).includes(opt.label):ans[cur.id]===opt.label;
+                return (
+                  <button key={opt.label} onClick={()=>sel(opt.label)} style={{ background:active?"rgba(56,189,248,0.1)":"rgba(255,255,255,0.03)", border:`1.5px solid ${active?"#38bdf8":"rgba(255,255,255,0.08)"}`, borderRadius:12, padding:"14px 12px", cursor:"pointer", textAlign:"left", position:"relative", transition:"all .15s" }}>
+                    <div style={{ fontSize:22, marginBottom:6 }}>{opt.icon}</div>
+                    <div style={{ fontSize:13, color:"#fff", fontWeight:600, lineHeight:1.3 }}>{opt.label}</div>
+                    {active&&<span style={{ position:"absolute", top:8, right:8, width:18, height:18, background:"#38bdf8", borderRadius:"50%", fontSize:10, color:"#fff", fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center" }}></span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {cur.type==="form" && (
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:22 }}>
+              {[["prenom","Prénom *","text"],["nom","Nom *","text"],["email","Email *","email"],["tel","Téléphone *","tel"]].map(([k,l,t])=>(
+                <Inp key={k} label={l} v={form[k]} set={e=>setForm({...form,[k]:e.target.value})} type={t}/>
+              ))}
+              <AddressInput form={form} setForm={setForm} onValidate={setAdresseOk}/>
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={S.lbl}>Message (optionnel)</label>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Décrivez votre projet..." style={{ ...S.inp, height:72, resize:"vertical" }}/>
+              </div>
+            </div>
+          )}
+          <BigBtn style={{ background:"linear-gradient(135deg,#38bdf8,#0ea5e9)", boxShadow:"0 4px 20px #38bdf844", opacity:canNext()?1:.4 }} disabled={!canNext()||sending} onClick={next}>
+            {sending?"Envoi en cours...":step===STEPS.length-1?" Envoyer ma demande":"Continuer "}
+          </BigBtn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 
+//  PRO DOCS
+// 
+function ProDocs({ ctx }) {
+  return (
+    <Shell ctx={ctx} color="#FF6F00" title="Documents requis">
+      <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, lineHeight:1.75, marginBottom:24 }}>
+        Déposez vos justificatifs pour activer votre compte partenaire. Fichiers stockés de façon sécurisée. 
+      </p>
+      <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:22 }}>
+        {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
+      </div>
+      <BigBtn style={{ opacity:ctx.docsOk?1:.4 }} disabled={!ctx.docsOk} onClick={()=>ctx.setPage("pro-pricing")}>
+        {ctx.docsOk?"Choisir mon pack ":" Documents obligatoires manquants"}
+      </BigBtn>
+    </Shell>
+  );
+}
+
+function DocRow({ doc, status, onUpload }) {
+  const ref = useRef();
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:14, background:status?"rgba(34,197,94,0.05)":"rgba(255,255,255,0.03)", border:`1px solid ${status?"#22c55e":doc.oblig?"rgba(255,111,0,0.2)":"rgba(255,255,255,0.07)"}`, borderRadius:14, padding:"14px 16px", transition:"all .2s" }}>
+      <span style={{ fontSize:24 }}>{doc.icon}</span>
+      <div style={{ flex:1 }}>
+        <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:2 }}>
+          <span style={{ color:"#fff", fontWeight:700, fontSize:14 }}>{doc.label}</span>
+          <span style={{ fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:99, background:doc.oblig?"rgba(255,111,0,0.1)":"rgba(255,255,255,0.05)", color:doc.oblig?"#FF6F00":"rgba(255,255,255,0.3)", border:`1px solid ${doc.oblig?"rgba(255,111,0,0.2)":"rgba(255,255,255,0.07)"}` }}>{doc.oblig?"Obligatoire":"Facultatif"}</span>
+        </div>
+        <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{doc.desc}</div>
+      </div>
+      {status
+        ? <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}> Déposé</span>
+        : <><input ref={ref} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={e=>e.target.files[0]&&onUpload(doc.id,e.target.files[0])}/><button style={S.smBtn} onClick={()=>ref.current?.click()}> Déposer</button></>
+      }
+    </div>
+  );
+}
+
+// 
+//  PRO PRICING
+// 
+function ProPricing({ ctx }) {
+  const [hov,setHov]=useState(null);
+  const s=ctx.sess;
+  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite"||s.pack==="pro"||s.pack==="elite");
+  return (
+    <Shell ctx={ctx} color="#FF6F00" title="Choisissez votre pack" maxW={940}>
+      <p style={{ color:"rgba(255,255,255,0.36)", fontSize:13, textAlign:"center", marginBottom:34, lineHeight:1.7 }}>
+        RDV qualifiés livrés dans votre espace sous 48h. Sans abonnement, sans engagement.
+      </p>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18, marginBottom:28 }}>
+        {PACKS.map(p=>(
+          <div key={p.id} onMouseEnter={()=>setHov(p.id)} onMouseLeave={()=>setHov(null)}
+            style={{ position:"relative", background:hov===p.id?"rgba(255,255,255,0.06)":"rgba(255,255,255,0.03)", border:`1.5px solid ${hov===p.id||p.best?p.couleur:"rgba(255,255,255,0.08)"}`, borderRadius:22, padding:"28px 22px", display:"flex", flexDirection:"column", transition:"all .22s", transform:hov===p.id?"translateY(-5px)":"none", boxShadow:hov===p.id?`0 24px 60px ${p.couleur}25`:"none" }}>
+            {p.best&&<div style={{ position:"absolute", top:-13, left:"50%", transform:"translateX(-50%)", background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`, color:"#fff", fontSize:11, fontWeight:800, padding:"4px 14px", borderRadius:99, letterSpacing:.5, whiteSpace:"nowrap", boxShadow:`0 4px 16px ${p.couleur}55` }}> Plus populaire</div>}
+            <div style={{ color:p.couleur, fontWeight:800, fontSize:12, letterSpacing:2, textTransform:"uppercase", marginBottom:6 }}>{p.name}</div>
+            <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12, marginBottom:18 }}>{p.tagline}</div>
+            <div style={{ display:"flex", alignItems:"flex-end", gap:4, marginBottom:2 }}>
+              <span style={{ fontSize:44, fontWeight:900, color:"#fff", lineHeight:1 }}>{p.prix.toLocaleString("fr-FR")}</span>
+              <span style={{ color:"rgba(255,255,255,0.35)", marginBottom:7, fontSize:16 }}>€</span>
+            </div>
+            <div style={{ color:p.couleur, fontSize:12, fontWeight:700, marginBottom:8 }}>{p.par}</div>
+            <div style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, display:"inline-block", marginBottom:16, background:p.abonnement?"rgba(255,111,0,0.1)":"rgba(56,189,248,0.1)", color:p.abonnement?"#FF6F00":"#38bdf8", border:`1px solid ${p.abonnement?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"}` }}>{p.abonnement?" Abonnement mensuel":" Paiement unique"}</div>
+            <div style={{ background:`${p.couleur}18`, border:`1px solid ${p.couleur}33`, borderRadius:12, padding:"10px", textAlign:"center", marginBottom:22 }}>
+              <span style={{ fontSize:34, fontWeight:900, color:p.couleur }}>{p.rdv}</span>
+              <span style={{ color:"rgba(255,255,255,0.4)", fontSize:13 }}> rendez-vous</span>
+            </div>
+            {p.features.map(f=>(
+              <div key={f} style={{ display:"flex", gap:8, marginBottom:8, fontSize:13, color:"rgba(255,255,255,0.5)" }}>
+                <span style={{ color:p.couleur, flexShrink:0 }}></span>{f}
+              </div>
+            ))}
+            {hasMonthly&&p.id!=="decouverte" ? <button disabled style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,color:"rgba(255,255,255,0.3)",fontWeight:800,fontSize:14,cursor:"not-allowed",fontFamily:"Outfit,sans-serif" }}>Pack actif</button> : <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"Outfit,sans-serif",boxShadow:`0 4px 24px ${p.couleur}44`,letterSpacing:.3 }}>{p.id==="decouverte"&&hasMonthly?"+ Ajouter 5 RDV":"Choisir ce pack"}</button>}
+          </div>
+        ))}
+      </div>
+      <div style={{ textAlign:"center", color:"rgba(255,255,255,0.2)", fontSize:12 }}> Paiement sécurisé   Satisfait ou remboursé 7 jours   Support dédié</div>
+    </Shell>
+  );
+}
+
+// 
+//  PRO DASHBOARD
+// 
+function ProDashboard({ ctx }) {
+  const [tab,setTab]=useState("rdv");
+  const s=ctx.sess, rdv=ctx.myLeadsPro, conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
+  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"confirmes",ico:"",label:"RDV confirmes"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
+  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0])ctx.updateSession({...s,...d[0]});}).catch(()=>{});}},[]);
+
+  return (
+    <div style={{ display:"flex", minHeight:"100vh" }}>
+      <div style={{ width:232, background:"rgba(255,255,255,0.025)", borderRight:"1px solid rgba(255,255,255,0.055)", display:"flex", flexDirection:"column", flexShrink:0 }}>
+        <div style={{ padding:"24px 18px 16px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+            <span style={{ fontSize:20 }}></span>
+            <span style={{ fontSize:17, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix <span style={{ fontSize:9, background:"rgba(255,111,0,0.15)", color:"#FF6F00", border:"1px solid rgba(255,111,0,0.3)", borderRadius:4, padding:"1px 5px", fontWeight:700, letterSpacing:1 }}>PRO</span></span>
+          </div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{s?.prenom} {s?.nom}</div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,0.24)", marginTop:1 }}>{s?.entreprise}</div>
+        </div>
+        <div style={{ padding:"10px 8px", flex:1 }}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setTab(t.id)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", textAlign:"left", padding:"10px 12px", background:tab===t.id?"rgba(255,111,0,0.12)":"transparent", border:"none", borderRadius:10, color:tab===t.id?"#FF6F00":"rgba(255,255,255,0.4)", fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:600, cursor:"pointer", marginBottom:3, transition:"all .15s" }}>
+              <span>{t.ico}</span>{t.label}
+            </button>
+          ))}
+        </div>
+        {s?.pack&&(
+          <div style={{ margin:"0 8px 8px", background:"rgba(255,111,0,0.07)", border:"1px solid rgba(255,111,0,0.17)", borderRadius:12, padding:13 }}>
+            <div style={{ fontSize:10, color:"rgba(255,255,255,0.28)", letterSpacing:1, marginBottom:3 }}>PACK ACTIF</div>
+            <div style={{ fontSize:15, fontWeight:900, color:"#FF6F00" }}>{s.pack.name}</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", marginTop:1 }}>{s.rdv_restants||0}/{s.rdv_total||0} RDV</div>
+            <div style={{ marginTop:7, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
+              <div style={{ width:`${s.rdv_total>0?((s.rdv_restants||0)/s.rdv_total)*100:0}%`, height:"100%", background:"linear-gradient(90deg,#FF6F00,#FBC005)", borderRadius:99 }}/>
+            </div>
+          </div>
+        )}
+        <div style={{ padding:"0 8px 14px" }}>
+          <button onClick={ctx.logout} style={{ width:"100%", padding:"9px", background:"transparent", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, color:"rgba(255,255,255,0.22)", fontFamily:"'Outfit',sans-serif", fontSize:12, cursor:"pointer" }}> Déconnexion</button>
+        </div>
+      </div>
+
+      <div style={{ flex:1, overflow:"auto", background:"#07090f" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 28px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
+          <div>
+            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {s?.prenom} </div>
+            <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
+          </div>
+          <div style={{ display:"flex", gap:8 }}>
+            {!ctx.docsOk&&<button style={S.smBtn} onClick={()=>setTab("docs")}> Documents</button>}
+            {!s?.pack&&<button style={S.smBtn} onClick={()=>ctx.setPage("pro-pricing")}> Acheter un pack</button>}
+          </div>
+        </div>
+
+        <div style={{ padding:"24px 28px" }}>
+          {tab==="rdv"&&<>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
+              <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
+              <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
+              <StatCard icon="" label="En attente"    val={rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length}    color="#FBC005"/>
+              <StatCard icon="" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
+            </div>
+            <ST> Rendez-vous qualifiés</ST>
+            {rdv.length===0
+              ? <Empty icon="" title="Aucun RDV pour l'instant" sub="Activez un pack pour recevoir vos premiers RDV qualifiés sous 48h." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
+              : rdv.map(l=>(
+                <div key={l.id} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"16px 18px", marginBottom:10 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7, flexWrap:"wrap" }}>
+                        <span style={{ color:"#fff", fontWeight:800, fontSize:16 }}>{l.client_nom}</span>
+                        <SBadge s={l.statut}/>
+                      </div>
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:14, fontSize:12, color:"rgba(255,255,255,0.4)" }}>
+                        {l.created_at&&<span> {new Date(l.created_at).toLocaleDateString("fr-FR")}</span>}
+                        {l.adresse&&<span> {l.adresse}</span>}
+                        {l.travaux&&<span> {l.travaux}</span>}
+                        {l.budget&&<span> {l.budget}</span>}
+                      </div>
+                      {l.note&&<div style={{ marginTop:6, fontSize:12, color:"rgba(255,165,0,.65)", fontStyle:"italic" }}> {l.note}</div>}
+                    </div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                      {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}> {l.client_tel}</a>}
+                      {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}> Email</a>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}> Confirmer</button>}
+                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}> Refuser</button>}
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </>}
+
+          {tab==="confirmes"&&<><ST>RDV confirmes</ST>{rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici."/>:rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(<div key={l.id} style={{...S.leadRow,marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||l.precision}</div><span style={{fontSize:11,padding:"3px 9px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.4)"}}>Confirme</span></div><div style={{display:"grid",gap:6}}>{[["Specialite",l.precision],["Details",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Client",l.client_nom],["Tel",l.client_tel]].map(([k,v])=>v&&<div key={k} style={{display:"flex",gap:8}}><span style={{color:"rgba(255,255,255,0.35)",fontSize:12,minWidth:80}}>{k}</span><span style={{color:"#fff",fontSize:12}}>{v}</span></div>)}</div>{l.creneaux&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(34,197,94,0.1)",color:"#22c55e"}}>{sl.label||sl}</span>)}</div>}</div>))}</>}          {tab==="docs"&&<>
+            <ST> Mes Documents</ST>
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
+            </div>
+          </>}
+
           {tab==="pack"&&<PackTab s={s} ctx={ctx}/>}
           {tab==="profil"&&<ProfilTab s={s} ctx={ctx}/>}
         </div>
@@ -943,7 +1075,6 @@ if (!form.code_postal.trim()) errors.push("Code postal manquant");
 // 
 //  SHARED UI
 // 
-function ProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",entreprise:s?.entreprise||"",ville_intervention:s?.ville_intervention||"",lat:s?.lat||null,lon:s?.lon||null,rayon:s?.rayon||"",specialites:s?.specialites||[],selectedCat:null});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel,entreprise:f.entreprise,ville_intervention:f.ville_intervention,lat:f.lat,lon:f.lon,rayon:f.rayon,specialites:f.specialites})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{maxWidth:560}}><div style={{...S.card,marginBottom:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Entreprise" v={f.entreprise} set={e=>setF(p=>({...p,entreprise:e.target.value}))}/></div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Mes specialites</div>{f.specialites.length>0?<div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>{f.specialites.map(sp=><span key={sp} style={{display:"flex",alignItems:"center",gap:4,fontSize:12,padding:"4px 10px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}<span onClick={()=>setF(p=>({...p,specialites:p.specialites.filter(x=>x!==sp)}))} style={{cursor:"pointer",color:"rgba(255,111,0,0.6)",fontWeight:900,marginLeft:2}}>x</span></span>)}</div>:<div style={{color:"rgba(255,255,255,0.25)",fontSize:13,marginBottom:14}}>Aucune specialite selectionnee</div>}<div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:12}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Ajouter des specialites :</div><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:8}}>{TRAVAUX_CATS.map(cat=>{const sel=f.selectedCat===cat.id;return(<button key={cat.id} type="button" onClick={()=>setF(p=>({...p,selectedCat:sel?null:cat.id}))} style={{position:"relative",borderRadius:10,overflow:"hidden",aspectRatio:"1.5",border:"2px solid "+(sel?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}><img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover"}}/><div style={{position:"absolute",inset:0,background:sel?"rgba(255,111,0,0.5)":"rgba(0,0,0,0.4)"}}/><div style={{position:"absolute",bottom:0,left:0,right:0,padding:"4px",color:"#fff",fontSize:9,fontWeight:700,textAlign:"center"}}>{cat.label}</div></button>);})}</div>{f.selectedCat&&<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{(SPECIALITES_CATEGORIES.find(sc=>sc.cat===CAT_MAPPING[f.selectedCat])?.items||[]).map(t=>{const active=f.specialites.includes(t);return <button key={t} type="button" onClick={()=>{const prev=f.specialites;setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]}));}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:11,cursor:"pointer"}}>{active?"✓ "+t:t}</button>;})}</div>}</div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Zone d intervention</div><ProAddressInput f={f} setF={setF}/><div style={{marginTop:14}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Rayon</div><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{const active=f.rayon===r;return <button key={r} type="button" onClick={()=>setF(p=>({...p,rayon:r}))} style={{padding:"7px 14px",borderRadius:8,border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:12,cursor:"pointer"}}>{r}</button>;})}</div></div></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 function ProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",entreprise:s?.entreprise||"",ville_intervention:s?.ville_intervention||"",lat:s?.lat||null,lon:s?.lon||null,rayon:s?.rayon||"",specialites:s?.specialites||[],selectedCat:null});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel,entreprise:f.entreprise,ville_intervention:f.ville_intervention,lat:f.lat,lon:f.lon,rayon:f.rayon,specialites:f.specialites})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{maxWidth:560}}><div style={{...S.card,marginBottom:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Entreprise" v={f.entreprise} set={e=>setF(p=>({...p,entreprise:e.target.value}))}/></div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Mes specialites</div>{f.specialites.length>0?<div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>{f.specialites.map(sp=><span key={sp} style={{display:"flex",alignItems:"center",gap:4,fontSize:12,padding:"4px 10px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}<span onClick={()=>setF(p=>({...p,specialites:p.specialites.filter(x=>x!==sp)}))} style={{cursor:"pointer",color:"rgba(255,111,0,0.6)",fontWeight:900,marginLeft:2}}>x</span></span>)}</div>:<div style={{color:"rgba(255,255,255,0.25)",fontSize:13,marginBottom:14}}>Aucune specialite selectionnee</div>}<div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:12}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Ajouter des specialites :</div><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:8}}>{TRAVAUX_CATS.map(cat=>{const sel=f.selectedCat===cat.id;return(<button key={cat.id} type="button" onClick={()=>setF(p=>({...p,selectedCat:sel?null:cat.id}))} style={{position:"relative",borderRadius:10,overflow:"hidden",aspectRatio:"1.5",border:"2px solid "+(sel?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}><img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover"}}/><div style={{position:"absolute",inset:0,background:sel?"rgba(255,111,0,0.5)":"rgba(0,0,0,0.4)"}}/><div style={{position:"absolute",bottom:0,left:0,right:0,padding:"4px",color:"#fff",fontSize:9,fontWeight:700,textAlign:"center"}}>{cat.label}</div></button>);})}</div>{f.selectedCat&&<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{(SPECIALITES_CATEGORIES.find(sc=>sc.cat===CAT_MAPPING[f.selectedCat])?.items||[]).map(t=>{const active=f.specialites.includes(t);return <button key={t} type="button" onClick={()=>{const prev=f.specialites;setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]}));}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:11,cursor:"pointer"}}>{active?"✓ "+t:t}</button>;})}</div>}</div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Zone d intervention</div><ProAddressInput f={f} setF={setF}/><div style={{marginTop:14}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Rayon</div><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{const active=f.rayon===r;return <button key={r} type="button" onClick={()=>setF(p=>({...p,rayon:r}))} style={{padding:"7px 14px",borderRadius:8,border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:12,cursor:"pointer"}}>{r}</button>;})}</div></div></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 function Shell({ ctx, color, title, maxW=660, children }) {
   return (
