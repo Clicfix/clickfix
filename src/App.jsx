@@ -360,6 +360,35 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
   <div style={{maxWidth:980,margin:'0 auto'}}>
+<section style={{padding:'100px 48px',background:'linear-gradient(135deg,#1a0a0a,#2d0f0f)'}}>
+  <div style={{maxWidth:980,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
+    <div>
+      <div style={{fontSize:11,fontWeight:700,color:'#ef4444',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Nouveau — Dépannage instantané</div>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18,color:'#fff'}}>Un artisan chez vous<br/>en moins d&apos;une heure</h2>
+      <p style={{fontSize:16,color:'rgba(255,255,255,0.5)',lineHeight:1.75,marginBottom:36,fontWeight:400}}>Fuite d&apos;eau, panne électrique, porte bloquée — nos artisans disponibles interviennent immédiatement près de chez vous.</p>
+      {[['📍 Géolocalisation automatique','Nous détectons votre position et trouvons les artisans les plus proches.'],['⚡ Réponse en temps réel','L&apos;artisan disponible le plus proche est alerté instantanément.'],['✅ Réservé aux membres','Connectez-vous gratuitement pour accéder au service d&apos;urgence.']].map(([t,d],i)=>(
+        <div key={i} style={{display:'flex',gap:14,marginBottom:20}}>
+          <div style={{width:32,height:32,borderRadius:'50%',background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,flexShrink:0}}>{t.split(' ')[0]}</div>
+          <div>
+            <p style={{fontWeight:700,fontSize:14,marginBottom:2,color:'#fff'}}>{t.split(' ').slice(1).join(' ')}</p>
+            <p style={{fontSize:13,color:'rgba(255,255,255,0.38)',lineHeight:1.55,margin:0}} dangerouslySetInnerHTML={{__html:d}}/>
+          </div>
+        </div>
+      ))}
+      <button onClick={()=>go('urgence')} style={{...F,marginTop:24,padding:'14px 32px',borderRadius:980,border:'none',background:'#ef4444',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 24px rgba(239,68,68,0.4)',letterSpacing:'-0.2px'}}>🚨 Accéder au dépannage urgent</button>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+      {[['🚿','Fuite d\'eau','Intervention immédiate'],['⚡','Panne électrique','Dépannage rapide'],['🔐','Serrurerie','Ouverture porte'],['🔥','Chauffage','Remise en marche']].map(([ico,t,d])=>(
+        <div key={t} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:20,padding:'24px 20px',textAlign:'center'}}>
+          <div style={{fontSize:32,marginBottom:10}}>{ico}</div>
+          <div style={{fontWeight:700,fontSize:14,color:'#fff',marginBottom:4}}>{t}</div>
+          <div style={{fontSize:12,color:'rgba(255,255,255,0.35)'}}>{d}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
     <div style={{marginBottom:64}}>
       <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8,color:'#1d1d1f'}}>Actualités travaux</h2>
       <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Les dernières nouvelles du secteur</p>
