@@ -1099,7 +1099,7 @@ function ProDashboard({ ctx }) {
   )}
   <div style={{flex:1}}>
     {TABS.map(t=>(
-      <button key={t.id} onClick={()=>setTab(t.id)} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(255,111,0,0.08)":"transparent",color:tab===t.id?"#FF6F00":"#6e6e73",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
+      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(255,111,0,0.08)":"transparent",color:tab===t.id?"#FF6F00":"#6e6e73",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
         <span style={{fontSize:14}}>{t.ico}</span>{t.label}
       </button>
     ))}
