@@ -1061,6 +1061,8 @@ function ProDashboard({ ctx }) {
   const [profile,setProfile]=useState(s);
   const [selRdv,setSelRdv]=useState(null);
   const [selConf,setSelConf]=useState(null);
+  const [dispo,setDispo]=useState(profile?.disponible||false);
+  async function toggleDispo(){const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
@@ -1112,6 +1114,7 @@ function ProDashboard({ ctx }) {
   </div>
   <div style={{height:1,background:"#f0f0f0",margin:"12px 0"}}/>
   <div style={{padding:"0 8px",marginBottom:8,fontSize:16,fontWeight:800,color:"#1d1d1f",letterSpacing:"-0.3px"}}>click<span style={{color:"#FF6F00"}}>&</span>fix</div>
+  <div style={{padding:"10px 14px",marginBottom:8,background:dispo?"rgba(34,197,94,0.06)":"rgba(0,0,0,0.02)",borderRadius:12,border:"1px solid "+(dispo?"rgba(34,197,94,0.2)":"#f0f0f0")}}><div style={{fontSize:10,fontWeight:600,color:"#8e8e93",marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>Dépannage urgent</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:12,fontWeight:600,color:dispo?"#22c55e":"#8e8e93"}}>{dispo?"Disponible":"Hors ligne"}</span><div onClick={toggleDispo} style={{width:44,height:26,borderRadius:13,background:dispo?"#22c55e":"#e5e5ea",position:"relative",cursor:"pointer",transition:"background .3s"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:dispo?20:2,transition:"left .3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></div></div></div>
   <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
 </div>
 <div style={{flex:1,marginLeft:260,padding:"40px 48px",minHeight:"100vh",background:"#fff"}}>
