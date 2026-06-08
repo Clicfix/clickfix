@@ -1053,113 +1053,154 @@ function ProPricing({ ctx }) {
 //  PRO DASHBOARD
 // 
 function ProDashboard({ ctx }) {
-  const [tab,setTab]=useState("rdv");
-  const s=ctx.sess, rdv=ctx.myLeadsPro, conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
-  const TABS=[{id:"rdv",ico:"",label:"Mes RDV"},{id:"confirmes",ico:"",label:"RDV confirmes"},{id:"docs",ico:"",label:"Documents"},{id:"pack",ico:"",label:"Mon Pack"},{id:"profil",ico:"",label:"Profil"}];
-  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0])ctx.updateSession({...s,...d[0]});}).catch(()=>{});}},[]);
-
-  return (
-    <div style={{ display:"flex", minHeight:"100vh" }}>
-      <div style={{ width:232, background:"rgba(255,255,255,0.025)", borderRight:"1px solid rgba(255,255,255,0.055)", display:"flex", flexDirection:"column", flexShrink:0 }}>
-        <div style={{ padding:"24px 18px 16px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
-            <span style={{ fontSize:20 }}></span>
-            <span style={{ fontSize:17, fontWeight:900, color:"#fff" }}>click<span style={{ color:"#FF6F00" }}>&</span>fix <span style={{ fontSize:9, background:"rgba(255,111,0,0.15)", color:"#FF6F00", border:"1px solid rgba(255,111,0,0.3)", borderRadius:4, padding:"1px 5px", fontWeight:700, letterSpacing:1 }}>PRO</span></span>
-          </div>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,0.52)", fontWeight:700 }}>{s?.prenom} {s?.nom}</div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,0.24)", marginTop:1 }}>{s?.entreprise}</div>
-        </div>
-        <div style={{ padding:"10px 8px", flex:1 }}>
-          {TABS.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", textAlign:"left", padding:"10px 12px", background:tab===t.id?"rgba(255,111,0,0.12)":"transparent", border:"none", borderRadius:10, color:tab===t.id?"#FF6F00":"rgba(255,255,255,0.4)", fontFamily:"'Outfit',sans-serif", fontSize:13, fontWeight:600, cursor:"pointer", marginBottom:3, transition:"all .15s" }}>
-              <span>{t.ico}</span>{t.label}
-            </button>
-          ))}
-        </div>
-        {s?.pack&&(
-          <div style={{ margin:"0 8px 8px", background:"rgba(255,111,0,0.07)", border:"1px solid rgba(255,111,0,0.17)", borderRadius:12, padding:13 }}>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,0.28)", letterSpacing:1, marginBottom:3 }}>PACK ACTIF</div>
-            <div style={{ fontSize:15, fontWeight:900, color:"#FF6F00" }}>{s.pack.name}</div>
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.35)", marginTop:1 }}>{s.rdv_restants||0}/{s.rdv_total||0} RDV</div>
-            <div style={{ marginTop:7, height:3, background:"rgba(255,255,255,0.07)", borderRadius:99 }}>
-              <div style={{ width:`${s.rdv_total>0?((s.rdv_restants||0)/s.rdv_total)*100:0}%`, height:"100%", background:"linear-gradient(90deg,#FF6F00,#FBC005)", borderRadius:99 }}/>
-            </div>
-          </div>
-        )}
-        <div style={{ padding:"0 8px 14px" }}>
-          <button onClick={ctx.logout} style={{ width:"100%", padding:"9px", background:"transparent", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, color:"rgba(255,255,255,0.22)", fontFamily:"'Outfit',sans-serif", fontSize:12, cursor:"pointer" }}> Déconnexion</button>
-        </div>
-      </div>
-
-      <div style={{ flex:1, overflow:"auto", background:"#07090f" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 28px", borderBottom:"1px solid rgba(255,255,255,0.05)", background:"rgba(255,255,255,0.015)" }}>
-          <div>
-            <div style={{ color:"#fff", fontWeight:800, fontSize:18 }}>Bonjour {s?.prenom} </div>
-            <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-          </div>
-          <div style={{ display:"flex", gap:8 }}>
-            {!ctx.docsOk&&<button style={S.smBtn} onClick={()=>setTab("docs")}> Documents</button>}
-            {!s?.pack&&<button style={S.smBtn} onClick={()=>ctx.setPage("pro-pricing")}> Acheter un pack</button>}
-          </div>
-        </div>
-
-        <div style={{ padding:"24px 28px" }}>
-          {tab==="rdv"&&<>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:24 }}>
-              <StatCard icon="" label="RDV ce mois"  val={rdv.length}         color="#FF6F00"/>
-              <StatCard icon="" label="Confirmés"     val={conf}               color="#22c55e"/>
-              <StatCard icon="" label="En attente"    val={rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length}    color="#FBC005"/>
-              <StatCard icon="" label="RDV restants"  val={s?.rdv_restants||0} color="#38bdf8"/>
-            </div>
-            <ST> Rendez-vous qualifiés</ST>
-            {rdv.length===0
-              ? <Empty icon="" title="Aucun RDV pour l'instant" sub="Activez un pack pour recevoir vos premiers RDV qualifiés sous 48h." cta="Voir les packs" onCta={()=>ctx.setPage("pro-pricing")}/>
-              : rdv.map(l=>(
-                <div key={l.id} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:14, padding:"16px 18px", marginBottom:10 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7, flexWrap:"wrap" }}>
-                        <span style={{ color:"#fff", fontWeight:800, fontSize:16 }}>{l.client_nom}</span>
-                        <SBadge s={l.statut}/>
-                      </div>
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:14, fontSize:12, color:"rgba(255,255,255,0.4)" }}>
-                        {l.created_at&&<span> {new Date(l.created_at).toLocaleDateString("fr-FR")}</span>}
-                        {l.adresse&&<span> {l.adresse}</span>}
-                        {l.travaux&&<span> {l.travaux}</span>}
-                        {l.budget&&<span> {l.budget}</span>}
-                      </div>
-                      {l.note&&<div style={{ marginTop:6, fontSize:12, color:"rgba(255,165,0,.65)", fontStyle:"italic" }}> {l.note}</div>}
-                    </div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                      {l.client_tel&&<a href={`tel:${l.client_tel}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5 }}> {l.client_tel}</a>}
-                      {l.client_email&&<a href={`mailto:${l.client_email}`} style={{ ...S.smBtn, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:5, borderColor:"rgba(56,189,248,0.3)", color:"#38bdf8", background:"rgba(56,189,248,0.07)" }}> Email</a>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.confirmerRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(34,197,94,0.4)", color:"#22c55e", background:"rgba(34,197,94,0.08)", cursor:"pointer" }}> Confirmer</button>}
-                      {(l.statut==="dispatche"||l.statut==="en attente")&&<button onClick={()=>ctx.refuserRdv(l)} style={{ ...S.smBtn, borderColor:"rgba(239,68,68,0.3)", color:"#ef4444", background:"rgba(239,68,68,0.07)", cursor:"pointer" }}> Refuser</button>}
-                    </div>
-                  </div>
-                </div>
-              ))
-            }
-          </>}
-
-          {tab==="confirmes"&&<><ST>RDV confirmes</ST>{rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?<Empty icon="" title="Aucun RDV confirme" sub="Vos RDV confirmes apparaitront ici."/>:rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(<div key={l.id} style={{...S.leadRow,marginBottom:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><div style={{color:"#fff",fontWeight:700,fontSize:15}}>{l.travaux||l.precision}</div><span style={{fontSize:11,padding:"3px 9px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.4)"}}>Confirme</span></div><div style={{display:"grid",gap:6}}>{[["Specialite",l.precision],["Details",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Client",l.client_nom],["Tel",l.client_tel]].map(([k,v])=>v&&<div key={k} style={{display:"flex",gap:8}}><span style={{color:"rgba(255,255,255,0.35)",fontSize:12,minWidth:80}}>{k}</span><span style={{color:"#fff",fontSize:12}}>{v}</span></div>)}</div>{l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(34,197,94,0.1)",color:"#22c55e"}}>{sl.label||sl}</span>)}</div>}</div>))}</>}          {tab==="docs"&&<>
-            <ST> Mes Documents</ST>
-            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
-            </div>
-          </>}
-
-          {tab==="pack"&&<PackTab s={s} ctx={ctx}/>}
-          {tab==="profil"&&<ProfilTab s={s} ctx={ctx}/>}
-        </div>
-      </div>
-    </div>
-  );
+  const s=ctx.sess;
+  const [tab,setTab]=useState("rdv");
+  const [profile,setProfile]=useState(s);
+  const F={fontFamily:"'Inter',sans-serif"};
+  const rdv=ctx.myLeadsPro;
+  const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
+  const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
+  useEffect(()=>{
+    if(!s?.id)return;
+    const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+    const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+    fetch(SB+"/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":KEY,"Authorization":"Bearer "+(s.token||KEY)}})
+    .then(r=>r.json()).then(d=>{if(d[0])setProfile({...s,...d[0]});}).catch(()=>{});
+  },[s?.id]);
+  const TABS=[{id:"rdv",ico:"📋",label:"Mes RDV"},{id:"confirmes",ico:"✅",label:"RDV confirmés"},{id:"docs",ico:"📄",label:"Documents"},{id:"pack",ico:"📦",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
+  const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
+  return(
+<div style={{...F,minHeight:"100vh",background:"#f5f5f7",color:"#1d1d1f",display:"flex"}}>
+<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap')"}</style>
+<div style={{width:240,minHeight:"100vh",background:"#fff",borderRight:"0.5px solid rgba(0,0,0,0.08)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
+  <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
+    <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>{initiales.toUpperCase()}</div>
+    <div>
+      <div style={{fontSize:13,fontWeight:700,color:"#1d1d1f",lineHeight:1.2}}>{s?.prenom} {s?.nom}</div>
+      <div style={{fontSize:11,color:"#6e6e73"}}>{s?.entreprise||"Artisan"}</div>
+    </div>
+  </div>
+  {profile?.pack&&(
+    <div style={{background:"rgba(255,111,0,0.06)",border:"0.5px solid rgba(255,111,0,0.15)",borderRadius:12,padding:"12px 14px",marginBottom:16}}>
+      <div style={{fontSize:10,fontWeight:600,color:"rgba(255,111,0,0.6)",letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Pack actif</div>
+      <div style={{fontSize:15,fontWeight:800,color:"#FF6F00"}}>{profile.pack}</div>
+      <div style={{fontSize:12,color:"#6e6e73",marginTop:2}}>{profile.rdv_restants||0}/{profile.rdv_total||0} RDV</div>
+      <div style={{marginTop:8,height:3,background:"rgba(0,0,0,0.06)",borderRadius:99}}>
+        <div style={{width:`${profile.rdv_total>0?((profile.rdv_restants||0)/profile.rdv_total)*100:0}%`,height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99}}/>
+      </div>
+    </div>
+  )}
+  {!profile?.pack&&(
+    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"10px",background:"#FF6F00",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:16}}>Acheter un pack</button>
+  )}
+  <div style={{flex:1}}>
+    {TABS.map(t=>(
+      <button key={t.id} onClick={()=>setTab(t.id)} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(255,111,0,0.08)":"transparent",color:tab===t.id?"#FF6F00":"#6e6e73",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
+        <span style={{fontSize:14}}>{t.ico}</span>{t.label}
+      </button>
+    ))}
+  </div>
+  <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:"transparent",color:"rgba(0,0,0,0.2)",fontSize:12,cursor:"pointer",textAlign:"left"}}>Déconnexion</button>
+</div>
+<div style={{flex:1,marginLeft:240,padding:"40px 48px",minHeight:"100vh"}}>
+  <div style={{maxWidth:800,margin:"0 auto"}}>
+    <div style={{marginBottom:32}}>
+      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
+      <p style={{fontSize:13,color:"#6e6e73",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:32}}>
+      {[["RDV ce mois",thisMonth,"#FF6F00","rgba(255,111,0,0.08)","rgba(255,111,0,0.15)"],["Confirmés",conf,"#22c55e","rgba(34,197,94,0.08)","rgba(34,197,94,0.15)"],["En attente",rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length,"#FBC005","rgba(251,192,5,0.08)","rgba(251,192,5,0.15)"],["RDV restants",profile?.rdv_restants||0,"#38bdf8","rgba(56,189,248,0.08)","rgba(56,189,248,0.15)"]].map(([label,val,color,bg,border])=>(
+        <div key={label} style={{background:bg,border:"0.5px solid "+border,borderRadius:16,padding:"16px 18px"}}>
+          <div style={{fontSize:10,fontWeight:600,color:color,letterSpacing:2,textTransform:"uppercase",opacity:0.8,marginBottom:6}}>{label}</div>
+          <div style={{fontSize:28,fontWeight:800,color:color,letterSpacing:"-1px"}}>{val}</div>
+        </div>
+      ))}
+    </div>
+    {tab==="rdv"&&(
+      <div>
+        <div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes RDV</div>
+        {rdv.length===0?(
+          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+            <div style={{fontSize:40,marginBottom:12}}>📋</div>
+            <div style={{fontWeight:700,fontSize:16,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
+            <div style={{fontSize:13,color:"#6e6e73",marginBottom:20}}>Activez un pack pour recevoir vos premiers RDV</div>
+            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"12px 24px",background:"#FF6F00",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>Voir les packs</button>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {rdv.map(l=>(
+              <div key={l.id} style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderLeft:"3px solid #FF6F00",borderRadius:14,padding:"16px 18px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <div>
+                    <span style={{fontWeight:700,fontSize:14,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
+                    {l.ville&&<span style={{fontSize:12,color:"#6e6e73",marginLeft:8}}>📍 {l.ville}</span>}
+                  </div>
+                  <SBadge s={l.statut}/>
+                </div>
+                <div style={{fontSize:12,color:"#6e6e73",display:"flex",gap:12,flexWrap:"wrap",marginBottom:10}}>
+                  {l.client_nom&&<span>👤 {l.client_nom}</span>}
+                  {l.surface&&<span>📐 {l.surface}</span>}
+                  {l.budget&&<span>💰 {l.budget}</span>}
+                </div>
+                {l.details&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:10,padding:"8px 12px",background:"#f5f5f7",borderRadius:8}}>{l.details}</div>}
+                {(l.statut==="dispatche"||l.statut==="en attente")&&(
+                  <div style={{display:"flex",gap:8}}>
+                    <button onClick={()=>ctx.confirmerRdv(l)} style={{...F,flex:1,padding:"9px",background:"rgba(34,197,94,0.08)",border:"0.5px solid rgba(34,197,94,0.3)",borderRadius:10,color:"#22c55e",fontWeight:600,fontSize:13,cursor:"pointer"}}>✓ Confirmer</button>
+                    <button onClick={()=>ctx.refuserRdv(l)} style={{...F,flex:1,padding:"9px",background:"rgba(239,68,68,0.06)",border:"0.5px solid rgba(239,68,68,0.2)",borderRadius:10,color:"#ef4444",fontWeight:600,fontSize:13,cursor:"pointer"}}>✕ Refuser</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tab==="confirmes"&&(
+      <div>
+        <div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>RDV confirmés</div>
+        {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?(
+          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+            <div style={{fontSize:40,marginBottom:12}}>✅</div>
+            <div style={{fontWeight:700,fontSize:16,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(
+              <div key={l.id} style={{background:"#fff",border:"0.5px solid rgba(34,197,94,0.2)",borderLeft:"3px solid #22c55e",borderRadius:14,padding:"16px 18px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <span style={{fontWeight:700,fontSize:14,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
+                  <span style={{fontSize:11,padding:"3px 9px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",fontWeight:600}}>Confirmé</span>
+                </div>
+                <div style={{display:"grid",gap:6}}>
+                  {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",l.details],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
+                    <div key={k} style={{display:"flex",gap:8}}>
+                      <span style={{fontSize:11,color:"#6e6e73",minWidth:80,flexShrink:0}}>{k}</span>
+                      <span style={{fontSize:12,color:"#1d1d1f"}}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
+                  <div style={{marginTop:10,display:"flex",flexWrap:"wrap",gap:5}}>
+                    {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
+                      <span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(56,189,248,0.08)",color:"#38bdf8",border:"0.5px solid rgba(56,189,248,0.2)"}}>{sl.label||sl}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tab==="docs"&&<DocsTab s={profile} ctx={ctx}/>}
+    {tab==="pack"&&<PackTab s={profile} ctx={ctx}/>}
+    {tab==="profil"&&<ProfilTab s={profile} ctx={ctx}/>}
+  </div>
+</div>
+</div>
+);
 }
 
-// 
-//  SHARED UI
-// 
 function ProfilTab({s,ctx}){const [f,setF]=useState({prenom:s?.prenom||"",nom:s?.nom||"",tel:s?.tel||"",entreprise:s?.entreprise||"",ville_intervention:s?.ville_intervention||"",lat:s?.lat||null,lon:s?.lon||null,rayon:s?.rayon||"",specialites:s?.specialites||[],selectedCat:null});async function save(){try{const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch(SB+"/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({prenom:f.prenom,nom:f.nom,tel:f.tel,entreprise:f.entreprise,ville_intervention:f.ville_intervention,lat:f.lat,lon:f.lon,rayon:f.rayon,specialites:f.specialites})});ctx.updateSession({...s,...f});ctx.notify("Profil mis a jour !");}catch(e){ctx.notify("Erreur","err");}}return(<div style={{maxWidth:560}}><div style={{...S.card,marginBottom:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Inp label="Prenom" v={f.prenom} set={e=>setF(p=>({...p,prenom:e.target.value}))}/><Inp label="Nom" v={f.nom} set={e=>setF(p=>({...p,nom:e.target.value}))}/><Inp label="Telephone" v={f.tel} set={e=>setF(p=>({...p,tel:e.target.value.replace(/[^0-9]/g,"")}))} type="tel"/><Inp label="Entreprise" v={f.entreprise} set={e=>setF(p=>({...p,entreprise:e.target.value}))}/></div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Mes specialites</div>{f.specialites.length>0?<div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>{f.specialites.map(sp=><span key={sp} style={{display:"flex",alignItems:"center",gap:4,fontSize:12,padding:"4px 10px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}<span onClick={()=>setF(p=>({...p,specialites:p.specialites.filter(x=>x!==sp)}))} style={{cursor:"pointer",color:"rgba(255,111,0,0.6)",fontWeight:900,marginLeft:2}}>x</span></span>)}</div>:<div style={{color:"rgba(255,255,255,0.25)",fontSize:13,marginBottom:14}}>Aucune specialite selectionnee</div>}<div style={{borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:12}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Ajouter des specialites :</div><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:8}}>{TRAVAUX_CATS.map(cat=>{const sel=f.selectedCat===cat.id;return(<button key={cat.id} type="button" onClick={()=>setF(p=>({...p,selectedCat:sel?null:cat.id}))} style={{position:"relative",borderRadius:10,overflow:"hidden",aspectRatio:"1.5",border:"2px solid "+(sel?"#FF6F00":"transparent"),cursor:"pointer",padding:0}}><img src={cat.img} alt={cat.label} style={{width:"100%",height:"100%",objectFit:"cover"}}/><div style={{position:"absolute",inset:0,background:sel?"rgba(255,111,0,0.5)":"rgba(0,0,0,0.4)"}}/><div style={{position:"absolute",bottom:0,left:0,right:0,padding:"4px",color:"#fff",fontSize:9,fontWeight:700,textAlign:"center"}}>{cat.label}</div></button>);})}</div>{f.selectedCat&&<div style={{display:"flex",flexWrap:"wrap",gap:5}}>{(SPECIALITES_CATEGORIES.find(sc=>sc.cat===CAT_MAPPING[f.selectedCat])?.items||[]).map(t=>{const active=f.specialites.includes(t);return <button key={t} type="button" onClick={()=>{const prev=f.specialites;setF(p=>({...p,specialites:active?prev.filter(x=>x!==t):[...prev,t]}));}} style={{padding:"5px 10px",borderRadius:6,border:"1px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:11,cursor:"pointer"}}>{active?"✓ "+t:t}</button>;})}</div>}</div></div><div style={{...S.card,marginBottom:14}}><div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:12,fontWeight:700}}>Zone d intervention</div><ProAddressInput f={f} setF={setF}/><div style={{marginTop:14}}><div style={{fontSize:12,color:"rgba(255,255,255,0.35)",marginBottom:8}}>Rayon</div><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{["10 km","20 km","30 km","50 km","100 km","200 km"].map(r=>{const active=f.rayon===r;return <button key={r} type="button" onClick={()=>setF(p=>({...p,rayon:r}))} style={{padding:"7px 14px",borderRadius:8,border:"1.5px solid "+(active?"#FF6F00":"rgba(255,255,255,0.08)"),background:active?"rgba(255,111,0,0.15)":"transparent",color:active?"#FF6F00":"rgba(255,255,255,0.4)",fontSize:12,cursor:"pointer"}}>{r}</button>;})}</div></div></div><BigBtn onClick={save}>Enregistrer</BigBtn></div>);}
 function Shell({ ctx, color, title, maxW=660, children }) {
   return (
