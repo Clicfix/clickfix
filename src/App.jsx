@@ -584,7 +584,7 @@ setArtisans(sorted);
 async function sendUrgence(artisan){
 setLoading(true);
 try{
-await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
+console.log("SESS:",ctx.sess);await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
 setSent(true);
 }catch(e){}
 setLoading(false);
