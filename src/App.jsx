@@ -1074,9 +1074,9 @@ function ProDashboard({ ctx }) {
   const TABS=[{id:"rdv",ico:"📋",label:"Mes RDV"},{id:"confirmes",ico:"✅",label:"RDV confirmés"},{id:"docs",ico:"📄",label:"Documents"},{id:"pack",ico:"📦",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
   const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
   return(
-<div style={{...F,minHeight:"100vh",background:"#f5f5f7",color:"#1d1d1f",display:"flex"}}>
+<div style={{...F,minHeight:"100vh",background:"#e8e8ed",color:"#1d1d1f",display:"flex"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap')"}</style>
-<div style={{width:240,minHeight:"100vh",background:"#fff",borderRight:"0.5px solid rgba(0,0,0,0.08)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
+<div style={{width:240,minHeight:"100vh",background:"#fff",borderRight:"0.5px solid rgba(0,0,0,0.12)",boxShadow:"2px 0 12px rgba(0,0,0,0.06)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
   <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
     <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>{initiales.toUpperCase()}</div>
     <div>
@@ -1124,7 +1124,7 @@ function ProDashboard({ ctx }) {
       <div>
         <div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes RDV</div>
         {rdv.length===0?(
-          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.1)",boxShadow:"0 2px 8px rgba(0,0,0,0.04)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
             <div style={{fontSize:40,marginBottom:12}}>📋</div>
             <div style={{fontWeight:700,fontSize:16,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
             <div style={{fontSize:13,color:"#6e6e73",marginBottom:20}}>Activez un pack pour recevoir vos premiers RDV</div>
@@ -1133,7 +1133,7 @@ function ProDashboard({ ctx }) {
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {rdv.map(l=>(
-              <div key={l.id} style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderLeft:"3px solid #FF6F00",borderRadius:14,padding:"16px 18px"}}>
+              <div key={l.id} style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.1)",boxShadow:"0 2px 8px rgba(0,0,0,0.04)",borderLeft:"3px solid #FF6F00",borderRadius:14,padding:"16px 18px"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
                   <div>
                     <span style={{fontWeight:700,fontSize:14,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
@@ -1163,7 +1163,7 @@ function ProDashboard({ ctx }) {
       <div>
         <div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>RDV confirmés</div>
         {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?(
-          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+          <div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.1)",boxShadow:"0 2px 8px rgba(0,0,0,0.04)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
             <div style={{fontSize:40,marginBottom:12}}>✅</div>
             <div style={{fontWeight:700,fontSize:16,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
           </div>
@@ -1196,7 +1196,7 @@ function ProDashboard({ ctx }) {
         )}
       </div>
     )}
-    {tab==="docs"&&<div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:28}}><div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:20}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map(d=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"0.5px solid rgba(0,0,0,0.06)"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#6e6e73",marginTop:2}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"8px 16px",background:"#f5f5f7",border:"0.5px solid rgba(0,0,0,0.1)",borderRadius:8,fontSize:12,fontWeight:600,color:"#1d1d1f",cursor:"pointer"}}>{profile?.docs?.[d.id]?"Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
+    {tab==="docs"&&<div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.1)",boxShadow:"0 2px 8px rgba(0,0,0,0.04)",borderRadius:20,padding:28}}><div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:20}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map(d=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"0.5px solid rgba(0,0,0,0.06)"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#6e6e73",marginTop:2}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"8px 16px",background:"#f5f5f7",border:"0.5px solid rgba(0,0,0,0.1)",borderRadius:8,fontSize:12,fontWeight:600,color:"#1d1d1f",cursor:"pointer"}}>{profile?.docs?.[d.id]?"Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
     {tab==="pack"&&<PackTab s={profile} ctx={ctx}/>}
     {tab==="profil"&&<ProfilTab s={profile} ctx={ctx}/>}
   </div>
