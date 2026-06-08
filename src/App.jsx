@@ -1147,7 +1147,7 @@ function ProDashboard({ ctx }) {
               <div key={l.id} className="pro-row" onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selRdv?.id===l.id?"rgba(255,111,0,0.3)":"#f0f0f0"),borderLeft:"4px solid #FF6F00",borderRadius:18,padding:"18px 22px",boxShadow:selRdv?.id===l.id?"0 8px 32px rgba(255,111,0,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
+                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
                     {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -1193,7 +1193,7 @@ function ProDashboard({ ctx }) {
               <div key={l.id} className="pro-row" onClick={()=>setSelConf(selConf?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selConf?.id===l.id?"rgba(34,197,94,0.3)":"#f0f0f0"),borderLeft:"4px solid #22c55e",borderRadius:18,padding:"18px 22px",boxShadow:selConf?.id===l.id?"0 8px 32px rgba(34,197,94,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
+                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
                     {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
