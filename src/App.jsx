@@ -290,7 +290,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
       setArtLoading(false);
     }).catch(()=>setArtLoading(false));
   },[]);
-  function go(role){ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
+  function go(role){if(role==='urgence'){ctx.setPage('urgence');return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
   const F={fontFamily:"'Inter',sans-serif"};
   return(
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
@@ -312,7 +312,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
     <h1 style={{fontSize:'clamp(40px,6vw,80px)',fontWeight:800,letterSpacing:'-2.5px',lineHeight:1.05,marginBottom:18,color:'#fff'}}>Trouvez <span style={{color:'#FF6F00'}}>l&apos;artisan</span><br/>qu&apos;il vous faut</h1>
     <p style={{fontSize:'clamp(15px,2vw,19px)',color:'rgba(255,255,255,0.65)',maxWidth:480,margin:'0 auto 44px',lineHeight:1.65,fontWeight:300}}>Click&amp;fix met en relation particuliers et artisans. Rapide, fiable et gratuit.</p>
     <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
-      <button className="hero-btn" onClick={()=>go('part')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'#fff',color:'#1d1d1f',fontSize:15,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Déposer une demande</button>
+      <button className="hero-btn" onClick={()=>go('part')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'#fff',color:'#1d1d1f',fontSize:15,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Déposer une demande</button><button className="hero-btn" onClick={()=>ctx.setPage('urgence')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'rgba(239,68,68,0.9)',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer',letterSpacing:'-0.2px'}}>🚨 Dépannage urgent</button>
       <button className="hero-btn" onClick={()=>go('pro')} style={{...F,padding:'14px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.4)',background:'transparent',color:'#fff',fontSize:15,fontWeight:500,cursor:'pointer',letterSpacing:'-0.2px'}}>Je suis artisan</button>
     </div>
   </div>
