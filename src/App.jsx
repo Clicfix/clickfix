@@ -227,7 +227,7 @@ setBusy(false);
       const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
       const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
       await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
-      notify("Document depose avec succes !");
+      notify("Document depose avec succes !");ctx.updateSession({...sess,docs:newDocs});
     } catch(e) { notify("Erreur upload : "+e.message,"err"); }
     setBusy(false);
   }
@@ -549,7 +549,7 @@ return(
   <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
   <div style={{flex:1}}>
     {TABS.map(t=>(
-      <button key={t.id} onClick={()=>setTab(t.id)} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
+      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
         <span style={{fontSize:14}}>{t.ico}</span>{t.label}
         {t.id==="demandes"&&ctx.myLeadsPart.length>0&&<span style={{marginLeft:"auto",fontSize:11,fontWeight:700,background:"rgba(56,189,248,0.15)",color:"#38bdf8",padding:"2px 7px",borderRadius:99}}>{ctx.myLeadsPart.length}</span>}
       </button>
@@ -1057,7 +1057,7 @@ function ProPricing({ ctx }) {
 // 
 function ProDashboard({ ctx }) {
   const s=ctx.sess;
-  const [tab,setTab]=useState("rdv");
+  const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
