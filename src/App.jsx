@@ -525,7 +525,7 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 //  PARTICULIER HOME
 // 
 function PartHome({ctx}){
-const [selLead,setSelLead]=useState(null);const [selRdv,setSelRdv]=useState(null);
+const [selLead,setSelLead]=useState(null);const [selRdv,setSelRdv]=useState(null);const [dispo,setDispo]=useState(s?.disponible||false);async function toggleDispo(){const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible pour les urgences !":"Vous etes hors ligne");}
 const s=ctx.sess;
 const [tab,setTab]=useState("demandes");
 const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé");
