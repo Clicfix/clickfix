@@ -522,7 +522,7 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 //  PARTICULIER HOME
 // 
 function PartHome({ctx}){
-const [selLead,setSelLead]=useState(null);
+const [selLead,setSelLead]=useState(null);const [selRdv,setSelRdv]=useState(null);
 const s=ctx.sess;
 const [tab,setTab]=useState("demandes");
 const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé");
