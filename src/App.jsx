@@ -626,14 +626,27 @@ return(
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {confirmed.map(l=>(
-              <div key={l.id} style={{background:"rgba(34,197,94,0.04)",border:"0.5px solid rgba(34,197,94,0.15)",borderLeft:"3px solid #22c55e",borderRadius:14,padding:"16px 18px"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                  <span style={{fontWeight:700,fontSize:14}}>{l.travaux||l.precision}</span>
+              <div key={l.id} onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"rgba(34,197,94,0.04)",border:"0.5px solid "+(selRdv?.id===l.id?"rgba(34,197,94,0.4)":"rgba(34,197,94,0.15)"),borderLeft:"3px solid #22c55e",borderRadius:14,padding:"16px 18px",cursor:"pointer",transition:"all .2s"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div><span style={{fontWeight:700,fontSize:14,color:"#fff"}}>{l.travaux||l.precision}</span>{l.ville&&<span style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginLeft:8}}>📍 {l.ville}</span>}</div>
                   <SBadge s={l.statut}/>
                 </div>
-                {l.heure&&<div style={{fontSize:12,color:"#22c55e",marginBottom:8}}>🕐 {l.heure}</div>}
-                {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&<div style={{marginTop:10,paddingTop:10,borderTop:"0.5px solid rgba(34,197,94,0.15)"}}><div style={{fontSize:10,fontWeight:600,color:"rgba(56,189,248,0.6)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Creneaux proposes</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><div key={i} style={{background:"rgba(56,189,248,0.07)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#38bdf8",fontWeight:500}}>📅 {sl.label||sl}</div>)}</div></div>}{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+                {selRdv?.id===l.id&&(
+                  <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(34,197,94,0.15)"}}>
+                    <div style={{display:"grid",gap:8,marginBottom:12}}>
+                      {[["Spécialité",l.precision],["Adresse",l.adresse],["Ville",l.ville],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(<div key={k} style={{display:"flex",gap:12}}><span style={{fontSize:11,color:"rgba(255,255,255,0.25)",minWidth:80,flexShrink:0}}>{k}</span><span style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>{v}</span></div>))}
+                    </div>
+                    {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
+                      <div style={{marginBottom:12}}>
+                        <div style={{fontSize:10,fontWeight:600,color:"rgba(56,189,248,0.6)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Créneaux</div>
+                        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><div key={i} style={{background:"rgba(56,189,248,0.07)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#38bdf8",fontWeight:500}}>{sl.label||sl}</div>)}</div>
+                      </div>
+                    )}
+                    {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+                  </div>
+                )}
               </div>
+            ))}
             ))}
           </div>
         )}
