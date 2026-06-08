@@ -1297,7 +1297,7 @@ const S = {
   authCard:{ background:"rgba(255,255,255,0.04)", backdropFilter:"blur(28px)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:22, padding:"36px 32px", boxShadow:"0 32px 80px rgba(0,0,0,.4)" },
   smBtn:   { padding:"7px 13px", background:"rgba(255,111,0,0.1)", border:"1px solid rgba(255,111,0,0.3)", borderRadius:8, color:"#FF6F00", fontWeight:700, fontSize:12, cursor:"pointer", fontFamily:"'Outfit',sans-serif", whiteSpace:"nowrap" },
   backBtn: { background:"none", border:"none", color:"rgba(255,255,255,0.32)", cursor:"pointer", fontSize:13, marginBottom:20, display:"flex", alignItems:"center", gap:6 },
-  lbl:     { fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:.5, textTransform:"uppercase", display:"block", marginBottom:5 },
+  lbl:     { fontSize:11, fontWeight:700, color:"#6e6e73", letterSpacing:.5, textTransform:"uppercase", display:"block", marginBottom:5 },
   inp:     { background:"#f5f5f7", border:"1.5px solid rgba(0,0,0,0.1)", borderRadius:10, padding:"11px 13px", color:"#1d1d1f", fontSize:14, fontFamily:"'Outfit',sans-serif", width:"100%", outline:"none", transition:"border-color .18s" },
   leadRow: { background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"14px 16px", marginBottom:10 },
 };
