@@ -642,7 +642,7 @@ return(
                     {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
                       <div style={{marginBottom:12}}>
                         <div style={{fontSize:10,fontWeight:600,color:"rgba(56,189,248,0.6)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Créneaux</div>
-                        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><div key={i} style={{background:"rgba(56,189,248,0.07)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#38bdf8",fontWeight:500}}>{sl.label||sl}</div>)}</div>
+                        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><div key={i} style={{background:"rgba(56,189,248,0.07)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#38bdf8",fontWeight:500}}>{(sl.label||sl).replace(/([0-9]{2})\/([0-9]{2})\/[0-9]{4} a ([0-9]{2}:[0-9]{2})/,(m,d,mo,h)=>["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][new Date(2026,mo-1,d).getDay()]+" "+d+" "+["jan","fev","mars","avr","mai","juin","juil","aout","sep","oct","nov","dec"][mo-1]+" a "+h)}</div>)}</div>
                       </div>
                     )}
                     {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
@@ -1211,7 +1211,7 @@ function ProDashboard({ ctx }) {
                     {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
                       <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
                         {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
-                          <span key={i} style={{fontSize:11,padding:"4px 12px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {sl.label||sl}</span>
+                          <span key={i} style={{fontSize:11,padding:"4px 12px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {(sl.label||sl).replace(/([0-9]{2})\/([0-9]{2})\/[0-9]{4} a ([0-9]{2}:[0-9]{2})/,(m,d,mo,h)=>["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][new Date(2026,mo-1,d).getDay()]+" "+d+" "+["jan","fev","mars","avr","mai","juin","juil","aout","sep","oct","nov","dec"][mo-1]+" a "+h)}</span>
                         ))}
                       </div>
                     )}
