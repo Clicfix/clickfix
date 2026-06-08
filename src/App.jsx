@@ -1192,7 +1192,7 @@ function ProDashboard({ ctx }) {
         )}
       </div>
     )}
-    {tab==="docs"&&<DocsTab s={profile} ctx={ctx}/>}
+    {tab==="docs"&&<div style={{background:"#fff",border:"0.5px solid rgba(0,0,0,0.08)",borderRadius:20,padding:28}}><div style={{fontSize:11,fontWeight:600,color:"#6e6e73",letterSpacing:2,textTransform:"uppercase",marginBottom:20}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map(d=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"0.5px solid rgba(0,0,0,0.06)"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#6e6e73",marginTop:2}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"8px 16px",background:"#f5f5f7",border:"0.5px solid rgba(0,0,0,0.1)",borderRadius:8,fontSize:12,fontWeight:600,color:"#1d1d1f",cursor:"pointer"}}>{profile?.docs?.[d.id]?"Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
     {tab==="pack"&&<PackTab s={profile} ctx={ctx}/>}
     {tab==="profil"&&<ProfilTab s={profile} ctx={ctx}/>}
   </div>
