@@ -703,7 +703,7 @@ return(
       <div style={{fontSize:11,color:"rgba(255,255,255,0.28)"}}>Particulier</div>
     </div>
   </div>
-  <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
+  <button onClick={()=>ctx.setPage("urgence")} style={{...F,width:"100%",padding:"11px 16px",background:"#ef4444",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:8,letterSpacing:"-0.2px"}}>🚨 Dépannage urgent</button><button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
   <div style={{flex:1}}>
     {TABS.map(t=>(
       <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
