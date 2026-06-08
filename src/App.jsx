@@ -1082,7 +1082,7 @@ function ProDashboard({ ctx }) {
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
 <div style={{width:260,minHeight:"100vh",background:"#fafafa",borderRight:"1px solid #f0f0f0",padding:"28px 16px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
   <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
-    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
+    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#1d1d1f",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
     <div>
       <div style={{fontSize:14,fontWeight:700,color:"#1d1d1f",letterSpacing:"-0.2px"}}>{s?.prenom} {s?.nom}</div>
       <div style={{fontSize:11,color:"#8e8e93",marginTop:1}}>{s?.entreprise||"Artisan"}</div>
@@ -1101,13 +1101,13 @@ function ProDashboard({ ctx }) {
       <div style={{fontSize:10,color:"#8e8e93",marginTop:5}}>{rdvPct}% restants</div>
     </div>
   ):(
-    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.25)"}}>🚀 Activer un pack</button>
+    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#1d1d1f",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.25)"}}>🚀 Activer un pack</button>
   )}
   <div style={{flex:1}}>
     {TABS.map(t=>(
       <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:12,border:"none",background:tab===t.id?"linear-gradient(135deg,rgba(255,111,0,0.08),rgba(251,192,5,0.05))":"transparent",color:tab===t.id?"#FF6F00":"#3a3a3c",fontWeight:tab===t.id?700:500,fontSize:13,cursor:"pointer",marginBottom:3,textAlign:"left",transition:"all .2s",boxShadow:tab===t.id?"inset 0 0 0 1px rgba(255,111,0,0.15)":"none"}}>
         <span style={{fontSize:15}}>{t.ico}</span>{t.label}
-        {t.id==="rdv"&&pending>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#fff",padding:"2px 7px",borderRadius:99}}>{pending}</span>}
+        {t.id==="rdv"&&pending>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#1d1d1f",padding:"2px 7px",borderRadius:99}}>{pending}</span>}
       </button>
     ))}
   </div>
@@ -1137,7 +1137,7 @@ function ProDashboard({ ctx }) {
             <div style={{fontSize:52,marginBottom:16}}>📋</div>
             <div style={{fontWeight:700,fontSize:17,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
             <div style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Activez un pack pour recevoir vos premiers RDV</div>
-            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"13px 32px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.25)"}}>Voir les packs</button>
+            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"13px 32px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#1d1d1f",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.25)"}}>Voir les packs</button>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
