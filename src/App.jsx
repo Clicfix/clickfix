@@ -526,75 +526,84 @@ const [selLead,setSelLead]=useState(null);
 const s=ctx.sess;
 const [tab,setTab]=useState("demandes");
 const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé");
+const pending=ctx.myLeadsPart.filter(l=>l.statut==="en attente"||l.statut==="dispatche");
 const TABS=[{id:"demandes",ico:"📋",label:"Mes demandes"},{id:"rdv",ico:"✅",label:"RDV confirmés"},{id:"profil",ico:"👤",label:"Mon profil"}];
 const F={fontFamily:"'Inter',sans-serif"};
+function timeAgo(d){const diff=Date.now()-new Date(d).getTime();const mins=Math.floor(diff/60000);const hours=Math.floor(diff/3600000);const days=Math.floor(diff/86400000);if(days>0)return"il y a "+days+" jour"+(days>1?"s":"");if(hours>0)return"il y a "+hours+"h";if(mins>0)return"il y a "+mins+" min";return"à l instant";}
+function statusColor(s){if(s==="confirme"||s==="confirmed"||s==="confirmé")return"#22c55e";if(s==="dispatche")return"#38bdf8";return"#FBC005";}
+const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
 return(
 <div style={{...F,minHeight:"100vh",background:"#0a0a0a",display:"flex",color:"#fff"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap')"}</style>
-<div style={{width:240,minHeight:"100vh",background:"rgba(255,255,255,0.03)",borderRight:"0.5px solid rgba(255,255,255,0.08)",padding:"28px 16px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
-  <div style={{padding:"0 8px",marginBottom:32}}>
-    <div style={{fontSize:17,fontWeight:800,color:"#fff",letterSpacing:"-0.3px",marginBottom:4}}>click<span style={{color:"#38bdf8"}}>&</span>fix</div>
-    <div style={{fontSize:12,color:"rgba(255,255,255,0.3)",fontWeight:400}}>{s?.prenom} {s?.nom}</div>
+<div style={{width:240,minHeight:"100vh",background:"rgba(255,255,255,0.025)",borderRight:"0.5px solid rgba(255,255,255,0.07)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
+  <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
+    <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>{initiales.toUpperCase()}</div>
+    <div>
+      <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.2}}>{s?.prenom} {s?.nom}</div>
+      <div style={{fontSize:11,color:"rgba(255,255,255,0.28)"}}>Particulier</div>
+    </div>
   </div>
-  <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:24,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
+  <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
   <div style={{flex:1}}>
     {TABS.map(t=>(
-      <button key={t.id} onClick={()=>setTab(t.id)} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.35)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
-        <span style={{fontSize:15}}>{t.ico}</span>{t.label}
+      <button key={t.id} onClick={()=>setTab(t.id)} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
+        <span style={{fontSize:14}}>{t.ico}</span>{t.label}
+        {t.id==="demandes"&&ctx.myLeadsPart.length>0&&<span style={{marginLeft:"auto",fontSize:11,fontWeight:700,background:"rgba(56,189,248,0.15)",color:"#38bdf8",padding:"2px 7px",borderRadius:99}}>{ctx.myLeadsPart.length}</span>}
       </button>
     ))}
+  </div>
+  <div style={{padding:"0 8px",marginBottom:8}}>
+    <div style={{fontSize:10,color:"rgba(255,255,255,0.15)",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>click<span style={{color:"#38bdf8"}}>&</span>fix</div>
   </div>
   <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.18)",fontSize:12,cursor:"pointer",textAlign:"left"}}>Déconnexion</button>
 </div>
 <div style={{flex:1,marginLeft:240,padding:"40px 48px",minHeight:"100vh"}}>
-  <div style={{maxWidth:800,margin:"0 auto"}}>
+  <div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{marginBottom:32}}>
-      <h1 style={{fontSize:28,fontWeight:800,letterSpacing:"-1px",marginBottom:4}}>Bonjour {s?.prenom} 👋</h1>
-      <p style={{fontSize:14,color:"rgba(255,255,255,0.35)",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
+      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4}}>Bonjour {s?.prenom} 👋</h1>
+      <p style={{fontSize:13,color:"rgba(255,255,255,0.28)",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
-      <div style={{background:"rgba(56,189,248,0.08)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:16,padding:"20px 24px"}}>
-        <div style={{fontSize:11,fontWeight:600,color:"rgba(56,189,248,0.7)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Mes demandes</div>
-        <div style={{fontSize:36,fontWeight:800,color:"#38bdf8",letterSpacing:"-1px"}}>{ctx.myLeadsPart.length}</div>
-      </div>
-      <div style={{background:"rgba(34,197,94,0.08)",border:"0.5px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"20px 24px"}}>
-        <div style={{fontSize:11,fontWeight:600,color:"rgba(34,197,94,0.7)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>RDV confirmés</div>
-        <div style={{fontSize:36,fontWeight:800,color:"#22c55e",letterSpacing:"-1px"}}>{confirmed.length}</div>
-      </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:32}}>
+      {[["Demandes",ctx.myLeadsPart.length,"#38bdf8","rgba(56,189,248,0.08)","rgba(56,189,248,0.15)"],["En attente",pending.length,"#FBC005","rgba(251,192,5,0.08)","rgba(251,192,5,0.15)"],["Confirmés",confirmed.length,"#22c55e","rgba(34,197,94,0.08)","rgba(34,197,94,0.15)"]].map(([label,val,color,bg,border])=>(
+        <div key={label} style={{background:bg,border:"0.5px solid "+border,borderRadius:16,padding:"18px 20px"}}>
+          <div style={{fontSize:10,fontWeight:600,color:color,letterSpacing:2,textTransform:"uppercase",opacity:0.7,marginBottom:6}}>{label}</div>
+          <div style={{fontSize:32,fontWeight:800,color:color,letterSpacing:"-1px"}}>{val}</div>
+        </div>
+      ))}
     </div>
     {tab==="demandes"&&(
       <div>
-        <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.25)",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Mes demandes de devis</div>
+        <div style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.2)",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes demandes</div>
         {ctx.myLeadsPart.length===0?(
-          <div style={{background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+          <div style={{background:"rgba(255,255,255,0.02)",border:"0.5px solid rgba(255,255,255,0.06)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
             <div style={{fontSize:40,marginBottom:12}}>📋</div>
             <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>Aucune demande</div>
-            <div style={{fontSize:14,color:"rgba(255,255,255,0.35)",marginBottom:20}}>Déposez votre premier projet</div>
-            <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,padding:"12px 24px",background:"#38bdf8",border:"none",borderRadius:980,color:"#000",fontWeight:700,fontSize:14,cursor:"pointer"}}>Déposer une demande</button>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginBottom:20}}>Déposez votre premier projet gratuitement</div>
+            <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,padding:"12px 24px",background:"#38bdf8",border:"none",borderRadius:980,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer"}}>Déposer une demande</button>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {ctx.myLeadsPart.map(l=>(
-              <div key={l.id} onClick={()=>setSelLead(selLead?.id===l.id?null:l)} style={{background:"rgba(255,255,255,0.03)",border:"0.5px solid "+(selLead?.id===l.id?"rgba(56,189,248,0.4)":"rgba(255,255,255,0.08)"),borderRadius:16,padding:"18px 20px",cursor:"pointer",transition:"all .2s"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:selLead?.id===l.id?12:0}}>
-                  <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#fff"}}>{l.travaux||""}</span>
-                    {l.precision&&<span style={{color:"rgba(255,255,255,0.35)",fontSize:13}}> — {l.precision}</span>}
+              <div key={l.id} onClick={()=>setSelLead(selLead?.id===l.id?null:l)} style={{background:"rgba(255,255,255,0.025)",border:"0.5px solid rgba(255,255,255,0.07)",borderLeft:"3px solid "+statusColor(l.statut),borderRadius:14,padding:"16px 18px",cursor:"pointer",transition:"all .2s"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                  <div style={{flex:1}}>
+                    <span style={{fontWeight:700,fontSize:14,color:"#fff"}}>{l.travaux||""}</span>
+                    {l.precision&&<span style={{color:"rgba(255,255,255,0.3)",fontSize:12}}> — {l.precision}</span>}
+                    <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4,display:"flex",gap:10,flexWrap:"wrap"}}>
+                      {l.budget&&<span>{l.budget}</span>}
+                      {l.surface&&<span>{l.surface}</span>}
+                      {l.ville&&<span>📍 {l.ville}</span>}
+                      <span>{timeAgo(l.created_at)}</span>
+                    </div>
                   </div>
                   <SBadge s={l.statut}/>
                 </div>
-                <div style={{fontSize:12,color:"rgba(255,255,255,0.25)",marginTop:4,display:"flex",gap:12,flexWrap:"wrap"}}>
-                  {l.budget&&<span>{l.budget}</span>}
-                  {l.surface&&<span>{l.surface}</span>}
-                  {l.ville&&<span>{l.ville}</span>}
-                  <span>{new Date(l.created_at).toLocaleDateString("fr-FR")}</span>
-                </div>
                 {selLead?.id===l.id&&(
-                  <div style={{marginTop:16,paddingTop:16,borderTop:"0.5px solid rgba(255,255,255,0.08)",display:"grid",gap:8}}>
+                  <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",display:"grid",gap:8}}>
                     {[["Spécialité",l.precision],["Détails",l.details],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&(
                       <div key={k} style={{display:"flex",gap:12}}>
-                        <span style={{fontSize:12,color:"rgba(255,255,255,0.25)",minWidth:80,flexShrink:0}}>{k}</span>
-                        <span style={{fontSize:12,color:"rgba(255,255,255,0.8)"}}>{v}</span>
+                        <span style={{fontSize:11,color:"rgba(255,255,255,0.22)",minWidth:80,flexShrink:0}}>{k}</span>
+                        <span style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>{v}</span>
                       </div>
                     ))}
                   </div>
@@ -607,22 +616,22 @@ return(
     )}
     {tab==="rdv"&&(
       <div>
-        <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.25)",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Rendez-vous confirmés</div>
+        <div style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.2)",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Rendez-vous confirmés</div>
         {confirmed.length===0?(
-          <div style={{background:"rgba(255,255,255,0.03)",border:"0.5px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+          <div style={{background:"rgba(255,255,255,0.02)",border:"0.5px solid rgba(255,255,255,0.06)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
             <div style={{fontSize:40,marginBottom:12}}>✅</div>
             <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>Aucun RDV confirmé</div>
-            <div style={{fontSize:14,color:"rgba(255,255,255,0.35)"}}>Vos RDV confirmés apparaîtront ici</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.3)"}}>Vos RDV confirmés apparaîtront ici</div>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {confirmed.map(l=>(
-              <div key={l.id} style={{background:"rgba(34,197,94,0.05)",border:"0.5px solid rgba(34,197,94,0.2)",borderRadius:16,padding:"18px 20px"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                  <span style={{fontWeight:700,fontSize:15}}>{l.travaux||l.precision}</span>
+              <div key={l.id} style={{background:"rgba(34,197,94,0.04)",border:"0.5px solid rgba(34,197,94,0.15)",borderLeft:"3px solid #22c55e",borderRadius:14,padding:"16px 18px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                  <span style={{fontWeight:700,fontSize:14}}>{l.travaux||l.precision}</span>
                   <SBadge s={l.statut}/>
                 </div>
-                {l.heure&&<div style={{fontSize:13,color:"#22c55e",marginBottom:8}}>🕐 {l.heure}</div>}
+                {l.heure&&<div style={{fontSize:12,color:"#22c55e",marginBottom:8}}>🕐 {l.heure}</div>}
                 {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
               </div>
             ))}
