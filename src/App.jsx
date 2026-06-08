@@ -533,7 +533,7 @@ function timeAgo(d){const diff=Date.now()-new Date(d).getTime();const mins=Math.
 function statusColor(s){if(s==="confirme"||s==="confirmed"||s==="confirmé")return"#22c55e";if(s==="dispatche")return"#38bdf8";return"#FBC005";}
 const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
 return(
-<div style={{...F,minHeight:"100vh",background:"#0a0a0a",display:"flex",color:"#fff"}}>
+<div style={{...F,minHeight:"100vh",background:"#111113",display:"flex",color:"#fff"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap')"}</style>
 <div style={{width:240,minHeight:"100vh",background:"rgba(255,255,255,0.025)",borderRight:"0.5px solid rgba(255,255,255,0.07)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
   <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
