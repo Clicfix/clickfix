@@ -1189,14 +1189,14 @@ function ProDashboard({ ctx }) {
   const [profile,setProfile]=useState(s);
   const [selRdv,setSelRdv]=useState(null);
   const [selConf,setSelConf]=useState(null);
-  const [dispo,setDispo]=useState(profile?.disponible||false);
+  const [dispo,setDispo]=useState(s?.disponible||false);
   async function toggleDispo(){const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
   const pending=rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length;
   const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
-  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);
+  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);useEffect(()=>{if(profile?.disponible!==undefined)setDispo(profile.disponible);},[profile?.disponible]);
   useEffect(()=>{
     if(!s?.id)return;
     const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
