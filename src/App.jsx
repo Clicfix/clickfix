@@ -1060,6 +1060,7 @@ function ProDashboard({ ctx }) {
   const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
   const F={fontFamily:"'Inter',sans-serif"};
+  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
   const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
