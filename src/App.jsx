@@ -632,7 +632,7 @@ return(
                   <SBadge s={l.statut}/>
                 </div>
                 {l.heure&&<div style={{fontSize:12,color:"#22c55e",marginBottom:8}}>🕐 {l.heure}</div>}
-                {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+                {l.creneaux&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(56,189,248,0.1)",color:"#38bdf8",border:"0.5px solid rgba(56,189,248,0.2)"}}>{sl.label||sl}</span>)}</div>}{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
               </div>
             ))}
           </div>
