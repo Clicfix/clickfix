@@ -251,7 +251,7 @@ setBusy(false);
       {page==="part-home"     && <PartHome     ctx={ctx} />}
       {page==="part-lead" && <LeadForm ctx={ctx} />}
       {page==="ai-lead" && <AILeadForm ctx={ctx} />}
-      {page==="pro-docs"      && <ProDocs      ctx={ctx} />}
+      {page==="urgence" && <UrgencePage ctx={ctx} />}      {page==="pro-docs"      && <ProDocs      ctx={ctx} />}
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
       {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
       {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
@@ -524,6 +524,134 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 // 
 //  PARTICULIER HOME
 // 
+function UrgencePage({ctx}){
+const [step,setStep]=useState("type");
+const [type,setType]=useState("");
+const [details,setDetails]=useState("");
+const [loc,setLoc]=useState(null);
+const [loading,setLoading]=useState(false);
+const [sent,setSent]=useState(false);
+const [artisans,setArtisans]=useState([]);
+const F={fontFamily:"'Inter',sans-serif"};
+const TYPES=[{id:"plomberie",label:"🚿 Fuite d'eau",desc:"Fuite, dégât des eaux, canalisation"},{id:"electricite",label:"⚡ Panne électrique",desc:"Coupure, court-circuit, tableau"},{id:"serrurerie",label:"🔐 Serrurerie",desc:"Porte bloquée, serrure cassée"},{id:"chauffage",label:"🔥 Chauffage",desc:"Chaudière en panne, radiateur"},{id:"autre",label:"🔧 Autre urgence",desc:"Autre type de dépannage urgent"}];
+useEffect(()=>{
+if(step==="localisation"){
+navigator.geolocation.getCurrentPosition(pos=>{
+setLoc({lat:pos.coords.latitude,lon:pos.coords.longitude});
+},()=>{setLoc({lat:48.8566,lon:2.3522});});
+}
+},[step]);
+useEffect(()=>{
+if(loc&&step==="carte"){
+const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?role=eq.pro&disponible=eq.true&select=id,prenom,nom,entreprise,tel,lat,lon,specialites",{headers:{"apikey":AK}})
+.then(r=>r.json()).then(d=>{
+function haversine(la1,lo1,la2,lo2){const R=6371;const dLat=(la2-la1)*Math.PI/180;const dLon=(lo2-lo1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+const sorted=(d||[]).filter(p=>p.lat&&p.lon).map(p=>({...p,dist:Math.round(haversine(loc.lat,loc.lon,p.lat,p.lon)*10)/10})).sort((a,b)=>a.dist-b.dist).slice(0,5);
+setArtisans(sorted);
+}).catch(()=>{});
+}
+},[loc,step]);
+async function sendUrgence(artisan){
+setLoading(true);
+try{
+await fetch("/api/save-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
+setSent(true);
+}catch(e){}
+setLoading(false);
+}
+if(sent)return(
+<div style={{...F,minHeight:"100vh",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
+<div style={{textAlign:"center",maxWidth:480}}>
+<div style={{fontSize:64,marginBottom:24}}>✅</div>
+<h2 style={{fontSize:28,fontWeight:800,color:"#1d1d1f",marginBottom:12,letterSpacing:"-1px"}}>Demande envoyée !</h2>
+<p style={{fontSize:16,color:"#6e6e73",marginBottom:32,lineHeight:1.6}}>Un artisan disponible près de vous a été alerté. Il devrait vous contacter très rapidement.</p>
+<button onClick={()=>ctx.setPage("home")} style={{...F,padding:"14px 32px",background:"#1d1d1f",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Retour à l&apos;accueil</button>
+</div>
+</div>
+);
+return(
+<div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f"}}>
+<div style={{padding:"20px 24px",borderBottom:"1px solid #f0f0f0",display:"flex",alignItems:"center",gap:16}}>
+<button onClick={()=>ctx.setPage("home")} style={{...F,background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#1d1d1f"}}>←</button>
+<div>
+<div style={{fontSize:18,fontWeight:800,color:"#ef4444",letterSpacing:"-0.5px"}}>🚨 Dépannage urgent</div>
+<div style={{fontSize:12,color:"#8e8e93"}}>Artisan disponible près de vous</div>
+</div>
+</div>
+<div style={{padding:"32px 24px",maxWidth:560,margin:"0 auto"}}>
+{step==="type"&&(
+<div>
+<h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Quel est le problème ?</h2>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Sélectionnez le type d&apos;urgence</p>
+<div style={{display:"flex",flexDirection:"column",gap:10}}>
+{TYPES.map(t=>(
+<button key={t.id} onClick={()=>{setType(t.id);setStep("details");}} style={{...F,padding:"16px 20px",background:type===t.id?"rgba(239,68,68,0.06)":"#fafafa",border:"1.5px solid "+(type===t.id?"#ef4444":"#f0f0f0"),borderRadius:16,textAlign:"left",cursor:"pointer",transition:"all .2s"}}>
+<div style={{fontWeight:700,fontSize:15,color:"#1d1d1f",marginBottom:2}}>{t.label}</div>
+<div style={{fontSize:12,color:"#8e8e93"}}>{t.desc}</div>
+</button>
+))}
+</div>
+</div>
+)}
+{step==="details"&&(
+<div>
+<h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Décrivez le problème</h2>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Quelques mots pour aider l&apos;artisan</p>
+<textarea value={details} onChange={e=>setDetails(e.target.value)} placeholder="Ex: Fuite sous l'évier de la cuisine, eau qui coule partout..." style={{...F,width:"100%",height:120,padding:"14px 16px",border:"1.5px solid #f0f0f0",borderRadius:16,fontSize:14,color:"#1d1d1f",background:"#fafafa",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.5}}/>
+<button onClick={()=>setStep("localisation")} style={{...F,width:"100%",marginTop:16,padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
+</div>
+)}
+{step==="localisation"&&(
+<div style={{textAlign:"center",padding:"48px 0"}}>
+<div style={{fontSize:64,marginBottom:24}}>📍</div>
+<h2 style={{fontSize:22,fontWeight:800,marginBottom:8}}>Localisation en cours...</h2>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:32}}>Nous localisons les artisans disponibles près de vous</p>
+{loc?(
+<button onClick={()=>setStep("carte")} style={{...F,padding:"15px 32px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Voir les artisans disponibles →</button>
+):(
+<div style={{fontSize:13,color:"#8e8e93"}}>Autorisation en cours...</div>
+)}
+</div>
+)}
+{step==="carte"&&(
+<div>
+<h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Artisans disponibles</h2>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Près de votre position</p>
+{artisans.length===0?(
+<div style={{textAlign:"center",padding:"48px 0"}}>
+<div style={{fontSize:48,marginBottom:16}}>😔</div>
+<p style={{fontSize:15,color:"#8e8e93"}}>Aucun artisan disponible pour l&apos;instant</p>
+<button onClick={()=>ctx.setPage("ai-lead")} style={{...F,marginTop:20,padding:"14px 28px",background:"#1d1d1f",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Déposer une demande classique</button>
+</div>
+):(
+<div style={{display:"flex",flexDirection:"column",gap:10}}>
+{artisans.map(a=>(
+<div key={a.id} style={{background:"#fff",border:"1.5px solid #f0f0f0",borderRadius:20,padding:"20px 22px",boxShadow:"0 2px 12px rgba(0,0,0,0.04)"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+<div>
+<div style={{fontWeight:700,fontSize:16,color:"#1d1d1f"}}>{a.prenom} {a.nom}</div>
+<div style={{fontSize:13,color:"#8e8e93",marginTop:2}}>{a.entreprise}</div>
+</div>
+<div style={{background:"rgba(34,197,94,0.1)",color:"#22c55e",fontSize:12,fontWeight:700,padding:"4px 10px",borderRadius:99}}>📍 {a.dist} km</div>
+</div>
+<div style={{fontSize:12,color:"#8e8e93",marginBottom:14,display:"flex",flexWrap:"wrap",gap:6}}>
+{(a.specialites||[]).slice(0,3).map(sp=><span key={sp} style={{background:"#f5f5f7",padding:"3px 8px",borderRadius:6}}>{sp}</span>)}
+</div>
+<button onClick={()=>sendUrgence(a)} disabled={loading} style={{...F,width:"100%",padding:"12px",background:loading?"#f0f0f0":"#ef4444",border:"none",borderRadius:12,color:loading?"#8e8e93":"#fff",fontWeight:700,fontSize:14,cursor:loading?"not-allowed":"pointer",transition:"all .2s"}}>
+{loading?"Envoi en cours...":"🚨 Contacter cet artisan"}
+</button>
+</div>
+))}
+</div>
+)}
+</div>
+)}
+</div>
+</div>
+);
+}
+
 function PartHome({ctx}){
 const [selLead,setSelLead]=useState(null);const [selRdv,setSelRdv]=useState(null);
 const s=ctx.sess;
