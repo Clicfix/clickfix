@@ -632,7 +632,7 @@ return(
                   <SBadge s={l.statut}/>
                 </div>
                 {l.heure&&<div style={{fontSize:12,color:"#22c55e",marginBottom:8}}>🕐 {l.heure}</div>}
-                {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&<div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:5}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><span key={i} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(56,189,248,0.1)",color:"#38bdf8",border:"0.5px solid rgba(56,189,248,0.2)"}}>{sl.label||sl}</span>)}</div>}{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+                {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&<div style={{marginTop:10,paddingTop:10,borderTop:"0.5px solid rgba(34,197,94,0.15)"}}><div style={{fontSize:10,fontWeight:600,color:"rgba(56,189,248,0.6)",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Creneaux proposes</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=><div key={i} style={{background:"rgba(56,189,248,0.07)",border:"0.5px solid rgba(56,189,248,0.2)",borderRadius:8,padding:"6px 12px",fontSize:12,color:"#38bdf8",fontWeight:500}}>📅 {sl.label||sl}</div>)}</div></div>}{l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
               </div>
             ))}
           </div>
