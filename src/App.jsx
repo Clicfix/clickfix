@@ -1060,6 +1060,7 @@ function ProDashboard({ ctx }) {
   const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
   const [selRdv,setSelRdv]=useState(null);
+  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);
   const [selConf,setSelConf]=useState(null);
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
