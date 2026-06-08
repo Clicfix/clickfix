@@ -556,7 +556,7 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 function UrgencePage({ctx}){
 const [step,setStep]=useState("type");
 const [type,setType]=useState("");
-const [details,setDetails]=useState("");
+const [details,setDetails]=useState("");const [photo,setPhoto]=useState(null);const [analyse,setAnalyse]=useState(null);const [analysing,setAnalysing]=useState(false);
 const [loc,setLoc]=useState(null);
 const [loading,setLoading]=useState(false);
 const [sent,setSent]=useState(false);
@@ -584,7 +584,7 @@ setArtisans(sorted);
 async function sendUrgence(artisan){
 setLoading(true);
 try{
-console.log("SESS:",ctx.sess);await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
+console.log("SESS:",ctx.sess);await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details+(analyse?" | Diagnostic IA: "+analyse.diagnostic:""),photo:photo||null,analyse:analyse||null,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
 setSent(true);
 }catch(e){}
 setLoading(false);
@@ -626,9 +626,20 @@ return(
 {step==="details"&&(
 <div>
 <h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Décrivez le problème</h2>
-<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Quelques mots pour aider l&apos;artisan</p>
-<textarea value={details} onChange={e=>setDetails(e.target.value)} placeholder="Ex: Fuite sous l'évier de la cuisine, eau qui coule partout..." style={{...F,width:"100%",height:120,padding:"14px 16px",border:"1.5px solid #f0f0f0",borderRadius:16,fontSize:14,color:"#1d1d1f",background:"#fafafa",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.5}}/>
-<button onClick={()=>setStep("localisation")} style={{...F,width:"100%",marginTop:16,padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Quelques mots + une photo pour aider l&apos;artisan</p>
+<textarea value={details} onChange={e=>setDetails(e.target.value)} placeholder="Ex: Fuite sous l'évier de la cuisine, eau qui coule partout..." style={{...F,width:"100%",height:100,padding:"14px 16px",border:"1.5px solid #f0f0f0",borderRadius:16,fontSize:14,color:"#1d1d1f",background:"#fafafa",outline:"none",resize:"none",boxSizing:"border-box",lineHeight:1.5,marginBottom:12}}/>
+<label style={{display:"block",border:"2px dashed #f0f0f0",borderRadius:16,padding:"20px",textAlign:"center",cursor:"pointer",marginBottom:12,background:photo?"#f0fdf4":"#fafafa"}}>
+  {photo?<div><div style={{fontSize:32,marginBottom:4}}>✅</div><div style={{fontSize:13,color:"#22c55e",fontWeight:600}}>Photo ajoutée</div></div>:<div><div style={{fontSize:32,marginBottom:4}}>📸</div><div style={{fontSize:13,color:"#8e8e93"}}>Ajouter une photo du problème</div></div>}
+  <input type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={async e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{const b64=r.result;setPhoto(b64);setAnalysing(true);try{const res=await fetch("/api/analyze-photo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:b64,description:details||type})});const d=await res.json();setAnalyse(d);}catch(e){}setAnalysing(false);};r.readAsDataURL(f);}}/>
+</label>
+{analysing&&<div style={{padding:"12px 16px",background:"#fafafa",borderRadius:12,marginBottom:12,fontSize:13,color:"#8e8e93"}}>🔍 Analyse IA en cours...</div>}
+{analyse&&!analysing&&<div style={{padding:"16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:16,marginBottom:12}}>
+  <div style={{fontSize:11,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Analyse IA</div>
+  <div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:4}}>{analyse.diagnostic}</div>
+  {analyse.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>🔧 {analyse.materiel?.join(", ")}</div>}
+  {analyse.duree&&<div style={{fontSize:12,color:"#6e6e73"}}>⏱ {analyse.duree}</div>}
+</div>}
+<button onClick={()=>setStep("localisation")} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
 </div>
 )}
 {step==="localisation"&&(
