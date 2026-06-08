@@ -51,7 +51,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 // 
 export default function App() {
   const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
-  const [sess, setSess]   = useState(() => LS.get("cf_sess"));
+  const [sess, setSess]   = useState(() => LS.get("cf_sess")||JSON.parse(sessionStorage.getItem("cf_sess_bak")||"null"));
   useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -67,7 +67,7 @@ export default function App() {
 
   function saveSession(s) {
     setSess(s);
-    if (s) LS.set("cf_sess", s);
+    if (s) {LS.set("cf_sess", s);sessionStorage.setItem("cf_sess_bak",JSON.stringify(s));}
     else LS.del("cf_sess");
   }
 
