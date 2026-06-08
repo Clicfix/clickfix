@@ -1059,13 +1059,9 @@ function ProDashboard({ ctx }) {
   const s=ctx.sess;
   const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
-  const [selRdv,setSelRdv]=useState(null);
-  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);
-  const [selConf,setSelConf]=useState(null);
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
-  const pending=rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length;
   const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
   useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);
   useEffect(()=>{
@@ -1078,97 +1074,87 @@ function ProDashboard({ ctx }) {
   const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
   const rdvPct=profile?.rdv_total>0?Math.round(((profile?.rdv_restants||0)/profile.rdv_total)*100):0;
   return(
-<div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f",display:"flex"}}>
-<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
-<div style={{width:260,minHeight:"100vh",background:"#fafafa",borderRight:"1px solid #f0f0f0",padding:"28px 16px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
+<div style={{...F,minHeight:"100vh",background:"#f2f2f7",color:"#1d1d1f",display:"flex"}}>
+<style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');.pro-card{transition:box-shadow .2s}.pro-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.1)!important}"}</style>
+<div style={{width:260,minHeight:"100vh",background:"#fff",borderRight:"1px solid #e5e5ea",padding:"28px 16px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0,boxShadow:"2px 0 20px rgba(0,0,0,0.04)"}}>
   <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
-    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#1d1d1f",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
+    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
     <div>
       <div style={{fontSize:14,fontWeight:700,color:"#1d1d1f",letterSpacing:"-0.2px"}}>{s?.prenom} {s?.nom}</div>
       <div style={{fontSize:11,color:"#8e8e93",marginTop:1}}>{s?.entreprise||"Artisan"}</div>
     </div>
   </div>
-  <div style={{height:1,background:"#f0f0f0",margin:"16px 0"}}/>
+  <div style={{height:1,background:"#f2f2f7",margin:"16px 0"}}/>
   {profile?.pack?(
-    <div style={{background:"linear-gradient(135deg,rgba(255,111,0,0.06),rgba(251,192,5,0.06))",border:"1px solid rgba(255,111,0,0.12)",borderRadius:14,padding:"14px 16px",marginBottom:20}}>
+    <div style={{background:"linear-gradient(135deg,rgba(255,111,0,0.08),rgba(251,192,5,0.08))",border:"1px solid rgba(255,111,0,0.15)",borderRadius:14,padding:"14px 16px",marginBottom:20}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
         <span style={{fontSize:11,fontWeight:700,color:"#FF6F00",letterSpacing:1,textTransform:"uppercase"}}>Pack {profile.pack}</span>
         <span style={{fontSize:11,fontWeight:600,color:"#FF6F00"}}>{profile.rdv_restants||0} RDV</span>
       </div>
-      <div style={{height:4,background:"rgba(255,111,0,0.1)",borderRadius:99,overflow:"hidden"}}>
+      <div style={{height:4,background:"rgba(255,111,0,0.12)",borderRadius:99,overflow:"hidden"}}>
         <div style={{width:rdvPct+"%",height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99,transition:"width .5s"}}/>
       </div>
       <div style={{fontSize:10,color:"#8e8e93",marginTop:5}}>{rdvPct}% restants</div>
     </div>
   ):(
-    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#1d1d1f",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.25)"}}>🚀 Activer un pack</button>
+    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.3)"}}>🚀 Activer un pack</button>
   )}
   <div style={{flex:1}}>
     {TABS.map(t=>(
-      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:12,border:"none",background:tab===t.id?"linear-gradient(135deg,rgba(255,111,0,0.08),rgba(251,192,5,0.05))":"transparent",color:tab===t.id?"#FF6F00":"#3a3a3c",fontWeight:tab===t.id?700:500,fontSize:13,cursor:"pointer",marginBottom:3,textAlign:"left",transition:"all .2s",boxShadow:tab===t.id?"inset 0 0 0 1px rgba(255,111,0,0.15)":"none"}}>
+      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:12,border:"none",background:tab===t.id?"linear-gradient(135deg,rgba(255,111,0,0.1),rgba(251,192,5,0.06))":"transparent",color:tab===t.id?"#FF6F00":"#3a3a3c",fontWeight:tab===t.id?700:500,fontSize:13,cursor:"pointer",marginBottom:3,textAlign:"left",transition:"all .2s",boxShadow:tab===t.id?"inset 0 0 0 1px rgba(255,111,0,0.2)":"none"}}>
         <span style={{fontSize:15}}>{t.ico}</span>{t.label}
-        {t.id==="rdv"&&pending>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#1d1d1f",padding:"2px 7px",borderRadius:99}}>{pending}</span>}
+        {t.id==="rdv"&&rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#fff",padding:"2px 6px",borderRadius:99}}>{rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length}</span>}
       </button>
     ))}
   </div>
-  <div style={{height:1,background:"#f0f0f0",margin:"12px 0"}}/>
-  <div style={{padding:"0 8px",marginBottom:8,fontSize:16,fontWeight:800,color:"#1d1d1f",letterSpacing:"-0.3px"}}>click<span style={{color:"#FF6F00"}}>&</span>fix</div>
+  <div style={{height:1,background:"#f2f2f7",margin:"12px 0"}}/>
   <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
 </div>
-<div style={{flex:1,marginLeft:260,padding:"40px 48px",minHeight:"100vh",background:"#fff"}}>
-  <div style={{maxWidth:820,margin:"0 auto",animation:"fadeUp .5s ease both"}}>
-    <div style={{marginBottom:32}}>
-      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
+<div style={{flex:1,marginLeft:260,padding:"36px 44px",minHeight:"100vh"}}>
+  <div style={{maxWidth:820,margin:"0 auto"}}>
+    <div style={{marginBottom:28}}>
+      <h1 style={{fontSize:24,fontWeight:800,letterSpacing:"-0.5px",marginBottom:3,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
       <p style={{fontSize:13,color:"#8e8e93",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:36}}>
-      {[["RDV ce mois",thisMonth,"#FF6F00","rgba(255,111,0,0.06)","rgba(255,111,0,0.1)"],["Confirmés",conf,"#22c55e","rgba(34,197,94,0.06)","rgba(34,197,94,0.12)"],["En attente",pending,"#f59e0b","rgba(245,158,11,0.06)","rgba(245,158,11,0.12)"],["RDV restants",profile?.rdv_restants||0,"#6366f1","rgba(99,102,241,0.06)","rgba(99,102,241,0.12)"]].map(([label,val,color,bg,border])=>(
-        <div key={label} style={{background:bg,border:"1px solid "+border,borderRadius:20,padding:"20px 22px",boxShadow:"0 2px 12px rgba(0,0,0,0.03)",transition:"transform .2s"}}>
-          <div style={{fontSize:10,fontWeight:700,color:color,letterSpacing:2,textTransform:"uppercase",marginBottom:10,opacity:0.9}}>{label}</div>
-          <div style={{fontSize:36,fontWeight:800,color:color,letterSpacing:"-1.5px",lineHeight:1}}>{val}</div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:28}}>
+      {[["RDV ce mois",thisMonth,"#FF6F00","rgba(255,111,0,0.08)","rgba(255,111,0,0.12)"],["Confirmés",conf,"#22c55e","rgba(34,197,94,0.08)","rgba(34,197,94,0.12)"],["En attente",rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length,"#f59e0b","rgba(245,158,11,0.08)","rgba(245,158,11,0.12)"],["RDV restants",profile?.rdv_restants||0,"#6366f1","rgba(99,102,241,0.08)","rgba(99,102,241,0.12)"]].map(([label,val,color,bg,border])=>(
+        <div key={label} className="pro-card" style={{background:"#fff",border:"1px solid "+border,borderRadius:18,padding:"18px 20px",boxShadow:"0 2px 12px rgba(0,0,0,0.04)"}}>
+          <div style={{fontSize:10,fontWeight:700,color:color,letterSpacing:2,textTransform:"uppercase",opacity:0.8,marginBottom:8}}>{label}</div>
+          <div style={{fontSize:32,fontWeight:800,color:color,letterSpacing:"-1px",lineHeight:1}}>{val}</div>
         </div>
       ))}
     </div>
     {tab==="rdv"&&(
-      <div style={{animation:"fadeUp .4s ease both"}}>
-        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Mes RDV</div>
+      <div>
+        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes RDV dispatché</div>
         {rdv.length===0?(
-          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
-            <div style={{fontSize:52,marginBottom:16}}>📋</div>
-            <div style={{fontWeight:700,fontSize:17,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
-            <div style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Activez un pack pour recevoir vos premiers RDV</div>
-            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"13px 32px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#1d1d1f",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.25)"}}>Voir les packs</button>
+          <div style={{background:"#fff",border:"1px solid #e5e5ea",borderRadius:20,padding:"48px 32px",textAlign:"center",boxShadow:"0 2px 12px rgba(0,0,0,0.04)"}}>
+            <div style={{fontSize:48,marginBottom:12}}>📋</div>
+            <div style={{fontWeight:700,fontSize:16,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
+            <div style={{fontSize:13,color:"#8e8e93",marginBottom:24}}>Activez un pack pour recevoir vos premiers RDV</div>
+            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"12px 28px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",boxShadow:"0 4px 16px rgba(255,111,0,0.3)"}}>Voir les packs</button>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {rdv.map(l=>(
-              <div key={l.id} className="pro-row" onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selRdv?.id===l.id?"rgba(255,111,0,0.3)":"#f0f0f0"),borderLeft:"4px solid #FF6F00",borderRadius:18,padding:"18px 22px",boxShadow:selRdv?.id===l.id?"0 8px 32px rgba(255,111,0,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div key={l.id} className="pro-card" style={{background:"#fff",border:"1px solid #e5e5ea",borderLeft:"4px solid #FF6F00",borderRadius:16,padding:"18px 20px",boxShadow:"0 2px 8px rgba(0,0,0,0.04)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
                   <div>
                     <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
                     {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
                   </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <SBadge s={l.statut}/>
-                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selRdv?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
-                  </div>
+                  <SBadge s={l.statut}/>
                 </div>
-                {selRdv?.id===l.id&&(
-                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
-                    <div style={{display:"grid",gap:8,marginBottom:14}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",l.details]].map(([k,v])=>v&&(
-                        <div key={k} style={{display:"flex",gap:12}}>
-                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
-                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {(l.statut==="dispatche"||l.statut==="en attente")&&(
-                      <div style={{display:"flex",gap:8}}>
-                        <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
-                        <button onClick={e=>{e.stopPropagation();ctx.refuserRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✕ Refuser</button>
-                      </div>
-                    )}
+                <div style={{fontSize:12,color:"#8e8e93",display:"flex",gap:14,flexWrap:"wrap",marginBottom:l.details?10:0}}>
+                  {l.client_nom&&<span>👤 {l.client_nom}</span>}
+                  {l.surface&&<span>📐 {l.surface}</span>}
+                  {l.budget&&<span>💰 {l.budget}</span>}
+                </div>
+                {l.details&&<div style={{fontSize:12,color:"#3a3a3c",marginBottom:12,padding:"10px 14px",background:"#f9f9fb",borderRadius:10,lineHeight:1.5}}>{l.details}</div>}
+                {(l.statut==="dispatche"||l.statut==="en attente")&&(
+                  <div style={{display:"flex",gap:8,marginTop:4}}>
+                    <button onClick={()=>ctx.confirmerRdv(l)} style={{...F,flex:1,padding:"10px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:10,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer"}}>✓ Confirmer</button>
+                    <button onClick={()=>ctx.refuserRdv(l)} style={{...F,flex:1,padding:"10px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:10,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer"}}>✕ Refuser</button>
                   </div>
                 )}
               </div>
@@ -1178,44 +1164,34 @@ function ProDashboard({ ctx }) {
       </div>
     )}
     {tab==="confirmes"&&(
-      <div style={{animation:"fadeUp .4s ease both"}}>
-        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>RDV confirmés</div>
+      <div>
+        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>RDV confirmés</div>
         {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?(
-          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
-            <div style={{fontSize:52,marginBottom:16}}>✅</div>
-            <div style={{fontWeight:700,fontSize:17,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
+          <div style={{background:"#fff",border:"1px solid #e5e5ea",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+            <div style={{fontSize:48,marginBottom:12}}>✅</div>
+            <div style={{fontWeight:700,fontSize:16,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
             {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(
-              <div key={l.id} className="pro-row" onClick={()=>setSelConf(selConf?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selConf?.id===l.id?"rgba(34,197,94,0.3)":"#f0f0f0"),borderLeft:"4px solid #22c55e",borderRadius:18,padding:"18px 22px",boxShadow:selConf?.id===l.id?"0 8px 32px rgba(34,197,94,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
-                    {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",fontWeight:700}}>Confirmé</span>
-                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selConf?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
-                  </div>
+              <div key={l.id} className="pro-card" style={{background:"#fff",border:"1px solid rgba(34,197,94,0.2)",borderLeft:"4px solid #22c55e",borderRadius:16,padding:"18px 20px",boxShadow:"0 2px 8px rgba(0,0,0,0.04)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.travaux||l.precision}</span>
+                  <span style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",fontWeight:700}}>Confirmé</span>
                 </div>
-                {selConf?.id===l.id&&(
-                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
-                    <div style={{display:"grid",gap:8,marginBottom:12}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",l.details],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
-                        <div key={k} style={{display:"flex",gap:12}}>
-                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
-                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
-                        </div>
-                      ))}
+                <div style={{display:"grid",gap:6}}>
+                  {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",l.details],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
+                    <div key={k} style={{display:"flex",gap:10}}>
+                      <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0}}>{k}</span>
+                      <span style={{fontSize:12,color:"#1d1d1f",fontWeight:500}}>{v}</span>
                     </div>
-                    {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
-                      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
-                        {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
-                          <span key={i} style={{fontSize:11,padding:"4px 12px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {(sl.label||sl).replace(/([0-9]{2})\/([0-9]{2})\/[0-9]{4} a ([0-9]{2}:[0-9]{2})/,(m,d,mo,h)=>["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][new Date(2026,mo-1,d).getDay()]+" "+d+" "+["jan","fev","mars","avr","mai","juin","juil","aout","sep","oct","nov","dec"][mo-1]+" a "+h)}</span>
-                        ))}
-                      </div>
-                    )}
+                  ))}
+                </div>
+                {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
+                  <div style={{marginTop:12,display:"flex",flexWrap:"wrap",gap:6}}>
+                    {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
+                      <span key={i} style={{fontSize:11,padding:"4px 10px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {sl.label||sl}</span>
+                    ))}
                   </div>
                 )}
               </div>
@@ -1224,9 +1200,9 @@ function ProDashboard({ ctx }) {
         )}
       </div>
     )}
-    {tab==="docs"&&<div style={{animation:"fadeUp .4s ease both",background:"#fff",border:"1px solid #f0f0f0",borderRadius:24,padding:32,boxShadow:"0 2px 12px rgba(0,0,0,0.03)"}}><div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:24}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map((d,i,arr)=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",borderBottom:i<arr.length-1?"1px solid #f5f5f5":"none"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#8e8e93",marginTop:3}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"9px 20px",background:profile?.docs?.[d.id]?"rgba(34,197,94,0.08)":"#f5f5f5",border:"1px solid "+(profile?.docs?.[d.id]?"rgba(34,197,94,0.2)":"#e8e8e8"),borderRadius:12,fontSize:12,fontWeight:600,color:profile?.docs?.[d.id]?"#22c55e":"#1d1d1f",cursor:"pointer",transition:"all .2s"}}>{profile?.docs?.[d.id]?"✓ Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
-    {tab==="pack"&&<div style={{animation:"fadeUp .4s ease both"}}><PackTab s={profile} ctx={ctx}/></div>}
-    {tab==="profil"&&<div style={{animation:"fadeUp .4s ease both"}}><ProfilTab s={profile} ctx={ctx}/></div>}
+    {tab==="docs"&&<div style={{background:"#fff",border:"1px solid #e5e5ea",borderRadius:20,padding:28,boxShadow:"0 2px 12px rgba(0,0,0,0.04)"}}><div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:20}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map(d=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 0",borderBottom:"1px solid #f2f2f7"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#8e8e93",marginTop:2}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"8px 18px",background:profile?.docs?.[d.id]?"rgba(34,197,94,0.08)":"#f2f2f7",border:"1px solid "+(profile?.docs?.[d.id]?"rgba(34,197,94,0.2)":"#e5e5ea"),borderRadius:10,fontSize:12,fontWeight:600,color:profile?.docs?.[d.id]?"#22c55e":"#1d1d1f",cursor:"pointer"}}>{profile?.docs?.[d.id]?"✓ Modifer":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
+    {tab==="pack"&&<PackTab s={profile} ctx={ctx}/>}
+    {tab==="profil"&&<ProfilTab s={profile} ctx={ctx}/>}
   </div>
 </div>
 </div>
