@@ -222,9 +222,12 @@ setBusy(false);
         r.onerror = () => rej(new Error("Lecture échouée"));
         r.readAsDataURL(file);
       });
-      const newDocs = {...(sess.docs||{}), [docId]: url};
-      updateSession({ docs: newDocs });
-      notify("\"" + (DOCS_DEF.find(d=>d.id===docId)?.label||"Document") + "\" déposé ");
+      const newDocs = {...(sess.docs||{}), [docId]: url};
+      updateSession({ docs: newDocs });
+      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";
+      await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
+      notify("Document depose avec succes !");
     } catch(e) { notify("Erreur upload : "+e.message,"err"); }
     setBusy(false);
   }
