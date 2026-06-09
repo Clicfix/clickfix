@@ -584,7 +584,7 @@ setArtisans(sorted);
 async function sendUrgence(artisan){
 setLoading(true);
 try{
-console.log("SESS:",ctx.sess);await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details+(analyse?" | Diagnostic IA: "+analyse.diagnostic:""),photo:photo||null,analyse:analyse||null,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
+await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details+(analyse?" | Diagnostic IA: "+analyse.diagnostic:""),photo:photo||null,analyse_ia:analyse||null,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null})});
 setSent(true);
 }catch(e){}
 setLoading(false);
