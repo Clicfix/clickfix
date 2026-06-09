@@ -587,7 +587,7 @@ function UrgencePage({ctx}){
 const [step,setStep]=useState("type");
 const [type,setType]=useState("");
 const [details,setDetails]=useState("");const [photo,setPhoto]=useState(null);const [analyse,setAnalyse]=useState(null);const [analysing,setAnalysing]=useState(false);
-const [loc,setLoc]=useState(null);const [cardName,setCardName]=useState("");const [paymentReady,setPaymentReady]=useState(false);const [clientSecret,setClientSecret]=useState(null);const [paymentLoading,setPaymentLoading]=useState(false);
+const [loc,setLoc]=useState(null);const [cardName,setCardName]=useState("");const [paymentReady,setPaymentReady]=useState(false);const [clientSecret,setClientSecret]=useState(null);const [paymentLoading,setPaymentLoading]=useState(false);const stripeRef=React.useRef(null);const cardRef=React.useRef(null);useEffect(()=>{if(step!=="cb"||!clientSecret)return;const mountStripe=()=>{if(!window.Stripe)return;const stripe=window.Stripe("pk_test_51Tcl4JRyxerWKxWhZI5J2yXpqCoIcg83AYXN3GqcRifEt0IbkvAas32Tsg7l8Wb42jJfSXo71PzNCoNLsTRy5iRM00drfgGl6t");stripeRef.current=stripe;const elements=stripe.elements();const card=elements.create("card",{style:{base:{fontSize:"16px",color:"#1d1d1f",fontFamily:"Inter,sans-serif","::placeholder":{color:"#8e8e93"}}},hidePostalCode:true});cardRef.current=card;setTimeout(()=>{const el=document.getElementById("stripe-card-element");if(el&&!el.children.length)card.mount("#stripe-card-element");},100);};if(window.Stripe){mountStripe();}else{const s=document.createElement("script");s.src="https://js.stripe.com/v3/";s.onload=mountStripe;document.head.appendChild(s);}return()=>{if(cardRef.current){cardRef.current.unmount();}};},[step,clientSecret]);
 const [loading,setLoading]=useState(false);
 const [sent,setSent]=useState(false);
 const [artisans,setArtisans]=useState([]);
@@ -705,16 +705,7 @@ if(d.client_secret){setClientSecret(d.client_secret);setPaymentReady(true);setSt
 <p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Pré-autorisation uniquement — débit après validation</p>
 <div id="stripe-card-element" style={{padding:"14px 16px",border:"1.5px solid #f0f0f0",borderRadius:16,background:"#fafafa",marginBottom:16,minHeight:44}}/>
 <div id="stripe-error" style={{color:"#ef4444",fontSize:13,marginBottom:12}}/>
-<button id="stripe-submit" onClick={async()=>{
-const stripe=window.Stripe("pk_test_51Tcl4JRyxerWKxWhZI5J2yXpqCoIcg83AYXN3GqcRifEt0IbkvAas32Tsg7l8Wb42jJfSXo71PzNCoNLsTRy5iRM00drfgGl6t");
-const elements=stripe.elements({clientSecret});
-const card=elements.getElement("card")||elements.create("card",{style:{base:{fontSize:"16px",color:"#1d1d1f"}}});
-if(!document.getElementById("stripe-card-element").children.length)card.mount("#stripe-card-element");
-setPaymentLoading(true);
-const {error}=await stripe.confirmCardPayment(clientSecret,{payment_method:{card,billing_details:{name:cardName,email:ctx.sess?.email}}});
-if(error){document.getElementById("stripe-error").textContent=error.message;setPaymentLoading(false);}
-else{setPaymentReady(true);setStep("localisation");}
-}} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>{paymentLoading?"Vérification...":"✓ Confirmer la pré-autorisation"}</button>
+<button onClick={async()=>{if(!stripeRef.current||!cardRef.current)return;setPaymentLoading(true);const{error}=await stripeRef.current.confirmCardPayment(clientSecret,{payment_method:{card:cardRef.current,billing_details:{name:cardName,email:ctx.sess?.email||""}}});if(error){const el=document.getElementById("stripe-error");if(el)el.textContent=error.message;setPaymentLoading(false);}else{setPaymentReady(true);setStep("localisation");}}} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>{paymentLoading?"Vérification...":"✓ Confirmer la pré-autorisation"}</button>
 <p style={{fontSize:11,color:"#8e8e93",textAlign:"center",marginTop:12}}>🔒 Paiement 100% sécurisé par Stripe</p>
 </div>
 )}
