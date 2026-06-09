@@ -553,6 +553,36 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 // 
 //  PARTICULIER HOME
 // 
+
+function LeafletMap({loc,artisans}){
+  useEffect(()=>{
+    const loadMap=()=>{
+      const el=document.getElementById("urgence-map");
+      if(!el)return;
+      if(el._leafmap){el._leafmap.remove();el._leafmap=null;}
+      const L=window.L;
+      const map=L.map(el).setView([loc.lat,loc.lon],13);
+      el._leafmap=map;
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"OSM"}).addTo(map);
+      const you=L.divIcon({html:"<div style='background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[16,16],className:""});
+      L.marker([loc.lat,loc.lon],{icon:you}).addTo(map).bindPopup("Votre position").openPopup();
+      const pro=L.divIcon({html:"<div style='background:#FF6F00;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[14,14],className:""});
+      artisans.forEach(a=>{
+        if(a.lat&&a.lon){
+          L.marker([a.lat,a.lon],{icon:pro}).addTo(map).bindPopup("<b>"+a.prenom+" "+a.nom+"</b><br/>"+a.dist+" km");
+        }
+      });
+    };
+    if(window.L){loadMap();}
+    else{
+      const css=document.createElement("link");css.rel="stylesheet";css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";document.head.appendChild(css);
+      const s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      s.onload=loadMap;document.head.appendChild(s);
+    }
+    return()=>{const el=document.getElementById("urgence-map");if(el&&el._leafmap){el._leafmap.remove();el._leafmap=null;}};
+  },[loc,artisans]);
+  return <div id="urgence-map" style={{width:"100%",height:280,borderRadius:16,border:"1px solid #f0f0f0",marginBottom:16}}/>;
+}
 function UrgencePage({ctx}){
 const [step,setStep]=useState("type");
 const [type,setType]=useState("");
@@ -657,7 +687,7 @@ return(
 {step==="carte"&&(
 <div>
 <h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Artisans disponibles</h2>
-<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Près de votre position</p>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:16}}>Près de votre position</p><LeafletMap loc={loc} artisans={artisans}/>
 {artisans.length===0?(
 <div style={{textAlign:"center",padding:"48px 0"}}>
 <div style={{fontSize:48,marginBottom:16}}>😔</div>
