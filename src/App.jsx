@@ -1234,6 +1234,8 @@ function ProDashboard({ ctx }) {
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
+{l.photo&&<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><img src={l.photo} alt="Photo" style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:12}}/></div>}
+{l.analyse_ia&&<div style={{padding:"12px 16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12,marginBottom:12}}><div style={{fontSize:10,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Analyse IA</div><div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:4}}>{l.analyse_ia?.diagnostic}</div>{l.analyse_ia?.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:2}}>🔧 {(l.analyse_ia.materiel||[]).join(", ")}</div>}{l.analyse_ia?.duree&&<div style={{fontSize:12,color:"#6e6e73"}}>⏱ {l.analyse_ia.duree}</div>}</div>}
   const pending=rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length;
   const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
   useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);useEffect(()=>{if(profile?.disponible!==undefined)setDispo(profile.disponible);},[profile?.disponible]);
