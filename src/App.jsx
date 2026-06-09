@@ -1327,6 +1327,8 @@ function ProDashboard({ ctx }) {
                 </div>
                 {selRdv?.id===l.id&&(
                   <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
+                    {l.photo&&<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><img src={l.photo} alt="Photo" style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:12}}/></div>}
+                    {l.analyse_ia&&<div style={{padding:"12px 16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:12,marginBottom:12}}><div style={{fontSize:10,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Analyse IA</div><div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:4}}>{l.analyse_ia&&l.analyse_ia.diagnostic}</div>{l.analyse_ia&&l.analyse_ia.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:2}}>{"🔧 "+(l.analyse_ia.materiel||[]).join(", ")}</div>}{l.analyse_ia&&l.analyse_ia.duree&&<div style={{fontSize:12,color:"#6e6e73"}}>{"⏱ "+l.analyse_ia.duree}</div>}</div>}
                     <div style={{display:"grid",gap:8,marginBottom:14}}>
                       {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",l.details]].map(([k,v])=>v&&(
                         <div key={k} style={{display:"flex",gap:12}}>
