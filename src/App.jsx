@@ -884,6 +884,13 @@ function PackWelcome({ ctx }) {
 }
 
 function PackTab({ s, ctx }) {
+async function connectStripe(){
+try{
+const r=await fetch("/api/stripe-onboard",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:s?.email,artisan_id:s?.id})});
+const d=await r.json();
+if(d.url)window.open(d.url,"_blank");
+}catch(e){ctx.notify("Erreur Stripe","err");}
+}
   const [sel,setSel]=useState(null);
   const history=(s?.packs_history||[]).slice().reverse();
   const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
@@ -914,7 +921,7 @@ function PackTab({ s, ctx }) {
           </div>}
         </div>
       ))}
-      {hasMonthly&&<div style={{fontSize:12,color:"#6e6e73",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}
+      {hasMonthly&&<div style={{fontSize:12,color:"#6e6e73",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}<div style={{marginTop:16,padding:"16px",background:s?.stripe_account_id?"rgba(34,197,94,0.05)":"rgba(99,102,241,0.05)",border:"1px solid "+(s?.stripe_account_id?"rgba(34,197,94,0.2)":"rgba(99,102,241,0.2)"),borderRadius:14}}><div style={{fontSize:11,fontWeight:700,color:s?.stripe_account_id?"#22c55e":"#6366f1",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Paiements urgences</div><div style={{fontSize:13,color:"#6e6e73",marginBottom:12}}>{s?.stripe_account_id?"✅ Compte Stripe connecté — Vous pouvez recevoir des paiements d urgences":"Connectez votre compte Stripe pour recevoir les paiements d urgences directement."}</div>{!s?.stripe_account_id&&<button onClick={connectStripe} style={{width:"100%",padding:"10px",background:"#6366f1",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>🔗 Connecter mon compte Stripe</button>}</div>
     </>
   );
 }
