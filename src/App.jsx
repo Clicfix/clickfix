@@ -1339,7 +1339,7 @@ function ProDashboard({ ctx }) {
                       {l.analyse_ia.diagnostic&&<div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:6}}>{l.analyse_ia.diagnostic}</div>}
                       {l.analyse_ia.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>{"🔧 Matériel: "+(l.analyse_ia.materiel||[]).join(", ")}</div>}
                       {l.analyse_ia.duree&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>{"⏱ Durée: "+l.analyse_ia.duree}</div>}
-                      {l.analyse_ia.prix_min&&l.analyse_ia.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:4}}>{"💰 Estimation: "+l.analyse_ia.prix_min+" - "+l.analyse_ia.prix_max}</div>}
+                      {l.analyse_ia.prix_min&&l.analyse_ia.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:4}}>{"💰 Estimation: "+l.analyse_ia.prix_min+" — "+l.analyse_ia.prix_max+(l.analyse_ia.main_oeuvre?" (MO: "+l.analyse_ia.main_oeuvre+")":"")}</div>}
                     </div>}
                     {(l.statut==="dispatche"||l.statut==="en attente")&&(
                       <div style={{display:"flex",gap:8}}>
