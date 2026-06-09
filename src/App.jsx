@@ -637,7 +637,7 @@ return(
   <div style={{fontSize:11,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Analyse IA</div>
   <div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:4}}>{analyse.diagnostic}</div>
   {analyse.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>🔧 {analyse.materiel?.join(", ")}</div>}
-  {analyse.duree&&<div style={{fontSize:12,color:"#6e6e73"}}>⏱ {analyse.duree}</div>}
+  {analyse.duree&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:2}}>⏱ {analyse.duree}</div>}{analyse.prix_min&&analyse.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:6}}>💰 Estimation : {analyse.prix_min} - {analyse.prix_max}</div>}
 </div>}
 <button onClick={()=>setStep("localisation")} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
 </div>
@@ -1333,6 +1333,14 @@ function ProDashboard({ ctx }) {
                         </div>
                       ))}
                     </div>
+                    {l.photo&&<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><img src={l.photo} alt="Photo" style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:12}}/></div>}
+                    {l.analyse_ia&&<div style={{padding:"14px 16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:14,marginBottom:12}}>
+                      <div style={{fontSize:10,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Analyse IA</div>
+                      {l.analyse_ia.diagnostic&&<div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:6}}>{l.analyse_ia.diagnostic}</div>}
+                      {l.analyse_ia.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>{"🔧 Matériel: "+(l.analyse_ia.materiel||[]).join(", ")}</div>}
+                      {l.analyse_ia.duree&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>{"⏱ Durée: "+l.analyse_ia.duree}</div>}
+                      {l.analyse_ia.prix_min&&l.analyse_ia.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:4}}>{"💰 Estimation: "+l.analyse_ia.prix_min+" - "+l.analyse_ia.prix_max}</div>}
+                    </div>}
                     {(l.statut==="dispatche"||l.statut==="en attente")&&(
                       <div style={{display:"flex",gap:8}}>
                         <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
