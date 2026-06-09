@@ -587,7 +587,7 @@ function UrgencePage({ctx}){
 const [step,setStep]=useState("type");
 const [type,setType]=useState("");
 const [details,setDetails]=useState("");const [photo,setPhoto]=useState(null);const [analyse,setAnalyse]=useState(null);const [analysing,setAnalysing]=useState(false);
-const [loc,setLoc]=useState(null);
+const [loc,setLoc]=useState(null);const [cardName,setCardName]=useState("");const [paymentReady,setPaymentReady]=useState(false);
 const [loading,setLoading]=useState(false);
 const [sent,setSent]=useState(false);
 const [artisans,setArtisans]=useState([]);
@@ -669,7 +669,29 @@ return(
   {analyse.materiel&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>🔧 {analyse.materiel?.join(", ")}</div>}
   {analyse.duree&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:2}}>⏱ {analyse.duree}</div>}{analyse.prix_min&&analyse.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:6}}>💰 Estimation : {analyse.prix_min} - {analyse.prix_max}</div>}
 </div>}
-<button onClick={()=>setStep("localisation")} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
+<button onClick={()=>setStep("paiement")} style={{...F,width:"100%",padding:"15px",background:"#ef4444",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer"}}>Continuer →</button>
+</div>
+)}
+{step==="paiement"&&(
+<div>
+<h2 style={{fontSize:22,fontWeight:800,marginBottom:8,letterSpacing:"-0.5px"}}>Pré-autorisation CB</h2>
+<p style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Votre carte sera débitée uniquement après validation de l&apos;intervention</p>
+<div style={{background:"#fafafa",border:"1.5px solid #f0f0f0",borderRadius:16,padding:"20px",marginBottom:16}}>
+  <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Informations de paiement</div>
+  <div style={{marginBottom:12}}>
+    <label style={{fontSize:12,color:"#6e6e73",fontWeight:600,display:"block",marginBottom:6}}>Nom sur la carte</label>
+    <input value={cardName} onChange={e=>setCardName(e.target.value)} placeholder="Marie Dupont" style={{...F,width:"100%",padding:"12px 14px",border:"1.5px solid #f0f0f0",borderRadius:12,fontSize:14,color:"#1d1d1f",background:"#fff",outline:"none",boxSizing:"border-box"}}/>
+  </div>
+  <div style={{padding:"14px",background:"#f5f5f7",borderRadius:12,fontSize:13,color:"#6e6e73",marginBottom:12}}>
+    <div style={{fontWeight:600,color:"#1d1d1f",marginBottom:4}}>💳 Paiement sécurisé par Stripe</div>
+    Numéro de carte, date et CVV seront saisis à l&apos;étape suivante
+  </div>
+  <div style={{padding:"12px 14px",background:"rgba(255,111,0,0.05)",border:"1px solid rgba(255,111,0,0.15)",borderRadius:12,fontSize:13,color:"#6e6e73"}}>
+    💰 Estimation : {analyse?analyse.prix_min+" — "+analyse.prix_max:"50€ — 300€"}<br/>
+    <span style={{fontSize:11}}>Montant exact validé après intervention</span>
+  </div>
+</div>
+<button onClick={()=>{setPaymentReady(true);setStep("localisation");}} disabled={!cardName} style={{...F,width:"100%",padding:"15px",background:cardName?"#ef4444":"#f0f0f0",border:"none",borderRadius:980,color:cardName?"#fff":"#8e8e93",fontWeight:700,fontSize:15,cursor:cardName?"pointer":"not-allowed"}}>Continuer vers la carte →</button>
 </div>
 )}
 {step==="localisation"&&(
