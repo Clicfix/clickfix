@@ -1372,9 +1372,15 @@ function ProDashboard({ ctx }) {
                       {l.analyse_ia.prix_min&&l.analyse_ia.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:4}}>{"💰 Estimation: "+l.analyse_ia.prix_min+" — "+l.analyse_ia.prix_max+(l.analyse_ia.main_oeuvre?" (MO: "+l.analyse_ia.main_oeuvre+")":"")}</div>}
                     </div>}
                     {(l.statut==="dispatche"||l.statut==="en attente")&&(
-                      <div style={{display:"flex",gap:8}}>
-                        <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
-                        <button onClick={e=>{e.stopPropagation();ctx.refuserRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✕ Refuser</button>
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        <div style={{display:"flex",gap:8}}>
+                          <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
+                          <button onClick={e=>{e.stopPropagation();ctx.refuserRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✕ Refuser</button>
+                        </div>
+                        {(l.lat||l.adresse)&&<div style={{display:"flex",gap:8}}>
+                          <a href={l.lat?"https://waze.com/ul?ll="+l.lat+","+l.lon+"&navigate=yes":"https://waze.com/ul?q="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(0,119,195,0.08)",border:"1px solid rgba(0,119,195,0.2)",borderRadius:12,color:"#0077c3",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>🗺 Waze</a>
+                          <a href={l.lat?"https://maps.google.com/maps?daddr="+l.lat+","+l.lon:"https://maps.google.com/maps?daddr="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(66,133,244,0.08)",border:"1px solid rgba(66,133,244,0.2)",borderRadius:12,color:"#4285f4",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>📍 Google Maps</a>
+                        </div>}
                       </div>
                     )}
                   </div>
