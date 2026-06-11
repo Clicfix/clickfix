@@ -583,50 +583,53 @@ function LeafletMap({loc,artisans}){
   return <div id="urgence-map" style={{width:"100%",height:280,borderRadius:16,border:"1px solid #f0f0f0",marginBottom:16}}/>;
 }
 function TrackingMap({lead,clientLat,clientLon}){
-const [artisanPos,setArtisanPos]=useState(null);
-const mapRef=useRef(null);
-const markerRef=useRef(null);
+const mapId="tm"+lead.id;
 const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+const [artisanPos,setArtisanPos]=useState(null);
+const [eta,setEta]=useState("...");
+const artMarkerRef=useRef(null);
+const mapRef=useRef(null);
+const routeRef=useRef(null);
 useEffect(()=>{
 if(!lead?.assigned_to)return;
-const fetchPos=()=>{fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/artisan_positions?artisan_id=eq."+lead.assigned_to+"&select=lat,lon,statut",{headers:{"apikey":AK,"Authorization":"Bearer "+AK}}).then(r=>r.json()).then(d=>{if(d&&d[0])setArtisanPos(d[0]);}).catch(()=>{});};
+const fetchPos=()=>{fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/artisan_positions?artisan_id=eq."+lead.assigned_to,{headers:{"apikey":AK,"Authorization":"Bearer "+AK}}).then(r=>r.json()).then(d=>{if(d&&d[0]){setArtisanPos({lat:d[0].lat,lon:d[0].lon});}}).catch(()=>{});};
 fetchPos();
-const ws=new WebSocket("wss://bipqtqezntzcmxwiaqdz.supabase.co/realtime/v1/websocket?apikey="+AK+"&vsn=1.0.0");
-ws.onopen=()=>{ws.send(JSON.stringify({topic:"realtime:public:artisan_positions",event:"phx_join",payload:{},ref:"2"}));};
-ws.onmessage=(e)=>{const m=JSON.parse(e.data);if(m.event==="UPDATE"||m.event==="INSERT")fetchPos();};
-return()=>{ws.close();};
+const iv=setInterval(fetchPos,4000);
+return()=>clearInterval(iv);
 },[lead?.assigned_to]);
 useEffect(()=>{
-const mountMap=()=>{
-const el=document.getElementById("tracking-map-"+lead.id);
-if(!el||!window.L)return;
-if(el._lmap){el._lmap.remove();}
-const lat=clientLat||lead.lat||48.8566;const lon=clientLon||lead.lon||2.3522;
-const map=window.L.map(el,{zoomControl:false}).setView([lat,lon],14);
-el._lmap=map;
-window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-const clientIcon=window.L.divIcon({html:"<div style='background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)'></div>",iconSize:[16,16],className:""});
-window.L.marker([lat,lon],{icon:clientIcon}).addTo(map).bindPopup("Vous");
+const clat=parseFloat(clientLat)||48.8566;const clon=parseFloat(clientLon)||2.3522;
+const init=()=>{
+const el=document.getElementById(mapId);if(!el||!window.L)return;
+if(mapRef.current){mapRef.current.remove();}
+const map=window.L.map(el,{zoomControl:false,attributionControl:false}).setView([clat,clon],14);
+mapRef.current=map;
+window.L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png").addTo(map);
+const youHtml="<div style='width:14px;height:14px;background:#38bdf8;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 0 4px rgba(56,189,248,0.3)'></div>";
+window.L.marker([clat,clon],{icon:window.L.divIcon({html:youHtml,iconSize:[14,14],className:""})}).addTo(map).bindPopup("Vous");
 if(artisanPos?.lat){
-const artIcon=window.L.divIcon({html:"<div style='background:#FF6F00;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:10px'>🔧</div>",iconSize:[20,20],className:""});
-const m=window.L.marker([artisanPos.lat,artisanPos.lon],{icon:artIcon}).addTo(map).bindPopup("Votre artisan");
-markerRef.current=m;
-map.fitBounds([[lat,lon],[artisanPos.lat,artisanPos.lon]],{padding:[30,30]});
+const html="<div style='position:relative;width:36px;height:36px'><div style='position:absolute;inset:0;background:rgba(255,111,0,0.3);border-radius:50%;animation:pulse 1.5s infinite'></div><div style='position:absolute;inset:4px;background:#FF6F00;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px'>🔧</div></div>";
+const m=window.L.marker([artisanPos.lat,artisanPos.lon],{icon:window.L.divIcon({html:html,iconSize:[36,36],iconAnchor:[18,18],className:""})}).addTo(map);
+artMarkerRef.current=m;
+if(routeRef.current)map.removeLayer(routeRef.current);
+routeRef.current=window.L.polyline([[artisanPos.lat,artisanPos.lon],[clat,clon]],{color:"#FF6F00",weight:3,opacity:0.7,dashArray:"8,6"}).addTo(map);
+map.fitBounds([[artisanPos.lat,artisanPos.lon],[clat,clon]],{padding:[40,40]});
+const dist=Math.sqrt(Math.pow((artisanPos.lat-clat)*111,2)+Math.pow((artisanPos.lon-clon)*85,2));
+setEta(dist<0.3?"Moins de 2 min":Math.round(dist/0.5)+" min");
 }
 };
-if(window.L){mountMap();}else{const s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";s.onload=mountMap;document.head.appendChild(s);}
-},[artisanPos,lead.id]);
-useEffect(()=>{
-if(markerRef.current&&artisanPos?.lat){markerRef.current.setLatLng([artisanPos.lat,artisanPos.lon]);}
-},[artisanPos]);
-const dist=artisanPos?.lat&&clientLat?Math.round(Math.sqrt(Math.pow((artisanPos.lat-clientLat)*111,2)+Math.pow((artisanPos.lon-clientLon)*85,2))*10)/10:null;
-const eta=dist?Math.round(dist/0.5)+" min":"...";
-return(<div style={{marginTop:14,borderRadius:16,overflow:"hidden",border:"1px solid rgba(255,255,255,0.1)"}}>
-<div style={{padding:"12px 16px",background:"rgba(255,111,0,0.1)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-<div><div style={{fontSize:11,fontWeight:700,color:"#FF6F00",letterSpacing:1,textTransform:"uppercase"}}>🚗 Votre artisan est en route</div><div style={{fontSize:12,color:"rgba(255,255,255,0.6)",marginTop:2}}>Arrivée estimée: {eta}</div></div>
-<div style={{fontSize:24}}>🔧</div>
+const css=document.getElementById("leaflet-css");
+if(!css){const c=document.createElement("link");c.id="leaflet-css";c.rel="stylesheet";c.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";document.head.appendChild(c);}
+if(window.L){init();}else{const s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";s.onload=init;document.head.appendChild(s);}
+return()=>{if(mapRef.current){mapRef.current.remove();mapRef.current=null;}};
+},[artisanPos,clientLat,clientLon]);
+return(<div style={{marginTop:14,borderRadius:18,overflow:"hidden",background:"#1a1a2e"}}>
+<style>{"@keyframes pulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.4);opacity:0.2}}"}</style>
+<div style={{padding:"14px 16px",background:"linear-gradient(135deg,#FF6F00,#ff8c00)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+<div><div style={{fontSize:12,fontWeight:800,color:"#fff",letterSpacing:0.5}}>🚗 Votre artisan est en route</div><div style={{fontSize:11,color:"rgba(255,255,255,0.8)",marginTop:2}}>Arrivée estimée : {eta}</div></div>
+<div style={{background:"rgba(255,255,255,0.2)",borderRadius:10,padding:"6px 12px",fontSize:11,fontWeight:700,color:"#fff"}}>{eta}</div>
 </div>
-<div id={"tracking-map-"+lead.id} style={{height:220,width:"100%"}}/>
+<div id={mapId} style={{height:240,width:"100%"}}/>
 </div>);
 }
 
