@@ -633,6 +633,13 @@ return(<div style={{marginTop:14,borderRadius:18,overflow:"hidden",background:"#
 </div>);
 }
 
+function PhotoButton({leadId}){
+const [photo,setPhoto]=useState(null);
+const [loading,setLoading]=useState(false);
+const load=async e=>{e.stopPropagation();if(photo)return setPhoto(null);setLoading(true);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";const d=await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+leadId+"&select=photo",{headers:{"apikey":AK,"Authorization":"Bearer "+AK}}).then(r=>r.json());setPhoto(d&&d[0]&&d[0].photo?d[0].photo:null);setLoading(false);};
+return(<div style={{marginBottom:12}}><button onClick={load} style={{fontSize:12,padding:"6px 12px",background:"rgba(255,111,0,0.08)",border:"1px solid rgba(255,111,0,0.2)",borderRadius:8,color:"#FF6F00",fontWeight:600,cursor:"pointer",marginBottom:photo?8:0}}>{loading?"Chargement...":photo?"Masquer la photo":"📷 Voir la photo"}</button>{photo&&<div style={{borderRadius:12,overflow:"hidden"}}><img src={photo} alt="Photo" style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:12}}/></div>}</div>);
+}
+
 function ArtisanTrackingMap({lead,artisanLat,artisanLon}){
 const mapId="atm"+lead.id;
 const mapRef=useRef(null);
