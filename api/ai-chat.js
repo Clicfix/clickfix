@@ -1,10 +1,13 @@
 export default async function handler(req,res){
 if(req.method!=="POST")return res.status(405).end();
-const {messages,prenom}=req.body;
+const body=typeof req.body==="string"?JSON.parse(req.body):req.body;
+const messages=body.messages||(body.history?[...body.history,{role:"user",content:body.message}]:null);
+if(!messages)return res.status(400).json({error:"messages required"});
+const prenom=body.prenom||"";
 try{
 const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
 method:"POST",
-headers:{"Content-Type":"application/json","Authorization":"Bearer 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"},
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
 body:JSON.stringify({
 model:"llama-3.3-70b-versatile",
 max_tokens:1000,
