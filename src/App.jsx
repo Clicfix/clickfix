@@ -837,7 +837,7 @@ return(
                 </div>
                 {selLead?.id===l.id&&(
                   <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",display:"grid",gap:8}}>
-                    {[["Spécialité",l.precision],["Détails",(l.details||"").replace(/\| Diagnostic IA:.*$/,"").trim()||null],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&(
+                    {[["Spécialité",l.precision],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&(
                       <div key={k} style={{display:"flex",gap:12}}>
                         <span style={{fontSize:11,color:"rgba(255,255,255,0.22)",minWidth:80,flexShrink:0}}>{k}</span>
                         <span style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>{v}</span>
@@ -1364,7 +1364,7 @@ function ProDashboard({ ctx }) {
                 {selRdv?.id===l.id&&(
                   <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
                     <div style={{display:"grid",gap:8,marginBottom:14}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",(l.details||"").replace(/\| Diagnostic IA:.*$/,"").trim()||null]].map(([k,v])=>v&&(
+                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)]].map(([k,v])=>v&&(
                         <div key={k} style={{display:"flex",gap:12}}>
                           <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
                           <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
@@ -1424,7 +1424,7 @@ function ProDashboard({ ctx }) {
                 {selConf?.id===l.id&&(
                   <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
                     <div style={{display:"grid",gap:8,marginBottom:12}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",(l.details||"").replace(/\| Diagnostic IA:.*$/,"").trim()||null],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
+                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
                         <div key={k} style={{display:"flex",gap:12}}>
                           <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
                           <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
