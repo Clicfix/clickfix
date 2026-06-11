@@ -7,7 +7,7 @@ try{
 const params={
 amount:Math.round(amount*100),
 currency,
-capture_method:"manual",
+capture_method:"manual",automatic_payment_methods:{enabled:true,allow_redirects:"never"},
 description:description||"Intervention Click&fix",
 metadata:{lead_id:lead_id||"",platform:"clickfix"}
 };
