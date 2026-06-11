@@ -613,7 +613,7 @@ setArtisans(sorted);
 async function sendUrgence(artisan){
 setLoading(true);
 try{
-await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details+(analyse?" | Diagnostic IA: "+analyse.diagnostic:""),photo:photo||null,analyse_ia:analyse||null,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null,montant_pre_autorise:montantMax,payment_intent_id:clientSecret?clientSecret.split("_secret_")[0]:null,paiement_statut:clientSecret?"pre_autorise":"non_requis"})});
+await fetch("/api/urgence-lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({client_nom:ctx.sess?.prenom||"Client",client_tel:ctx.sess?.tel||"",client_email:ctx.sess?.email||"",travaux:type,precision:"Urgence — "+type,details:details||(analyse&&analyse.diagnostic?analyse.diagnostic:""),photo:photo||null,analyse_ia:analyse||null,adresse:"Géolocalisation",lat:loc?.lat,lon:loc?.lon,nb_artisans:1,statut:"dispatche",assigned_to:artisan.id,creneaux:"[]",heure:"Immédiatement",user_id:ctx.sess?.id||null,montant_pre_autorise:montantMax,payment_intent_id:clientSecret?clientSecret.split("_secret_")[0]:null,paiement_statut:clientSecret?"pre_autorise":"non_requis"})});
 setSent(true);
 }catch(e){}
 setLoading(false);
