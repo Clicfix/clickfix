@@ -833,7 +833,7 @@ return(
                       <span>{timeAgo(l.created_at)}</span>
                     </div>
                   </div>
-                  <SBadge s={l.statut}/>
+                  <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
                 </div>
                 {selLead?.id===l.id&&(
                   <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",display:"grid",gap:8}}>
@@ -867,7 +867,7 @@ return(
               <div key={l.id} onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"rgba(34,197,94,0.04)",border:"0.5px solid "+(selRdv?.id===l.id?"rgba(34,197,94,0.4)":"rgba(34,197,94,0.15)"),borderLeft:"3px solid #22c55e",borderRadius:14,padding:"16px 18px",cursor:"pointer",transition:"all .2s"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <div><span style={{fontWeight:700,fontSize:14,color:"#fff"}}>{l.travaux||l.precision}</span>{l.ville&&<span style={{fontSize:12,color:"rgba(255,255,255,0.3)",marginLeft:8}}>📍 {l.ville}</span>}</div>
-                  <SBadge s={l.statut}/>
+                  <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
                 </div>
                 {selRdv?.id===l.id&&(
                   <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(34,197,94,0.15)"}}>
@@ -1395,7 +1395,7 @@ function ProDashboard({ ctx }) {
                     {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <SBadge s={l.statut}/>
+                    <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
                     <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selRdv?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
                   </div>
                 </div>
@@ -1550,6 +1550,7 @@ function SBadge({ s }) {
   return <span style={{ fontSize:11, fontWeight:700, padding:"3px 9px", borderRadius:99, background:ok?"rgba(34,197,94,0.1)":dispatche?"rgba(56,189,248,0.1)":"rgba(251,192,5,0.1)", color:ok?"#22c55e":dispatche?"#38bdf8":"#FBC005", border:`1px solid ${ok?"rgba(34,197,94,0.4)":"rgba(251,192,5,0.4)"}` }}>{ok?"Confirmé":dispatche?"Artisan trouvé":"En attente"}</span>;
 }
 
+function PBadge({s,montant}){const p=s==="paye";const a=s==="en_attente_validation";const r=s==="pre_autorise";if(!s||s==="non_requis")return null;return <span style={{fontSize:11,fontWeight:700,padding:"3px 9px",borderRadius:99,background:p?"rgba(34,197,94,0.1)":a?"rgba(255,111,0,0.1)":"rgba(56,189,248,0.1)",color:p?"#22c55e":a?"#FF6F00":"#38bdf8",border:"1px solid "+(p?"rgba(34,197,94,0.3)":a?"rgba(255,111,0,0.3)":"rgba(56,189,248,0.3)"),marginLeft:6}}>{p?"✅ Payé "+(montant||"")+"€":a?"⏳ Validation "+(montant||"")+"€":"💳 Pré-auth "+(montant||"")+"€"}</span>;}
 function ST({ children }) { return <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,0.3)", letterSpacing:1, textTransform:"uppercase", marginBottom:14 }}>{children}</div>; }
 
 function Empty({ icon, title, sub, cta, onCta }) {
