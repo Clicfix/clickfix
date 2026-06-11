@@ -1464,7 +1464,7 @@ function ProDashboard({ ctx }) {
                         </div>
                       ))}
                     </div>
-                    {l.photo&&<div style={{marginBottom:12,borderRadius:12,overflow:"hidden"}}><img src={l.photo} alt="Photo" style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:12}}/></div>}
+                    <PhotoButton leadId={l.id}/>
                     {l.analyse_ia&&<div style={{padding:"14px 16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:14,marginBottom:12}}>
                       <div style={{fontSize:10,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Analyse IA</div>
                       {l.analyse_ia.diagnostic&&<div style={{fontSize:13,color:"#1d1d1f",fontWeight:600,marginBottom:6}}>{l.analyse_ia.diagnostic}</div>}
