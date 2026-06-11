@@ -882,6 +882,7 @@ return(
                       </div>
                     )}
                     {l.assigned_to&&<ArtisanInfo id={l.assigned_to}/>}
+                    {l.paiement_statut==="en_attente_validation"&&<div style={{marginTop:12,background:"rgba(255,111,0,0.08)",padding:"12px",borderRadius:10}}><div style={{fontSize:11,fontWeight:700,color:"#FF6F00",marginBottom:8}}>Artisan a termine</div><div style={{fontSize:13,color:"rgba(255,255,255,0.8)",marginBottom:10}}>{(l.artisan_nom||"Artisan")+" propose : "+l.prix_final+"EUR"}</div><button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({paiement_statut:"paye"})});fetch("/api/capture-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_intent_id:l.payment_intent_id,amount_final:l.prix_final})}).then(r=>r.json()).then(d=>ctx.notify(d.success?"Paiement confirme !":"Erreur"));}} style={{width:"100%",padding:"10px",background:"#22c55e",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginTop:8}}>Valider et payer</button></div>}
                   </div>
                 )}
               </div>
