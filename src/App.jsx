@@ -1406,6 +1406,7 @@ function ProPricing({ ctx }) {
 //  PRO DASHBOARD
 // 
 function ProDashboard({ ctx }) {
+  const isMobile=useIsMobile();
   const s=ctx.sess;
   const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
