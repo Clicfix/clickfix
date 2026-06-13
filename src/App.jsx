@@ -1430,7 +1430,7 @@ function ProDashboard({ ctx }) {
   return(
 <div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f",display:"flex",flexDirection:isMobile?"column":"row"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
-<div style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:"flex",flexDirection:isMobile?"row":"column",position:isMobile?"relative":"fixed",top:0,left:0,bottom:isMobile?"auto":0,flexWrap:"wrap",gap:isMobile?8:0}}>
+<div data-sidebar="" style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:"flex",flexDirection:isMobile?"row":"column",position:isMobile?"relative":"fixed",top:0,left:0,bottom:isMobile?"auto":0,flexWrap:"wrap",gap:isMobile?8:0}}>
   <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
     <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
     <div>
@@ -1466,7 +1466,7 @@ function ProDashboard({ ctx }) {
   <div style={{padding:"10px 14px",marginBottom:8,background:dispo?"rgba(34,197,94,0.06)":"rgba(0,0,0,0.02)",borderRadius:12,border:"1px solid "+(dispo?"rgba(34,197,94,0.2)":"#f0f0f0")}}><div style={{fontSize:10,fontWeight:600,color:"#8e8e93",marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>Dépannage urgent</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:12,fontWeight:600,color:dispo?"#22c55e":"#8e8e93"}}>{dispo?"Disponible":"Hors ligne"}</span><div onClick={toggleDispo} style={{width:44,height:26,borderRadius:13,background:dispo?"#22c55e":"#e5e5ea",position:"relative",cursor:"pointer",transition:"background .3s"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:dispo?20:2,transition:"left .3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></div></div></div>
   <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
 </div>
-<div style={{flex:1,marginLeft:isMobile?0:260,padding:isMobile?"16px":"40px 48px",minHeight:"100vh",background:"#fff"}}>
+<div data-maincontent="" style={{flex:1,marginLeft:isMobile?0:260,padding:isMobile?"16px":"40px 48px",minHeight:"100vh",background:"#fff"}}>
   <div style={{maxWidth:820,margin:"0 auto",animation:"fadeUp .5s ease both"}}>
     <div style={{marginBottom:32}}>
       <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
