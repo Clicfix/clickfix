@@ -301,7 +301,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');html{scroll-behavior:smooth}@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}@keyframes revealUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}.reveal{animation:revealUp .9s cubic-bezier(.4,0,.2,1) both}.hero-btn:hover{transform:scale(1.03);transition:transform .2s}"}</style>
 
-<nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>50?'rgba(255,255,255,0.85)':'transparent',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderBottom:scrollY>50?'0.5px solid rgba(0,0,0,0.12)':'none',transition:'all .5s cubic-bezier(.4,0,.2,1)',padding:'0 48px',height:48,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+<nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>50?'rgba(255,255,255,0.85)':'transparent',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderBottom:scrollY>50?'0.5px solid rgba(0,0,0,0.12)':'none',transition:'all .5s cubic-bezier(.4,0,.2,1)',padding:isMobile?'0 16px':'0 48px',height:48,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
   <span style={{fontSize:17,fontWeight:800,color:scrollY>50?'#1d1d1f':'#fff',letterSpacing:'-0.3px',transition:'color .5s'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
   <div style={{display:'flex',gap:6,alignItems:'center'}}>
     <button onClick={()=>go('part')} style={{...F,padding:'6px 16px',borderRadius:18,border:'none',background:scrollY>50?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.15)',color:scrollY>50?'#1d1d1f':'#fff',fontSize:13,fontWeight:500,cursor:'pointer',transition:'all .3s',backdropFilter:'blur(10px)'}}>Particulier</button>
@@ -324,7 +324,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 </section>
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
-  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:96,alignItems:"center"}}>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:isMobile?32:96,alignItems:"center"}}>
     <div>
       <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Particuliers</p>
       <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Vos travaux,<br/>sans le stress</h2>
@@ -343,8 +343,8 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
   </div>
 </section>
 
-<section style={{padding:'120px 48px',background:'#f5f5f7'}}>
-  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:96,alignItems:"center"}}>
+<section style={{padding:isMobile?'60px 20px':'120px 48px',background:'#f5f5f7'}}>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:isMobile?32:96,alignItems:"center"}}>
     <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.12)'}}>
       <img src="https://images.unsplash.com/photo-1588854337221-4cf9fa96059c?w=900&q=85" alt="artisan professionnel" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
     </div>
@@ -365,7 +365,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
   <div style={{maxWidth:980,margin:'0 auto'}}>
-<section style={{padding:'100px 48px',background:'linear-gradient(135deg,#1a0a0a,#2d0f0f)'}}>
+<section style={{padding:isMobile?'60px 20px':'100px 48px',background:'linear-gradient(135deg,#1a0a0a,#2d0f0f)'}}>
   <div style={{maxWidth:980,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
     <div>
       <div style={{fontSize:11,fontWeight:700,color:'#ef4444',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Nouveau — Dépannage instantané</div>
