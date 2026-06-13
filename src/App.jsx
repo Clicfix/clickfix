@@ -1284,6 +1284,45 @@ if (!form.code_postal.trim()) errors.push("Code postal manquant");
 // 
 //  PRO DOCS
 // 
+function ContratArtisan({ctx}){
+const [accepted,setAccepted]=useState(ctx.sess?.contrat_signe_at?true:false);
+const [loading,setLoading]=useState(false);
+const sign=async()=>{
+if(!accepted)return;
+setLoading(true);
+const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+const now=new Date().toISOString();
+await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+ctx.sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({contrat_signe_at:now})});
+ctx.updateSession({...ctx.sess,contrat_signe_at:now});
+ctx.notify("Contrat signé !");
+ctx.setPage("pro-pricing");
+setLoading(false);
+};
+return(<div>
+<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:20,marginBottom:16}}>
+<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginBottom:12}}>📄 Contrat de prestation Click&fix</div>
+<div style={{fontSize:12,color:"rgba(255,255,255,0.5)",lineHeight:1.8,marginBottom:16}}>
+En rejoignant Click&fix, vous vous engagez à :<br/>
+• Être titulaire d'une assurance RC Pro valide<br/>
+• Respecter les délais et devis convenus<br/>
+• Maintenir une note minimale de 3/5<br/>
+• Accepter la commission de 15% sur les urgences<br/>
+• Respecter les CGV et CGU de la plateforme<br/>
+• Fournir des prestations de qualité professionnelle
+</div>
+<div onClick={()=>setAccepted(!accepted)} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+<div style={{width:20,height:20,borderRadius:6,border:"2px solid "+(accepted?"#FF6F00":"rgba(255,255,255,0.2)"),background:accepted?"#FF6F00":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+{accepted&&<span style={{color:"#fff",fontSize:12,fontWeight:900}}>✓</span>}
+</div>
+<span style={{fontSize:12,color:"rgba(255,255,255,0.7)"}}>J'ai lu et j'accepte le contrat de prestation Click&fix ainsi que les <button onClick={e=>{e.stopPropagation();ctx.setPage("cgv");}} style={{background:"none",border:"none",color:"#FF6F00",cursor:"pointer",fontSize:12,padding:0}}>CGV</button> et <button onClick={e=>{e.stopPropagation();ctx.setPage("cgu");}} style={{background:"none",border:"none",color:"#FF6F00",cursor:"pointer",fontSize:12,padding:0}}>CGU</button></span>
+</div>
+</div>
+<BigBtn style={{opacity:ctx.docsOk&&accepted?1:.4}} disabled={!ctx.docsOk||!accepted||loading} onClick={sign}>
+{loading?"Enregistrement...":(ctx.docsOk&&accepted?"Choisir mon pack →":"Documents ou contrat manquants")}
+</BigBtn>
+</div>);
+}
+
 function ProDocs({ ctx }) {
   return (
     <Shell ctx={ctx} color="#FF6F00" title="Documents requis">
