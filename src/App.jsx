@@ -1430,7 +1430,7 @@ function ProDashboard({ ctx }) {
   return(
 <div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f",display:"flex",flexDirection:isMobile?"column":"row"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
-<div data-sidebar="" style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:"flex",flexDirection:isMobile?"row":"column",position:isMobile?"relative":"fixed",top:0,left:0,bottom:isMobile?"auto":0,flexWrap:"wrap",gap:isMobile?8:0}}>
+<div data-sidebar="" style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:isMobile?"none":"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
   <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
     <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
     <div>
