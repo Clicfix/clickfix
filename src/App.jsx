@@ -1466,7 +1466,7 @@ function ProDashboard({ ctx }) {
   <div style={{padding:"10px 14px",marginBottom:8,background:dispo?"rgba(34,197,94,0.06)":"rgba(0,0,0,0.02)",borderRadius:12,border:"1px solid "+(dispo?"rgba(34,197,94,0.2)":"#f0f0f0")}}><div style={{fontSize:10,fontWeight:600,color:"#8e8e93",marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>Dépannage urgent</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:12,fontWeight:600,color:dispo?"#22c55e":"#8e8e93"}}>{dispo?"Disponible":"Hors ligne"}</span><div onClick={toggleDispo} style={{width:44,height:26,borderRadius:13,background:dispo?"#22c55e":"#e5e5ea",position:"relative",cursor:"pointer",transition:"background .3s"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:dispo?20:2,transition:"left .3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></div></div></div>
   <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
 </div>
-<div style={{flex:1,marginLeft:260,padding:"40px 48px",minHeight:"100vh",background:"#fff"}}>
+<div style={{flex:1,marginLeft:isMobile?0:260,padding:isMobile?"16px":"40px 48px",minHeight:"100vh",background:"#fff"}}>
   <div style={{maxWidth:820,margin:"0 auto",animation:"fadeUp .5s ease both"}}>
     <div style={{marginBottom:32}}>
       <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
