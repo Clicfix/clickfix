@@ -49,6 +49,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 // 
 //  ROOT APP
 // 
+import {MentionsLegales,CGV,CGU,RGPD} from "./LegalPages.jsx";
 export default function App() {
   const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess")||JSON.parse(sessionStorage.getItem("cf_sess_bak")||"null"));
@@ -254,6 +255,10 @@ setBusy(false);
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
       {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
       {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
+      {page==="mentions-legales" && <div style={{minHeight:"100vh",background:"#fff"}}><MentionsLegales/></div>}
+      {page==="cgv" && <div style={{minHeight:"100vh",background:"#fff"}}><CGV/></div>}
+      {page==="cgu" && <div style={{minHeight:"100vh",background:"#fff"}}><CGU/></div>}
+      {page==="rgpd" && <div style={{minHeight:"100vh",background:"#fff"}}><RGPD/></div>}
     </div>
   );
 }
@@ -472,7 +477,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
     <span style={{cursor:'pointer'}}>Mentions légales</span>
     <span style={{cursor:'pointer'}}>CGU</span>
   </div>
-  <span style={{fontSize:11,color:'rgba(255,255,255,0.12)'}}>© 2025 Click&fix</span>
+  <span style={{fontSize:11,color:'rgba(255,255,255,0.12)'}}>© 2026 Click&fix</span><div style={{display:'flex',gap:20,flexWrap:'wrap'}}><button onClick={()=>ctx.setPage('mentions-legales')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Mentions légales</button><button onClick={()=>ctx.setPage('cgv')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGV</button><button onClick={()=>ctx.setPage('cgu')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGU</button><button onClick={()=>ctx.setPage('rgpd')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Confidentialité</button></div>
 </footer>
 </div>
 );
