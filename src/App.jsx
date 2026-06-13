@@ -1431,8 +1431,8 @@ function ProDashboard({ ctx }) {
   const TABS=[{id:"rdv",ico:"📋",label:"Mes RDV"},{id:"confirmes",ico:"✅",label:"Confirmés"},{id:"docs",ico:"📄",label:"Documents"},{id:"pack",ico:"📦",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
   const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
   const rdvPct=profile?.rdv_total>0?Math.round(((profile?.rdv_restants||0)/profile.rdv_total)*100):0;
-  return(
   if(isMobile)return <ProDashboardMobile ctx={ctx} tab={tab} setTab={t=>{setTab(t);sessionStorage.setItem("pro_tab",t);}} dispo={dispo} toggleDispo={toggleDispo}/>;
+  return(
 <div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f",display:"flex",flexDirection:isMobile?"column":"row"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
 <div data-sidebar="" style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:isMobile?"none":"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
