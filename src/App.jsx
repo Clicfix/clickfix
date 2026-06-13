@@ -1407,6 +1407,7 @@ function ProPricing({ ctx }) {
 // 
 function ProDashboard({ ctx }) {
   const isMobile=useIsMobile();
+  console.log("ProDashboard isMobile:",isMobile,"innerWidth:",window.innerWidth);
   const s=ctx.sess;
   const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
   const [profile,setProfile]=useState(s);
