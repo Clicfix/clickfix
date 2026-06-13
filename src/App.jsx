@@ -1293,9 +1293,7 @@ function ProDocs({ ctx }) {
       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:22 }}>
         {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
       </div>
-      <BigBtn style={{ opacity:ctx.docsOk?1:.4 }} disabled={!ctx.docsOk} onClick={()=>ctx.setPage("pro-pricing")}>
-        {ctx.docsOk?"Choisir mon pack ":" Documents obligatoires manquants"}
-      </BigBtn>
+      <ContratArtisan ctx={ctx}/>
     </Shell>
   );
 }
