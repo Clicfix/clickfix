@@ -5,7 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Click&fix — Rénovation</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
+  <style>
+*{box-sizing:border-box;}
+@media(max-width:768px){
+  nav{padding:0 16px !important;}
+  section{padding:60px 20px !important;}
+  .grid-2{grid-template-columns:1fr !important;gap:32px !important;}
+  .hero-title{font-size:36px !important;}
+  .hide-mobile{display:none !important;}
+  .full-mobile{width:100% !important;max-width:100% !important;}
+  .pad-mobile{padding:16px !important;}
+  .footer-mobile{flex-direction:column !important;text-align:center !important;gap:16px !important;padding:24px 20px !important;}
+}
+</style>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

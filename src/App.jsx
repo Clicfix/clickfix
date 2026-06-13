@@ -50,6 +50,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 //  ROOT APP
 // 
 import {MentionsLegales,CGV,CGU,RGPD} from "./LegalPages.jsx";
+const isMobile=window.innerWidth<=768;
 export default function App() {
   const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess")||JSON.parse(sessionStorage.getItem("cf_sess_bak")||"null"));
