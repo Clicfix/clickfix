@@ -507,7 +507,7 @@ async function toggleDispo(){
 
 function selTab(b){b.closest('div').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');}
 
-(function init(){
+(function init(){if(window.innerWidth<900){window.location.href="/pro-mobile.html";return;}
   const s=localStorage.getItem('cf_sess') || localStorage.getItem('cf_pro');
   if(s){try{sess=JSON.parse(s);showDash();}catch(e){localStorage.removeItem('cf_sess');}}
 })();
