@@ -1,3 +1,4 @@
+import React from "react";
 export default function ProDashboardMobile({ctx,tab,setTab,dispo,toggleDispo}){
 const s=ctx.sess;
 const rdv=ctx.myLeadsPro;
