@@ -278,7 +278,7 @@ async function login(){
   btn.textContent='Se connecter';btn.disabled=false;
 }
 
-function logout(){localStorage.removeItem('cf_sess');sess=null;leads=[];document.getElementById('dash').style.display='none';document.getElementById('ls').style.display='flex';}
+function logout(){['cf_sess','cf_pro','cf_sess_bak'].forEach(k=>{localStorage.removeItem(k);sessionStorage.removeItem(k);});sess=null;leads=[];window.location.href='/';}
 
 async function showDash(){
   document.getElementById('ls').style.display='none';
