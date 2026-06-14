@@ -271,14 +271,14 @@ async function login(){
     const d=await r.json();
     if(d.access_token){
       sess={token:d.access_token,id:d.user.id,email:d.user.email};
-      localStorage.setItem('cf_pro',JSON.stringify(sess));
+      localStorage.setItem('cf_sess',JSON.stringify(sess));
       showDash();
     }else{err.textContent=d.error_description||'Identifiants incorrects';}
   }catch(e){err.textContent='Erreur réseau. Réessayez.';}
   btn.textContent='Se connecter';btn.disabled=false;
 }
 
-function logout(){localStorage.removeItem('cf_pro');sess=null;leads=[];document.getElementById('dash').style.display='none';document.getElementById('ls').style.display='flex';}
+function logout(){localStorage.removeItem('cf_sess');sess=null;leads=[];document.getElementById('dash').style.display='none';document.getElementById('ls').style.display='flex';}
 
 async function showDash(){
   document.getElementById('ls').style.display='none';
@@ -508,8 +508,8 @@ async function toggleDispo(){
 function selTab(b){b.closest('div').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');}
 
 (function init(){
-  const s=localStorage.getItem('cf_pro');
-  if(s){try{sess=JSON.parse(s);showDash();}catch(e){localStorage.removeItem('cf_pro');}}
+  const s=localStorage.getItem('cf_sess') || localStorage.getItem('cf_pro');
+  if(s){try{sess=JSON.parse(s);showDash();}catch(e){localStorage.removeItem('cf_sess');}}
 })();
 </script>
 </body>

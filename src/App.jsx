@@ -54,7 +54,7 @@ import ProDashboardMobile from "./ProDashboardMobile.jsx";
 function useIsMobile(){const [m,setM]=React.useState(window.innerWidth<=900);React.useEffect(()=>{const h=()=>setM(window.innerWidth<=900);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);return m;}
 export default function App() {
 const isMobile=useIsMobile();
-  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro")return "pro-dashboard";if(r==="part")return "part-home";return "home";});
+  const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro"){if(window.innerWidth>=900){window.location.href="/pro.html";return "home";}return "pro-dashboard";}if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess")||JSON.parse(sessionStorage.getItem("cf_sess_bak")||"null"));
   useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
@@ -126,7 +126,7 @@ saveSession(u);
 const users=getUsers();
 if(!users.find(x=>x.id===uid))saveUsers([...users,u]);
 else saveUsers(users.map(x=>x.id===uid?u:x));
-setPage(u.role==="pro"?"pro-dashboard":"part-home");
+if(u.role==="pro"&&window.innerWidth>=900){window.location.href="/pro.html";return;}setPage(u.role==="pro"?"pro-dashboard":"part-home");
 notify("Bienvenue "+u.prenom+" !");
 } catch(e){notify(e.message,"err");}
 setBusy(false);
