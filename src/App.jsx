@@ -52,7 +52,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 // 
 import {MentionsLegales,CGV,CGU,RGPD} from "./LegalPages.jsx";
 import ProDashboardMobile from "./ProDashboardMobile.jsx";
-function useIsMobile(){const [m,setM]=React.useState(window.innerWidth<=900);React.useEffect(()=>{const h=()=>setM(window.innerWidth<=900);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);return m;}
+function useIsMobile(){const [m,setM]=useState(window.innerWidth<=900);useEffect(()=>{const h=()=>setM(window.innerWidth<=900);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);return m;}
 export default function App() {
 const isMobile=useIsMobile();
   const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro"){if(window.innerWidth>=900){window.location.href="/pro.html";return "home";}return "pro-dashboard";}if(r==="part")return "part-home";return "home";});
