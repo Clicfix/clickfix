@@ -298,7 +298,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
       setArtLoading(false);
     }).catch(()=>setArtLoading(false));
   },[]);
-  function go(role){if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
+  function go(role){const isMobile=window.innerWidth<=900;if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
   const F={fontFamily:"'Inter',sans-serif"};
   return(
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
@@ -1416,7 +1416,7 @@ function ProDashboard({ ctx }) {
   const [selRdv,setSelRdv]=useState(null);
   const [selConf,setSelConf]=useState(null);
   const [dispo,setDispo]=useState(s?.disponible||false);
-  async function toggleDispo(){const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
+  async function toggleDispo(){const isMobile=window.innerWidth<=900;const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
   const F={fontFamily:"'Inter',sans-serif"};
   const rdv=ctx.myLeadsPro;
   const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
