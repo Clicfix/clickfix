@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Click&fix Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--o:#F26522;--ol:#FFF0E8;--g:#22C55E;--gl:#DCFCE7;--gd:#16A34A;--b:#3B82F6;--bl:#EFF6FF;--p:#8B5CF6;--pl:#F3E8FF;--r:#EF4444;--rl:#FEE2E2;--s50:#F8F9FB;--s100:#EFEFF3;--s200:#DCDCE6;--s400:#9898AA;--s500:#6B6B80;--s700:#2D2D3A;--s900:#16161F;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--s50);color:var(--s700);min-height:100vh;}
+#ls{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f0f1a,#1a0a00);}
+.lb{background:white;border-radius:20px;padding:40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.ll{font-size:26px;font-weight:800;margin-bottom:6px;}.ll span{color:var(--o);}
+.ls2{font-size:13px;color:var(--s400);margin-bottom:28px;}
+.lf{margin-bottom:14px;}.lf label{display:block;font-size:12px;font-weight:700;color:var(--s500);margin-bottom:6px;text-transform:uppercase;}
+.lf input{width:100%;padding:12px 14px;border:1.5px solid var(--s200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;}
+.lf input:focus{border-color:var(--o);}
+.lbtn{width:100%;height:48px;background:var(--o);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.lerr{font-size:13px;color:var(--r);margin-top:10px;text-align:center;min-height:18px;}
+.lback{font-size:13px;color:var(--o);text-align:center;margin-top:14px;cursor:pointer;font-weight:600;}
+#dash{display:none;min-height:100vh;}
+.sb{width:240px;min-height:100vh;background:var(--s900);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-logo-t{font-size:20px;font-weight:800;color:white;}.sb-logo-t span{color:var(--o);}
+.sb-logo-s{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.sb-user{padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-av{width:36px;height:36px;border-radius:50%;background:var(--o);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+.sb-name{font-size:13px;font-weight:700;color:white;}.sb-role{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px;}
+.sb-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;}
+.sb-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:8px 10px 4px;margin-top:8px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.5);font-size:13px;font-weight:600;transition:background .15s;}
+.sb-item:hover{background:#1F1F2E;color:rgba(255,255,255,.8);}
+.sb-item.on{background:rgba(242,101,34,.15);color:var(--o);}
+.sb-badge{margin-left:auto;background:var(--o);color:white;border-radius:99px;font-size:10px;font-weight:700;padding:2px 7px;}
+.sb-dispo{margin:10px 10px 16px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;}
+.sb-dispo-l{display:flex;align-items:center;gap:8px;}
+.ddot{width:8px;height:8px;background:var(--g);border-radius:50%;box-shadow:0 0 6px var(--g);}
+.dtxt{font-size:12px;font-weight:700;color:var(--g);}
+.tgl{position:relative;width:36px;height:20px;cursor:pointer;}.tgl input{display:none;}
+.tg-t{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:99px;transition:background .2s;}
+.tgl input:checked+.tg-t{background:var(--g);}
+.tg-th{position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s;}
+.tgl input:checked~.tg-th{transform:translateX(16px);}
+.main{margin-left:240px;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:white;border-bottom:1px solid var(--s100);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-title{font-size:18px;font-weight:700;letter-spacing:-.3px;}
+.tb-date{font-size:13px;color:var(--s400);margin-left:14px;}
+.tb-r{display:flex;align-items:center;gap:10px;}
+.tb-av{width:32px;height:32px;border-radius:50%;background:var(--o);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}
+.tb-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--s200);background:white;cursor:pointer;font-family:inherit;}
+.tb-btn.red{background:var(--rl);color:var(--r);border-color:var(--rl);}
+.content{padding:28px 32px;flex:1;display:flex;flex-direction:column;gap:24px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.stat{background:white;border-radius:14px;padding:20px 22px;border:1px solid var(--s100);position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.stat.o::before{background:var(--o);}.stat.g::before{background:var(--g);}.stat.b::before{background:var(--b);}.stat.p::before{background:var(--p);}
+.stat-lbl{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--s400);}
+.stat-val{font-size:30px;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-top:6px;}
+.stat.o .stat-val{color:var(--o);}.stat.g .stat-val{color:var(--gd);}.stat.b .stat-val{color:var(--b);}.stat.p .stat-val{color:var(--p);}
+.stat-sub{font-size:12px;font-weight:600;margin-top:5px;color:var(--gd);}
+.grid{display:grid;grid-template-columns:1fr 340px;gap:20px;}
+.card{background:white;border-radius:14px;border:1px solid var(--s100);overflow:hidden;}
+.card-hdr{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--s100);}
+.card-t{font-size:14px;font-weight:700;}.card-l{font-size:12px;color:var(--o);font-weight:600;cursor:pointer;}
+.tab{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:var(--s100);color:var(--s500);font-family:inherit;}
+.tab.on{background:var(--o);color:white;}
+.chart-wrap{padding:20px;}
+.chart-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.chart-total{font-size:28px;font-weight:800;letter-spacing:-1px;}.chart-sub{font-size:12px;color:var(--s400);margin-top:2px;}
+.chart-pill{background:var(--gl);color:var(--gd);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;}
+.bt{flex:1;width:100%;background:var(--s100);border-radius:6px 6px 0 0;display:flex;align-items:flex-end;overflow:hidden;}
+.bf{width:100%;background:#FFD9C2;border-radius:6px 6px 0 0;}.bf.cur{background:var(--o);}
+.bl{font-size:10px;color:var(--s400);font-weight:600;}
+.tbl-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 130px;padding:10px 20px;background:var(--s50);border-bottom:1px solid var(--s100);}
+.th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--s400);}
+.tbl-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 130px;padding:14px 20px;border-bottom:1px solid var(--s100);align-items:center;cursor:pointer;transition:background .1s;}
+.tbl-row:last-child{border-bottom:none;}.tbl-row:hover{background:var(--s50);}.tbl-row.urg{border-left:3px solid var(--o);}
+.cli{display:flex;align-items:center;gap:10px;}
+.cli-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.cli-name{font-size:13px;font-weight:700;}.cli-meta{font-size:11px;color:var(--s400);margin-top:1px;}
+.cell{font-size:13px;}.cell-s{font-size:11px;color:var(--s400);margin-top:1px;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;}
+.bg{background:var(--gl);color:var(--gd);}.bo{background:var(--ol);color:var(--o);}.bb{background:var(--bl);color:var(--b);}.bs{background:var(--s100);color:var(--s500);}.bp{background:var(--pl);color:var(--p);}
+.act-row{display:flex;gap:6px;}
+.btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.btn-g{background:var(--g);color:white;}.btn-o{background:var(--o);color:white;}.btn-s{background:var(--s100);color:var(--s700);}.btn-b{background:var(--bl);color:var(--b);border:1px solid #bfdbfe;}
+.rcol{display:flex;flex-direction:column;gap:16px;}
+.pack-card{background:linear-gradient(145deg,#16161F,#3D1A08);border-radius:14px;padding:22px;color:white;position:relative;overflow:hidden;}
+.pack-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:var(--o);border-radius:50%;opacity:.1;}
+.pack-ey{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.5;margin-bottom:6px;}
+.pack-n{font-size:22px;font-weight:800;letter-spacing:-.5px;}.pack-s{font-size:12px;opacity:.6;margin-top:4px;}
+.pack-bar-t{height:5px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden;margin:14px 0 6px;}
+.pack-bar-f{height:100%;background:var(--o);border-radius:99px;transition:width .5s;}
+.pack-stats{display:flex;justify-content:space-between;margin-top:14px;}
+.ps-v{font-size:17px;font-weight:800;}.ps-l{font-size:10px;opacity:.5;margin-top:1px;}
+.pack-btn{margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:white;border-radius:8px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;}
+.stripe-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--s100);}
+.stripe-row:last-child{border-bottom:none;}
+.sl{font-size:13px;font-weight:600;}.ss{font-size:11px;color:var(--s400);margin-top:1px;}
+.sa{font-size:16px;font-weight:800;color:var(--o);}.sa.g{color:var(--gd);}
+.up-item{padding:13px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--s100);cursor:pointer;transition:background .1s;}
+.up-item:last-child{border-bottom:none;}.up-item:hover{background:var(--s50);}
+.up-date{text-align:center;min-width:38px;}.up-day{font-size:19px;font-weight:800;color:var(--o);line-height:1;}
+.up-month{font-size:9px;font-weight:700;color:var(--s400);text-transform:uppercase;}
+.up-info{flex:1;}.up-name{font-size:13px;font-weight:700;}.up-meta{font-size:11px;color:var(--s400);margin-top:2px;}
+.up-time{font-size:12px;font-weight:700;background:var(--s100);border-radius:6px;padding:4px 9px;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:white;border-radius:16px;padding:28px;width:480px;max-height:85vh;overflow-y:auto;}
+.modal-t{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.modal-x{cursor:pointer;color:var(--s400);font-size:20px;}
+.info-r{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--s100);}
+.info-r:last-child{border-bottom:none;}
+.info-ic{font-size:16px;width:24px;text-align:center;flex-shrink:0;margin-top:2px;}
+.info-lbl{font-size:11px;color:var(--s400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.info-val{font-size:14px;font-weight:600;margin-top:2px;}
+.price-inp{width:100%;padding:12px 14px;border:1.5px solid var(--s200);border-radius:10px;font-size:16px;font-weight:700;font-family:inherit;outline:none;margin-top:8px;}
+.price-inp:focus{border-color:var(--g);}
+.modal-btns{display:flex;gap:10px;margin-top:16px;}
+.modal-btn{flex:1;height:44px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.modal-btn.g{background:var(--g);color:white;}.modal-btn.s{background:var(--s100);color:var(--s700);}
+.loader{text-align:center;padding:30px;color:var(--s400);font-size:14px;}
+.spinner{width:28px;height:28px;border:3px solid var(--s100);border-top-color:var(--o);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s900);color:white;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="ls">
+  <div class="lb">
+    <div class="ll">click<span>&</span>fix</div>
+    <div class="ls2">Espace artisan professionnel</div>
+    <div class="lf"><label>Email</label><input type="email" id="em" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')login()"></div>
+    <div class="lf"><label>Mot de passe</label><input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="lbtn" onclick="login()" id="lbtn">Se connecter</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="lback" onclick="window.location.href='/'">← Retour au site</div>
+  </div>
+</div>
+
+<div id="dash">
+  <aside class="sb">
+    <div class="sb-logo"><div class="sb-logo-t">click<span>&</span>fix</div><div class="sb-logo-s">Dashboard Artisan</div></div>
+    <div class="sb-user"><div class="sb-av" id="sb-av">?</div><div><div class="sb-name" id="sb-name">Chargement...</div><div class="sb-role" id="sb-role">Artisan</div></div></div>
+    <nav class="sb-nav">
+      <div class="sb-lbl">Principal</div>
+      <div class="sb-item on"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Tableau de bord</div>
+      <div class="sb-item" onclick="toast('Mes RDV')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mes RDV<span class="sb-badge" id="rdv-badge">0</span></div>
+      <div class="sb-item" onclick="toast('Carte')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Carte &amp; secteur</div>
+      <div class="sb-lbl">Finances</div>
+      <div class="sb-item" onclick="toast('Revenus')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenus &amp; paiements</div>
+      <div class="sb-item" onclick="toast('Stripe')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Stripe Connect</div>
+      <div class="sb-lbl">Compte</div>
+      <div class="sb-item" onclick="toast('Profil')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil</div>
+    </nav>
+    <div class="sb-dispo">
+      <div class="sb-dispo-l"><div class="ddot" id="ddot"></div><div class="dtxt" id="dtxt">Disponible</div></div>
+      <label class="tgl"><input type="checkbox" id="dtoggle" checked onchange="toggleDispo()"><div class="tg-t"></div><div class="tg-th"></div></label>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center"><div class="tb-title">Tableau de bord</div><div class="tb-date" id="tb-date"></div></div>
+      <div class="tb-r">
+        <button class="tb-btn" onclick="loadAll()">🔄 Actualiser</button>
+        <button class="tb-btn red" onclick="logout()">Déconnexion</button>
+        <div class="tb-av" id="tb-av">?</div>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><h1 style="font-size:24px;font-weight:800;letter-spacing:-.5px">Bonjour, <span style="color:var(--o)" id="gname">Artisan</span> 👋</h1><p style="font-size:13px;color:var(--s400);margin-top:3px">Voici un résumé de votre activité</p></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-s" style="padding:10px 18px;font-size:13px" onclick="toast('Calendrier')">📅 Calendrier</button>
+          <button class="btn btn-o" style="padding:10px 18px;font-size:13px" onclick="toast('Nouveau RDV')">+ Nouveau RDV</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat o"><div class="stat-lbl">RDV ce mois</div><div class="stat-val" id="s-rdv">—</div><div class="stat-sub" id="s-rdv-s">Chargement...</div></div>
+        <div class="stat g"><div class="stat-lbl">Confirmés</div><div class="stat-val" id="s-conf">—</div><div class="stat-sub" id="s-conf-s">Chargement...</div></div>
+        <div class="stat b"><div class="stat-lbl">À capturer</div><div class="stat-val" id="s-cap" style="font-size:22px">—</div><div class="stat-sub" id="s-cap-s">En attente</div></div>
+        <div class="stat p"><div class="stat-lbl">Pack</div><div class="stat-val" id="s-pack" style="font-size:20px">—</div><div class="stat-sub" id="s-pack-s">Chargement...</div></div>
+      </div>
+      <div class="grid">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="card">
+            <div class="card-hdr"><div class="card-t">Revenus</div><div style="display:flex;gap:6px"><button class="tab on" onclick="selTab(this)">6 mois</button><button class="tab" onclick="selTab(this)">Année</button></div></div>
+            <div class="chart-wrap">
+              <div class="chart-hdr"><div><div class="chart-total" id="chart-total">— €</div><div class="chart-sub">Revenus totaux ce mois</div></div><div class="chart-pill" id="chart-pill">Chargement...</div></div>
+              <div class="bars">
+                <div class="bw"><div class="bt"><div class="bf" style="height:42%"></div></div><div class="bl">Jan</div></div>
+                <div class="bw"><div class="bt"><div class="bf" style="height:58%"></div></div><div class="bl">Fév</div></div>
+                <div class="bw"><div class="bt"><div class="bf" style="height:45%"></div></div><div class="bl">Mar</div></div>
+                <div class="bw"><div class="bt"><div class="bf" style="height:72%"></div></div><div class="bl">Avr</div></div>
+                <div class="bw"><div class="bt"><div class="bf" style="height:68%"></div></div><div class="bl">Mai</div></div>
+                <div class="bw"><div class="bt"><div class="bf cur" id="bar-cur" style="height:0%"></div></div><div class="bl">Ce mois</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hdr">
+              <div class="card-t">Mes rendez-vous</div>
+              <div style="display:flex;gap:6px">
+                <button class="tab on" onclick="filterRdv('all',this)">Tous</button>
+                <button class="tab" onclick="filterRdv('urgent',this)">Urgences</button>
+                <button class="tab" onclick="filterRdv('reno',this)">Rénovation</button>
+              </div>
+            </div>
+            <div class="tbl-head"><div class="th">Client</div><div class="th">Date &amp; type</div><div class="th">Statut</div><div class="th">Paiement</div><div class="th">Actions</div></div>
+            <div id="rdv-list"><div class="loader"><div class="spinner"></div>Chargement...</div></div>
+          </div>
+        </div>
+        <div class="rcol">
+          <div class="pack-card">
+            <div class="pack-ey">Abonnement actif</div>
+            <div class="pack-n" id="pack-n">—</div>
+            <div class="pack-s" id="pack-s">Chargement...</div>
+            <div class="pack-bar-t"><div class="pack-bar-f" id="pack-bar" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.6"><span id="pack-used">—</span><span id="pack-tot">—</span></div>
+            <div class="pack-stats">
+              <div><div class="ps-v" id="pk-rdv">—</div><div class="ps-l">Confirmés</div></div>
+              <div><div class="ps-v" id="pk-note">—</div><div class="ps-l">Note moy.</div></div>
+              <div><div class="ps-v" id="pk-renew">—</div><div class="ps-l">Renouvellement</div></div>
+            </div>
+            <button class="pack-btn" onclick="toast('Gestion du pack')">Gérer l\'abonnement →</button>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-t">💳 Paiements Stripe</div><div class="card-l" onclick="toast('Stripe')">Voir tout</div></div>
+            <div id="stripe-list"><div class="loader" style="padding:20px"><div class="spinner" style="width:22px;height:22px;border-width:2px;margin-bottom:6px"></div>Chargement...</div></div>
+            <div style="padding:10px 20px;background:var(--s50);border-top:1px solid var(--s100);font-size:12px;color:var(--s500)">Split 85/15 · Vous recevez 85% de chaque paiement</div>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-t">Prochains RDV</div></div>
+            <div id="upcoming-list"><div class="loader" style="padding:16px;font-size:13px">Chargement...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><div class="modal-t"><span id="modal-title">Détail</span><span class="modal-x" onclick="closeModal()">✕</span></div><div id="modal-body"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB='https://bipqtqezntzcmxwiaqdz.supabase.co';
+const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU';
+let sess=null,leads=[],profile=null,fmode='all';
+
+function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+function hdr(tok){return{'Content-Type':'application/json','apikey':AK,'Authorization':'Bearer '+(tok||AK)};}
+function fmtD(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});}
+function acolor(s){const c=['#F26522','#3B82F6','#8B5CF6','#22C55E','#EF4444','#F59E0B'];let h=0;for(let x of(s||''))h=(h*31+x.charCodeAt(0))%c.length;return c[h];}
+
+async function login(){
+  const em=document.getElementById('em').value.trim();
+  const pw=document.getElementById('pw').value;
+  const err=document.getElementById('lerr');
+  const btn=document.getElementById('lbtn');
+  if(!em||!pw){err.textContent='Veuillez remplir tous les champs';return;}
+  btn.textContent='Connexion...';btn.disabled=true;err.textContent='';
+  try{
+    const r=await fetch(SB+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json','apikey':SK},body:JSON.stringify({email:em,password:pw})});
+    const d=await r.json();
+    if(d.access_token){
+      sess={token:d.access_token,id:d.user.id,email:d.user.email};
+      localStorage.setItem('cf_pro',JSON.stringify(sess));
+      showDash();
+    }else{err.textContent=d.error_description||'Identifiants incorrects';}
+  }catch(e){err.textContent='Erreur réseau. Réessayez.';}
+  btn.textContent='Se connecter';btn.disabled=false;
+}
+
+function logout(){localStorage.removeItem('cf_pro');sess=null;leads=[];document.getElementById('dash').style.display='none';document.getElementById('ls').style.display='flex';}
+
+async function showDash(){
+  document.getElementById('ls').style.display='none';
+  document.getElementById('dash').style.display='flex';
+  const d=new Date();
+  document.getElementById('tb-date').textContent=' · '+d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  await loadAll();
+  setInterval(loadLeads,30000);
+}
+
+async function loadAll(){await Promise.all([loadProfile(),loadLeads()]);}
+
+async function loadProfile(){
+  try{
+    const r=await fetch(SB+'/rest/v1/profiles?id=eq.'+sess.id+'&select=*',{headers:hdr(sess.token)});
+    const d=await r.json();
+    if(d&&d[0]){
+      profile=d[0];
+      const fn=((d[0].prenom||'')+' '+(d[0].nom||'')).trim()||sess.email;
+      const ini=((d[0].prenom||'')[0]||'').toUpperCase()+((d[0].nom||'')[0]||'').toUpperCase()||'?';
+      document.getElementById('sb-name').textContent=fn;
+      document.getElementById('sb-role').textContent=(d[0].metier||'Artisan')+' · '+(d[0].pack||'Standard');
+      ['sb-av','tb-av'].forEach(id=>document.getElementById(id).textContent=ini||sess.email[0].toUpperCase());
+      document.getElementById('gname').textContent=d[0].prenom||fn;
+      document.getElementById('s-pack').textContent=d[0].pack||'Standard';
+      document.getElementById('s-pack-s').textContent=(d[0].rdv_restants||0)+' leads restants';
+      document.getElementById('pack-n').textContent=d[0].pack||'Standard';
+      document.getElementById('pack-s').textContent=(d[0].metier||'Artisan')+' · Paris';
+      const tot=d[0].rdv_total||0,rest=d[0].rdv_restants||0,used=tot-rest;
+      document.getElementById('pack-bar').style.width=tot>0?Math.round(used/tot*100)+'%':'0%';
+      document.getElementById('pack-used').textContent=used+' leads utilisés';
+      document.getElementById('pack-tot').textContent='/ '+tot;
+      document.getElementById('pk-rdv').textContent=d[0].rdv_total||0;
+      document.getElementById('pk-note').textContent=d[0].note_moyenne||'—';
+      document.getElementById('pk-renew').textContent='1 juil.';
+      const dispo=d[0].disponible!==false;
+      document.getElementById('dtoggle').checked=dispo;
+      document.getElementById('ddot').style.background=dispo?'#22C55E':'#9898AA';
+      document.getElementById('dtxt').textContent=dispo?'Disponible':'Indisponible';
+    }
+  }catch(e){}
+}
+
+async function loadLeads(){
+  try{
+    const r=await fetch(SB+'/rest/v1/leads?assigned_to=eq.'+sess.id+'&select=*&order=created_at.desc&limit=100',{headers:hdr(sess.token)});
+    const d=await r.json();
+    if(Array.isArray(d)){leads=d;renderAll();}
+  }catch(e){}
+}
+
+function renderAll(){renderStats();renderRdv();renderStripe();renderUpcoming();}
+
+function renderStats(){
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  const mo=leads.filter(l=>{const d=new Date(l.created_at);return d.getMonth()===m&&d.getFullYear()===y;});
+  const conf=leads.filter(l=>l.artisan_statut||l.statut==='confirme');
+  const cap=leads.filter(l=>l.paiement_statut==='pre_autorise'&&l.artisan_statut==='termine');
+  const paid=leads.filter(l=>l.paiement_statut==='paye').reduce((s,l)=>s+(l.prix_final||0),0);
+  const totCap=cap.reduce((s,l)=>s+(l.prix_final||l.montant_pre_autorise||0),0);
+  document.getElementById('s-rdv').textContent=mo.length;
+  document.getElementById('s-rdv-s').textContent='Ce mois de '+now.toLocaleDateString('fr-FR',{month:'long'});
+  document.getElementById('s-conf').textContent=conf.length;
+  document.getElementById('s-conf-s').textContent='Total confirmés';
+  document.getElementById('s-cap').textContent=totCap>0?totCap+' €':'—';
+  document.getElementById('s-cap-s').textContent=cap.length>0?cap.length+' paiement(s) à capturer':'Aucun en attente';
+  document.getElementById('rdv-badge').textContent=leads.length;
+  const pct=paid>0?Math.min(100,Math.round(paid/2000*100)):0;
+  document.getElementById('bar-cur').style.height=pct+'%';
+  document.getElementById('chart-total').textContent=Math.round(paid*0.85)+' €';
+  document.getElementById('chart-pill').textContent=paid>0?'Revenus nets (85%)':'Aucun paiement';
+}
+
+function sBadge(l){
+  const as=l.artisan_statut,ps=l.paiement_statut,s=l.statut;
+  if(ps==='paye')return'<span class="badge bg">✅ Payé</span>';
+  if(ps==='en_attente_validation')return'<span class="badge bp">💰 À valider</span>';
+  if(as==='en_cours')return'<span class="badge bo">🔧 En cours</span>';
+  if(as==='arrive')return'<span class="badge bo">📍 Arrivé</span>';
+  if(as==='en_route')return'<span class="badge bb">🚗 En route</span>';
+  if(as==='confirme'||s==='confirme')return'<span class="badge bg">✓ Confirmé</span>';
+  if(s==='en_attente')return'<span class="badge bo">⏳ En attente</span>';
+  return'<span class="badge bs">'+(s||'—')+'</span>';
+}
+
+function pBadge(l){
+  const ps=l.paiement_statut;
+  if(ps==='paye')return'<span class="badge bg">✅ '+(l.prix_final||'')+' €</span>';
+  if(ps==='pre_autorise')return'<span class="badge bb">💳 Pré-auto</span>';
+  if(ps==='en_attente_validation')return'<span class="badge bp">💰 '+(l.prix_final||'')+' €</span>';
+  return'<span class="badge bs">—</span>';
+}
+
+function aBtns(l){
+  const as=l.artisan_statut,ps=l.paiement_statut,s=l.statut;
+  let b='';
+  if(s==='en_attente'&&!as)b+=`<button class="btn btn-o" onclick="event.stopPropagation();act('${l.id}','confirme','confirme','✅ RDV confirmé !')">✓ Confirmer</button>`;
+  if(as==='confirme')b+=`<button class="btn btn-b" onclick="event.stopPropagation();act('${l.id}','en_route',null,'🚗 En route !')">🚗 En route</button>`;
+  if(as==='en_route')b+=`<button class="btn btn-o" onclick="event.stopPropagation();act('${l.id}','arrive',null,'📍 Arrivé !')">📍 Arrivé</button>`;
+  if(as==='arrive')b+=`<button class="btn btn-g" onclick="event.stopPropagation();act('${l.id}','en_cours',null,'🔧 Commencé')">🔧 Commencer</button>`;
+  if(as==='en_cours')b+=`<button class="btn btn-g" onclick="event.stopPropagation();act('${l.id}','termine',null,'✅ Terminé')">✓ Terminer</button>`;
+  if(as==='termine'&&(ps==='pre_autorise'||!ps))b+=`<button class="btn btn-g" onclick="event.stopPropagation();openPrice('${l.id}')">💰 Prix final</button>`;
+  if(ps==='paye')b+=`<button class="btn btn-s" onclick="event.stopPropagation();toast('📄 Bientôt disponible')">📄 Facture</button>`;
+  return b||'<span style="font-size:12px;color:#9898AA">—</span>';
+}
+
+function renderRdv(){
+  let fl=leads;
+  if(fmode==='urgent')fl=leads.filter(l=>l.payment_intent_id);
+  if(fmode==='reno')fl=leads.filter(l=>!l.payment_intent_id);
+  const el=document.getElementById('rdv-list');
+  if(!fl.length){el.innerHTML='<div class="loader">Aucun RDV trouvé</div>';return;}
+  el.innerHTML=fl.map(l=>{
+    const urg=!!l.payment_intent_id;
+    const nom=l.client_nom||'Client';
+    const ini=nom.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return`<div class="tbl-row${urg?' urg':''}" onclick="openModal('${l.id}')">
+      <div class="cli"><div class="cli-av" style="background:${acolor(nom)}">${ini}</div><div><div class="cli-name">${nom}</div><div class="cli-meta">📍 ${l.ville||l.adresse||'—'}</div></div></div>
+      <div><div class="cell">${fmtD(l.created_at)} · ${urg?'⚡ Urgence':'🏠 Réno'}</div><div class="cell-s">${l.travaux||l.precision||'—'}</div></div>
+      <div>${sBadge(l)}</div><div>${pBadge(l)}</div>
+      <div class="act-row">${aBtns(l)}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterRdv(m,btn){
+  fmode=m;
+  btn.closest('div').querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderRdv();
+}
+
+function renderStripe(){
+  const cap=leads.filter(l=>l.paiement_statut==='pre_autorise'&&l.artisan_statut==='termine');
+  const pre=leads.filter(l=>l.paiement_statut==='pre_autorise'&&l.artisan_statut!=='termine');
+  const paid=leads.filter(l=>l.paiement_statut==='paye');
+  const totP=paid.reduce((s,l)=>s+(l.prix_final||0),0);
+  let h='';
+  cap.forEach(l=>{h+=`<div class="stripe-row"><div><div class="sl">💰 À capturer</div><div class="ss">${l.client_nom||'Client'} · ${fmtD(l.created_at)}</div></div><div><div class="sa">${l.prix_final||l.montant_pre_autorise||0} €</div><button class="btn btn-g" style="margin-top:4px;font-size:11px;padding:4px 9px" onclick="capture('${l.id}')">Capturer</button></div></div>`;});
+  if(pre.length)h+=`<div class="stripe-row"><div><div class="sl">💳 Pré-autorisé</div><div class="ss">${pre.length} RDV en cours</div></div><div class="sa">${pre.reduce((s,l)=>s+(l.montant_pre_autorise||0),0)} €</div></div>`;
+  if(totP>0)h+=`<div class="stripe-row"><div><div class="sl">✅ Encaissé total</div><div class="ss">${paid.length} paiements</div></div><div class="sa g">${Math.round(totP*0.85)} €</div></div>`;
+  if(!h)h='<div class="loader" style="padding:16px;font-size:13px">Aucun paiement en cours</div>';
+  document.getElementById('stripe-list').innerHTML=h;
+}
+
+function renderUpcoming(){
+  const up=leads.filter(l=>l.statut==='confirme'||l.artisan_statut==='confirme').slice(0,4);
+  const el=document.getElementById('upcoming-list');
+  if(!up.length){el.innerHTML='<div class="loader" style="padding:16px;font-size:13px">Aucun RDV à venir</div>';return;}
+  el.innerHTML=up.map(l=>{const d=new Date(l.created_at);return`<div class="up-item" onclick="openModal('${l.id}')"><div class="up-date"><div class="up-day">${d.getDate()}</div><div class="up-month">${d.toLocaleDateString('fr-FR',{month:'short'})}</div></div><div class="up-info"><div class="up-name">${l.client_nom||'Client'}</div><div class="up-meta">📍 ${l.ville||'—'} · ${l.travaux||'—'}</div></div><div class="up-time">${l.creneaux||'—'}</div></div>`;}).join('');
+}
+
+async function act(id,as,s,msg){
+  const body={artisan_statut:as};if(s)body.statut=s;
+  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify(body)});
+  if(r.ok){toast(msg);await loadLeads();}else toast('Erreur — réessayez');
+}
+
+function openPrice(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  const max=l.montant_pre_autorise||999;
+  document.getElementById('modal-title').textContent='💰 Prix final';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="background:#DCFCE7;border-radius:10px;padding:12px;font-size:13px;color:#16A34A;font-weight:600;margin-bottom:14px">Pré-autorisation : ${max} € max · Vous recevrez 85%</div>
+    <div class="info-r"><div class="info-ic">👤</div><div><div class="info-lbl">Client</div><div class="info-val">${l.client_nom||'—'}</div></div></div>
+    <div class="info-r"><div class="info-ic">🔧</div><div><div class="info-lbl">Travaux</div><div class="info-val">${l.travaux||'—'}</div></div></div>
+    <div style="margin-top:14px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px">Prix final (max ${max} €)</div>
+      <input class="price-inp" type="number" id="px" min="1" max="${max}" value="${l.prix_final||max}">
+      <div style="font-size:12px;color:#9898AA;margin-top:6px">Vous recevrez : <strong style="color:#16A34A" id="px-net">${Math.round((l.prix_final||max)*0.85)} €</strong></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn s" onclick="closeModal()">Annuler</button>
+      <button class="modal-btn g" onclick="submitPrice('${id}',${max})">✓ Proposer</button>
+    </div>`;
+  document.getElementById('px').addEventListener('input',function(){document.getElementById('px-net').textContent=Math.round(this.value*0.85)+' €';});
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+async function submitPrice(id,max){
+  const val=parseFloat(document.getElementById('px').value);
+  if(!val||val<=0||val>max){toast('Prix invalide');return;}
+  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify({prix_final:val,paiement_statut:'en_attente_validation',artisan_statut:'en_attente_validation'})});
+  if(r.ok){toast('💰 '+val+'€ proposé au client');closeModal();await loadLeads();}else toast('Erreur');
+}
+
+async function capture(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  toast('Capture en cours...',4000);
+  try{
+    const r=await fetch('/api/capture-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leadId:id,amount:l.prix_final||l.montant_pre_autorise})});
+    const d=await r.json();
+    if(d.success){toast('✅ '+Math.round((l.prix_final||0)*0.85)+'€ à vous !');await loadLeads();}
+    else toast('Erreur : '+(d.error||'réessayez'));
+  }catch(e){toast('Erreur réseau');}
+}
+
+function openModal(id){
+  const l=leads.find(x=>x.id===id);if(!l)return;
+  document.getElementById('modal-title').textContent=(l.payment_intent_id?'⚡':'🏠')+' '+(l.client_nom||'Client');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="info-r"><div class="info-ic">👤</div><div><div class="info-lbl">Client</div><div class="info-val">${l.client_nom||'—'}</div></div></div>
+    <div class="info-r"><div class="info-ic">📞</div><div><div class="info-lbl">Téléphone</div><div class="info-val"><a href="tel:${l.client_tel}" style="color:#F26522">${l.client_tel||'—'}</a></div></div></div>
+    <div class="info-r"><div class="info-ic">📍</div><div><div class="info-lbl">Adresse</div><div class="info-val">${l.adresse||'—'}, ${l.ville||''} ${l.code_postal||''}</div></div></div>
+    <div class="info-r"><div class="info-ic">🔧</div><div><div class="info-lbl">Travaux</div><div class="info-val">${l.travaux||l.precision||'—'}${l.details?' · '+l.details:''}</div></div></div>
+    ${l.montant_pre_autorise?`<div class="info-r"><div class="info-ic">💳</div><div><div class="info-lbl">Pré-autorisation</div><div class="info-val" style="color:#F26522;font-size:16px;font-weight:800">${l.montant_pre_autorise} €</div></div></div>`:''}
+    ${l.creneaux?`<div class="info-r"><div class="info-ic">🕐</div><div><div class="info-lbl">Créneaux</div><div class="info-val">${l.creneaux}</div></div></div>`:''}
+    ${l.analyse_ia&&l.analyse_ia.diagnostic?`<div class="info-r"><div class="info-ic">📋</div><div><div class="info-lbl">Diagnostic</div><div class="info-val" style="font-size:13px;color:#6B6B80;font-weight:500">${l.analyse_ia.diagnostic}</div></div></div>`:''}
+    <div style="display:flex;gap:8px;margin-top:16px">
+      ${l.adresse?`<a href="https://waze.com/ul?q=${encodeURIComponent((l.adresse||'')+' '+(l.ville||''))}" target="_blank" style="flex:1;height:42px;background:#33CCFF1A;color:#0099CC;border:1px solid #33CCFF44;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;text-decoration:none">🗺 Waze</a>`:''}
+      ${l.adresse?`<a href="https://maps.google.com?q=${encodeURIComponent((l.adresse||'')+' '+(l.ville||''))}" target="_blank" style="flex:1;height:42px;background:#4285F41A;color:#4285F4;border:1px solid #4285F444;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;text-decoration:none">🔵 Google Maps</a>`:''}
+    </div>
+    <div class="modal-btns"><button class="modal-btn s" onclick="closeModal()">Fermer</button></div>`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
+async function toggleDispo(){
+  const on=document.getElementById('dtoggle').checked;
+  document.getElementById('ddot').style.background=on?'#22C55E':'#9898AA';
+  document.getElementById('dtxt').textContent=on?'Disponible':'Indisponible';
+  try{await fetch(SB+'/rest/v1/profiles?id=eq.'+sess.id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify({disponible:on})});}catch(e){}
+  toast(on?'⚡ Disponible':'Dépannage désactivé');
+}
+
+function selTab(b){b.closest('div').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));b.classList.add('on');}
+
+(function init(){
+  const s=localStorage.getItem('cf_pro');
+  if(s){try{sess=JSON.parse(s);showDash();}catch(e){localStorage.removeItem('cf_pro');}}
+})();
+</script>
+</body>
+</html>
