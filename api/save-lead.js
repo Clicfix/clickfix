@@ -20,9 +20,10 @@ const creneaux=typeof body.creneaux==='string'?JSON.parse(body.creneaux||'[]'):(
 const nbArtisans=parseInt(body.nb_artisans)||3;
 const leadDesc=(body.precision||body.travaux||"")+" "+(body.details||"");
 const prosRes=await fetch(SB+"/rest/v1/profiles?role=eq.pro&statut_paiement=eq.actif&select=*",{headers:H});
-const pros=await prosRes.json();
+const prosRaw=await prosRes.json();
+const pros=Array.isArray(prosRaw)?prosRaw:[];
 const PACK_ORDER={"Elite":0,"Pro":1,"Decouverte":2};
-const sorted=pros.filter(p=>(p.rdv_restants||0)>0&&p.specialites?.length>0).sort((a,b)=>(PACK_ORDER[a.pack]||2)-(PACK_ORDER[b.pack]||2));
+const sorted=pros.filter(p=>p&&(p.rdv_restants||0)>0&&p.specialites?.length>0).sort((a,b)=>(PACK_ORDER[a.pack]||2)-(PACK_ORDER[b.pack]||2));
 const matching=[];
 for(const pro of sorted){
 if(matching.length>=nbArtisans)break;
