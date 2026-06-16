@@ -43,6 +43,7 @@ dispatched.push(lead);
 await fetch(SB+"/rest/v1/profiles?id=eq."+pro.id,{method:"PATCH",headers:H,body:JSON.stringify({rdv_restants:Math.max(0,(pro.rdv_restants||1)-1)})});
 await fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"new_lead_pro",to:pro.email,data:{prenom:pro.prenom,client_nom:body.client_nom,travaux:body.travaux||body.precision,adresse:body.adresse,ville:body.ville,surface:body.surface,budget:body.budget,details:body.details||"",heure:creneau?.label||"Sur RDV"}})});
 }}
+if(dispatched.length===0){await fetch(SB+"/rest/v1/leads",{method:"POST",headers:{...H,"Prefer":"return=minimal"},body:JSON.stringify({...body,lat,lon,statut:"en_attente",assigned_to:null,creneaux:JSON.stringify(creneaux),heure:creneaux[0]?.label||"Sur RDV",user_id:body.user_id||null})}).catch(()=>{});}
 res.status(200).json({ok:true,dispatched:dispatched.length});
 }catch(e){res.status(500).json({error:e.message});}
 }
