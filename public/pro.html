@@ -595,11 +595,11 @@ function aBtns(l){
     b+='<button class="btn btn-r" onclick="event.stopPropagation();refuser('+id+')">✕ Refuser</button>';
   }
   if(as==='confirme')b+='<button class="btn btn-b" onclick="event.stopPropagation();enRoute('+id+')">🚗 En route</button>';
-  if(as==='en_route')b+='<button class="btn btn-o" onclick="event.stopPropagation();patch('+id+','arrive',null,'📍 Arrivé !')">📍 Arrivé</button>';
-  if(as==='arrive')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+','en_cours',null,'🔧 Commencé')">🔧 Commencer</button>';
-  if(as==='en_cours')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+','termine',null,'✅ Terminé')">✓ Terminer</button>';
+  if(as==='en_route')b+='<button class="btn btn-o" onclick="event.stopPropagation();patch('+id+',\'arrive\',null,\'Arrive\')">📍 Arrivé</button>';
+  if(as==='arrive')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+',\'en_cours\',null,\'Commence\')">🔧 Commencer</button>';
+  if(as==='en_cours')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+',\'termine\',null,\'Termine\')">✓ Terminer</button>';
   if(as==='termine'&&(ps==='pre_autorise'||!ps))b+='<button class="btn btn-g" onclick="event.stopPropagation();openPrice('+id+')">💰 Prix final</button>';
-  if(ps==='paye')b+='<button class="btn btn-s" onclick="event.stopPropagation();toast('📄 Bientôt disponible')">📄 Facture</button>';
+  if(ps==='paye')b+='<button class="btn btn-s" onclick="event.stopPropagation();toast(\'Bientot disponible\')">📄 Facture</button>';
   if(ps==='en_attente_validation')b+='<span style="font-size:11px;color:var(--o);font-weight:600">⏳ Attente client</span>';
   return b||'<span style="font-size:12px;color:#9898AA">—</span>';
 }
