@@ -239,10 +239,10 @@ function DocsTab(){
 
 function PackTab(){
   const packs=[
-    {id:"decouverte",name:"Decouverte",price:"249",rdv:5,desc:"Sans engagement - 49 EUR/RDV"},
-    {id:"pro",name:"Pro",price:"599",rdv:15,desc:"Populaire - 39 EUR/RDV"},
-    {id:"elite",name:"Elite",price:"999",rdv:30,desc:"Maximum - 33 EUR/RDV"},
-    ,
+    {id:"decouverte",name:"Decouverte",price:"49",leads:5,desc:"Ideal pour debuter"},
+    {id:"starter",name:"Starter",price:"149",leads:15,desc:"Pour developper son activite"},
+    {id:"pro",name:"Pro",price:"299",leads:40,desc:"Pour les artisans actifs"},
+    {id:"elite",name:"Elite",price:"499",leads:80,desc:"Leads illimites et priorite max"},
   ];
   const current=(s?.pack||"decouverte").toLowerCase();
   return(<main style={{padding:"16px 16px 100px",display:"flex",flexDirection:"column",gap:14}}>
@@ -277,7 +277,7 @@ function PackTab(){
             <div style={{fontSize:11,color:"#9898A8"}}>/mois</div>
           </div>
         </div>
-        {!isCurrent&&<button onClick={()=>window.location.href=p.stripeUrl} style={{marginTop:10,width:"100%",padding:"10px",background:"#FFF0E8",border:"1px solid #FFD9C2",borderRadius:10,color:"#F26522",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Passer a ce pack</button>}
+        {!isCurrent&&<button onClick={()=>ctx.notify("Contactez support@click-fix.fr pour changer de pack")} style={{marginTop:10,width:"100%",padding:"10px",background:"#FFF0E8",border:"1px solid #FFD9C2",borderRadius:10,color:"#F26522",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Passer a ce pack</button>}
       </div>);
     })}
   </main>);}
