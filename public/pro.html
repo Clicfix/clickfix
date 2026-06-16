@@ -178,7 +178,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="lf"><label>Mot de passe</label><input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
     <button class="lbtn" onclick="login()" id="lbtn">Se connecter</button>
     <div class="lerr" id="lerr"></div>
-    <div class="lback" onclick="window.location.href='/'">← Retour au site</div>
+    <div class="lback" onclick="localStorage.removeItem('cf_sess');window.location.href='/'">← Retour au site</div>
   </div>
 </div>
 
@@ -437,7 +437,7 @@ async function login(){
   if(!em||!pw){err.textContent='Veuillez remplir tous les champs';return;}
   btn.textContent='Connexion...';btn.disabled=true;err.textContent='';
   try{
-    const r=await fetch(SB+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json','apikey':SK},body:JSON.stringify({email:em,password:pw})});
+    const r=await fetch(SB+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json','apikey':AK},body:JSON.stringify({email:em,password:pw})});
     const d=await r.json();
     if(d.access_token){
       sess={token:d.access_token,id:d.user.id,email:d.user.email};
