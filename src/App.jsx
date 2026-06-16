@@ -257,7 +257,7 @@ setBusy(false);
       {page==="ai-lead" && <AILeadForm ctx={ctx} />}
       {page==="urgence" && <UrgencePage ctx={ctx} />}      {page==="pro-docs"      && <ProDocs      ctx={ctx} />}
       {page==="pro-pricing"   && <ProPricing   ctx={ctx} />}
-      {page==="pro-dashboard" && <ProDashboard ctx={ctx} />}
+      {page==="pro-dashboard" && window.innerWidth<900 && <ProDashboard ctx={ctx} />}
       {page==="pack-welcome" && <PackWelcome ctx={ctx} />}
       {page==="mentions-legales" && <div style={{minHeight:"100vh",background:"#fff"}}><MentionsLegales/></div>}
       {page==="cgv" && <div style={{minHeight:"100vh",background:"#fff"}}><CGV/></div>}
