@@ -298,7 +298,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
       setArtLoading(false);
     }).catch(()=>setArtLoading(false));
   },[]);
-  function go(role){const isMobile=window.innerWidth<=900;if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
+  function go(role){const isMobile=window.innerWidth<=900;if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}if(role==='pro'&&ctx.sess?.role==='pro'&&window.innerWidth>=900){window.location.href='/pro.html';return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
   const F={fontFamily:"'Inter',sans-serif"};
   return(
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
