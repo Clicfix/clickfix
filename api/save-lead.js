@@ -26,7 +26,7 @@ const sorted=pros.filter(p=>(p.rdv_restants||0)>0&&p.specialites?.length>0).sort
 const matching=[];
 for(const pro of sorted){
 if(matching.length>=nbArtisans)break;
-if(pro.lat&&lat){const dist=haversine(pro.lat,pro.lon,lat,lon);const rayon=parseInt((pro.rayon||"50").replace(/[^0-9]/g,""));if(dist>rayon)continue;}
+if(pro.lat&&pro.lon&&lat&&lon){const dist=haversine(parseFloat(pro.lat),parseFloat(pro.lon),parseFloat(lat),parseFloat(lon));const rayon=parseInt((pro.rayon||"50").replace(/[^0-9]/g,""));if(dist>rayon)continue;}
 const ok=await matchWithAI(leadDesc,pro.specialites);
 if(ok)matching.push(pro);
 }
