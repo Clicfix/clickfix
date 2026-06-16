@@ -277,7 +277,7 @@ function PackTab(){
             <div style={{fontSize:11,color:"#9898A8"}}>/mois</div>
           </div>
         </div>
-        {!isCurrent&&<button onClick={()=>window.open(p.stripeUrl,"_blank")} style={{marginTop:10,width:"100%",padding:"10px",background:"#FFF0E8",border:"1px solid #FFD9C2",borderRadius:10,color:"#F26522",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Passer a ce pack</button>}
+        {!isCurrent&&<button onClick={()=>window.location.href=p.stripeUrl} style={{marginTop:10,width:"100%",padding:"10px",background:"#FFF0E8",border:"1px solid #FFD9C2",borderRadius:10,color:"#F26522",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Passer a ce pack</button>}
       </div>);
     })}
   </main>);}
