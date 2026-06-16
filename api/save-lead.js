@@ -40,3 +40,4 @@ await fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"C
 res.status(200).json({ok:true,dispatched:dispatched.length});
 }catch(e){res.status(500).json({error:e.message});}
 }
+// Mar 16 jui 2026 16:00:28 CEST
