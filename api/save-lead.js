@@ -5,13 +5,7 @@ const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
 const H={"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK};
 function haversine(la1,lo1,la2,lo2){const R=6371;const dLat=(la2-la1)*Math.PI/180;const dLon=(lo2-lo1)*Math.PI/180;const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-async function matchWithAI(leadDesc,proSpecialites){
-try{
-const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},body:JSON.stringify({model:"llama-3.3-70b-versatile",max_tokens:10,messages:[{role:"system",content:"Tu es un expert en matching de travaux. Reponds uniquement par oui ou non."},{role:"user",content:`La demande est: "${leadDesc}". L artisan propose: ${proSpecialites.join(", ")}. Est-ce que cet artisan peut realiser ce travail ? Reponds uniquement oui ou non.`}]})});
-const d=await r.json();
-const answer=(d.choices?.[0]?.message?.content||"").toLowerCase().trim();
-return answer.includes("oui");
-}catch(e){return true;}}
+async function matchWithAI(leadDesc,proSpecialites){return true;}
 try{
 let lat=body.lat||null,lon=body.lon||null;
 if(!lat&&(body.adresse||body.ville)){
