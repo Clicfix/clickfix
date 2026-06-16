@@ -655,7 +655,7 @@ function renderUpcoming(){
   const up=leads.filter(l=>l.statut==='confirme'||l.artisan_statut==='confirme').slice(0,4);
   const el=document.getElementById('upcoming-list');
   if(!up.length){el.innerHTML='<div class="loader" style="padding:16px;font-size:13px">Aucun RDV à venir</div>';return;}
-  el.innerHTML=up.map(l=>{const d=new Date(l.created_at);return`<div class="up-item" onclick="openModal(${l.id})"><div class="up-date"><div class="up-day">${d.getDate()}</div><div class="up-month">${d.toLocaleDateString('fr-FR',{month:'short'})}</div></div><div class="up-info"><div class="up-name">${l.client_nom||'Client'}</div><div class="up-meta">📍 ${l.ville||'—'} · ${l.travaux||'—'}</div></div><div class="up-time">${l.creneaux||'—'}</div></div>`;}).join('');
+  el.innerHTML=up.map(l=>{const d=new Date(l.created_at);return`<div class="up-item" onclick="openModal(${l.id})"><div class="up-date"><div class="up-day">${d.getDate()}</div><div class="up-month">${d.toLocaleDateString('fr-FR',{month:'short'})}</div></div><div class="up-info"><div class="up-name">${l.client_nom||'Client'}</div><div class="up-meta">📍 ${l.ville||'—'} · ${l.travaux||'—'}</div></div><div class="up-time">${parseCren(l.creneaux)}</div></div>`;}).join('');
 }
 
 function renderDocs(){
