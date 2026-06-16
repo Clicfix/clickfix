@@ -239,10 +239,10 @@ function DocsTab(){
 
 function PackTab(){
   const packs=[
-    {id:"decouverte",name:"Decouverte",price:"49",leads:5,desc:"Ideal pour debuter"},
-    {id:"starter",name:"Starter",price:"149",leads:15,desc:"Pour developper son activite"},
-    {id:"pro",name:"Pro",price:"299",leads:40,desc:"Pour les artisans actifs"},
-    {id:"elite",name:"Elite",price:"499",leads:80,desc:"Leads illimites et priorite max"},
+    {id:"decouverte",name:"Decouverte",price:"249",rdv:5,desc:"Sans engagement - 49 EUR/RDV"},
+    {id:"pro",name:"Pro",price:"599",rdv:15,desc:"Populaire - 39 EUR/RDV"},
+    {id:"elite",name:"Elite",price:"999",rdv:30,desc:"Maximum - 33 EUR/RDV"},
+    ,
   ];
   const current=(s?.pack||"decouverte").toLowerCase();
   return(<main style={{padding:"16px 16px 100px",display:"flex",flexDirection:"column",gap:14}}>
