@@ -11,7 +11,7 @@ const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"P
 const d=await r.json();
 const answer=(d.choices?.[0]?.message?.content||"").toLowerCase().trim();
 return answer.includes("oui");
-}catch(e){return false;}}
+}catch(e){return true;}}
 try{
 let lat=body.lat||null,lon=body.lon||null;
 if(!lat&&(body.adresse||body.ville)){
