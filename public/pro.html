@@ -448,7 +448,7 @@ async function login(){
   btn.textContent='Se connecter';btn.disabled=false;
 }
 
-function logout(){localStorage.removeItem('cf_sess');sess=null;leads=[];window.location.href='/';}
+function logout(){localStorage.removeItem('cf_sess');localStorage.removeItem('cf_pro');sessionStorage.removeItem('cf_sess_bak');sessionStorage.removeItem('cf_pro');sess=null;leads=[];window.location.href='/';}
 
 // === DASHBOARD ===
 async function showDash(){
