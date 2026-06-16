@@ -16,7 +16,7 @@ try{
 let lat=body.lat||null,lon=body.lon||null;
 if(!lat&&(body.adresse||body.ville)){
 try{const q=encodeURIComponent((body.adresse||"")+" "+(body.ville||"")+" France");const g=await fetch("https://api-adresse.data.gouv.fr/search/?q="+q+"&limit=1",{headers:{"User-Agent":"clickfix/1.0"}});const d=await g.json();if(d?.features?.[0]){lat=d.features[0].geometry.coordinates[1];lon=d.features[0].geometry.coordinates[0];}}catch(e){}}
-const creneaux=body.creneaux||[];
+const creneaux=typeof body.creneaux==='string'?JSON.parse(body.creneaux||'[]'):(body.creneaux||[]);
 const nbArtisans=parseInt(body.nb_artisans)||3;
 const leadDesc=(body.precision||body.travaux||"")+" "+(body.details||"");
 const prosRes=await fetch(SB+"/rest/v1/profiles?role=eq.pro&statut_paiement=eq.actif&select=*",{headers:H});
