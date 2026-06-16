@@ -551,9 +551,31 @@ function sBadge(l){
   if(as==='arrive')return'<span class="badge bo">📍 Arrivé</span>';
   if(as==='en_route')return'<span class="badge bb">🚗 En route</span>';
   if(as==='termine')return'<span class="badge bs">✓ Terminé</span>';
-  if(as==='confirme'||s==='confirme')return'<span class="badge bg">✓ Confirmé</span>';
-  if(s==='dispatche'||s==='en_attente')return'<span class="badge bo">⏳ En attente</span>';
-  return'<span class="badge bs">'+(s||'—')+'</span>';
+  if(as==='confirme')return'<span class="badge bg">✓ Confirmé</span>';
+  if(as==='refuse')return'<span class="badge br">✕ Refusé</span>';
+  return'<span class="badge bo">⏳ En attente</span>';
+}
+
+function needsConfirm(l){
+  const as=l.artisan_statut;
+  if(as==='confirme'||as==='en_route'||as==='arrive'||as==='en_cours'||as==='termine'||as==='refuse')return false;
+  return true;
+}
+
+function parseCren(c){
+  if(!c||c==='[]'||c==='""'||c==='["["]')return'—';
+  try{
+    let p=c;
+    if(typeof p==='string')p=JSON.parse(p);
+    if(typeof p==='string')p=JSON.parse(p);
+    if(Array.isArray(p)){
+      const items=p.filter(x=>x&&(typeof x==='string'?x.length>2:x.label));
+      if(!items.length)return'—';
+      return items.map(x=>x.label||x).join(' · ');
+    }
+    if(p&&p.label)return p.label;
+    return'—';
+  }catch(e){return'—';}
 }
 
 function pBadge(l){
@@ -565,19 +587,20 @@ function pBadge(l){
 }
 
 function aBtns(l){
-  const as=l.artisan_statut,ps=l.paiement_statut,s=l.statut;
+  const as=l.artisan_statut,ps=l.paiement_statut;
+  const id=l.id;
   let b='';
-  if((s==='dispatche'||s==='en_attente')&&!as){
-    b+=`<button class="btn btn-o" onclick="event.stopPropagation();act('${l.id}','confirme','confirme','✅ RDV confirmé !')">✓ Confirmer</button>`;
-    b+=`<button class="btn btn-r" onclick="event.stopPropagation();act('${l.id}','refuse','refuse','❌ RDV refusé')">✕ Refuser</button>`;
+  if(needsConfirm(l)){
+    b+='<button class="btn btn-o" onclick="event.stopPropagation();confirmer('+id+')">✓ Confirmer</button>';
+    b+='<button class="btn btn-r" onclick="event.stopPropagation();refuser('+id+')">✕ Refuser</button>';
   }
-  if(as==='confirme')b+=`<button class="btn btn-b" onclick="event.stopPropagation();actRoute('${l.id}')">🚗 En route</button>`;
-  if(as==='en_route')b+=`<button class="btn btn-o" onclick="event.stopPropagation();act('${l.id}','arrive',null,'📍 Arrivé sur place !')">📍 Arrivé</button>`;
-  if(as==='arrive')b+=`<button class="btn btn-g" onclick="event.stopPropagation();act('${l.id}','en_cours',null,'🔧 Intervention commencée')">🔧 Commencer</button>`;
-  if(as==='en_cours')b+=`<button class="btn btn-g" onclick="event.stopPropagation();act('${l.id}','termine',null,'✅ Intervention terminée')">✓ Terminer</button>`;
-  if(as==='termine'&&(ps==='pre_autorise'||!ps))b+=`<button class="btn btn-g" onclick="event.stopPropagation();openPrice('${l.id}')">💰 Prix final</button>`;
-  if(ps==='paye')b+=`<button class="btn btn-s" onclick="event.stopPropagation();toast('📄 Bientôt disponible')">📄 Facture</button>`;
-  if(ps==='en_attente_validation')b+=`<span style="font-size:11px;color:var(--o);font-weight:600">⏳ Attente client</span>`;
+  if(as==='confirme')b+='<button class="btn btn-b" onclick="event.stopPropagation();enRoute('+id+')">🚗 En route</button>';
+  if(as==='en_route')b+='<button class="btn btn-o" onclick="event.stopPropagation();patch('+id+','arrive',null,'📍 Arrivé !')">📍 Arrivé</button>';
+  if(as==='arrive')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+','en_cours',null,'🔧 Commencé')">🔧 Commencer</button>';
+  if(as==='en_cours')b+='<button class="btn btn-g" onclick="event.stopPropagation();patch('+id+','termine',null,'✅ Terminé')">✓ Terminer</button>';
+  if(as==='termine'&&(ps==='pre_autorise'||!ps))b+='<button class="btn btn-g" onclick="event.stopPropagation();openPrice('+id+')">💰 Prix final</button>';
+  if(ps==='paye')b+='<button class="btn btn-s" onclick="event.stopPropagation();toast('📄 Bientôt disponible')">📄 Facture</button>';
+  if(ps==='en_attente_validation')b+='<span style="font-size:11px;color:var(--o);font-weight:600">⏳ Attente client</span>';
   return b||'<span style="font-size:12px;color:#9898AA">—</span>';
 }
 
@@ -749,15 +772,24 @@ async function saveSpecialites(){
 }
 
 // === ACTIONS ===
-async function act(id,as,s,msg){
-  const body={artisan_statut:as};
-  if(s)body.statut=s;
+async function confirmer(id){
+  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify({artisan_statut:'confirme'})});
+  if(r.ok){toast('✅ RDV confirmé !');await loadLeads();}else toast('Erreur — réessayez');
+}
+
+async function refuser(id){
+  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify({artisan_statut:'refuse',statut:'refuse'})});
+  if(r.ok){toast('❌ RDV refusé');await loadLeads();}else toast('Erreur');
+}
+
+async function patch(id,as,s,msg){
+  const body={artisan_statut:as};if(s)body.statut=s;
   const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify(body)});
   if(r.ok){toast(msg);await loadLeads();}else toast('Erreur — réessayez');
 }
 
-async function actRoute(id){
-  await act(id,'en_route',null,'🚗 En route !');
+async function enRoute(id){
+  await patch(id,'en_route',null,'🚗 En route !');
   if(navigator.geolocation){
     navigator.geolocation.watchPosition(pos=>{
       fetch(SB+'/rest/v1/artisan_positions',{method:'POST',headers:{...hdr(SK),'Prefer':'resolution=merge-duplicates'},body:JSON.stringify({artisan_id:sess.id,lat:pos.coords.latitude,lon:pos.coords.longitude,statut:'en_route',lead_id:id,updated_at:new Date().toISOString()})}).catch(()=>{});
@@ -829,7 +861,7 @@ function openModal(id){
   document.getElementById('modal-bg').classList.add('open');
 }
 
-function parseCren(c){try{const p=JSON.parse(c);if(Array.isArray(p))return p.filter(x=>x.length>2).join(", ")||"—";return p||"—";}catch(e){return"—";}} function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
 function uploadDoc(docId,label){
   const input=document.createElement('input');
