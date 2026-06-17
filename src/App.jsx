@@ -52,6 +52,7 @@ function saveUsers(u) { LS.set("cf_users", u); }
 // 
 import {MentionsLegales,CGV,CGU,RGPD} from "./LegalPages.jsx";
 import ProDashboardMobile from "./ProDashboardMobile.jsx";
+import PartDashboardMobile from "./PartDashboardMobile.jsx";
 function useIsMobile(){const [m,setM]=useState(window.innerWidth<=900);useEffect(()=>{const h=()=>setM(window.innerWidth<=900);window.addEventListener("resize",h);return()=>window.removeEventListener("resize",h);},[]);return m;}
 export default function App() {
 const isMobile=useIsMobile();
@@ -866,9 +867,11 @@ if(d.client_secret){setClientSecret(d.client_secret);setMontantMax(analyse?parse
 }
 
 function PartHome({ctx}){
+const isMobile=useIsMobile();
 const [selLead,setSelLead]=useState(null);const [selRdv,setSelRdv]=useState(null);
 const s=ctx.sess;
-const [tab,setTab]=useState("demandes");
+const [tab,setTab]=useState(()=>window.innerWidth<900?"home":"demandes");
+if(isMobile)return <PartDashboardMobile ctx={ctx} tab={tab} setTab={setTab}/>;
 const confirmed=ctx.myLeadsPart.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé");
 const pending=ctx.myLeadsPart;
 const TABS=[{id:"demandes",ico:"📋",label:"Mes demandes"},{id:"profil",ico:"👤",label:"Mon profil"}];
