@@ -347,6 +347,10 @@ else if(type==="pack_active"){
 subject="Votre pack Click&fix est activé — Récapitulatif";
 html=wrap(`<h2 style="color:#FF6F00;margin:0 0 12px;font-size:22px">Pack ${data.pack_name} activé !</h2><p style="color:#444;font-size:14px;line-height:1.6;margin:0 0 16px">Bonjour ${data.prenom}, votre pack a bien été activé. Voici le récapitulatif de votre offre :</p>${box(row("Pack",data.pack_name)+row("Nombre de RDV",data.pack_rdv+" RDV")+row("Prix",data.pack_prix+" EUR"+(data.abonnement?" / mois":""))+row("Tarif par RDV",data.pack_par)+row("Type",data.abonnement?"Abonnement mensuel":"Paiement unique")+row("Statut","Actif"))}<p style="color:#555;font-size:13px;margin:16px 0 8px">Vous allez bientôt recevoir vos premiers RDV qualifiés. Chaque lead sera attribué selon votre expertise.</p>${btn("Accéder à mon espace","https://click-fix.fr")}`);
 }
+else if(type==="recharge_needed"){
+subject="Une demande de depannage vous attend - Rechargez votre pack";
+html=wrap(`<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px 16px;margin-bottom:16px"><p style="margin:0;color:#ef4444;font-weight:700">Une demande de depannage urgent vous attend !</p></div><h2 style="color:#fff;margin:0 0 12px;font-size:20px">Bonjour ${data.prenom},</h2><p style="color:rgba(255,255,255,0.6);font-size:13px;margin:0 0 16px">Un client a selectionne votre profil pour un depannage urgent, mais votre quota de RDV est epuise. Rechargez votre pack pour acceder immediatement a cette demande.</p>${btn("Recharger mon pack","https://click-fix.fr","#ef4444")}`);
+}
 if(!subject)return res.status(400).json({error:"Type inconnu"});
 try{
 const r=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+KEY},body:JSON.stringify({from:"Click&fix <contact@click-fix.fr>",to:[to],subject,html})});
@@ -384,7 +388,7 @@ if(t==="checkout.session.completed"){
 const email=obj?.customer_email||obj?.customer_details?.email;
 const pack=AMOUNTS[obj?.amount_total];
 if(email&&pack){
-const profRes=await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email)+"&select=pack,rdv_restants,rdv_total,prenom,packs_history,specialites",{headers:H});
+const profRes=await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email)+"&select=id,pack,rdv_restants,rdv_total,prenom,packs_history,specialites",{headers:H});
 const profs=await profRes.json();
 const current=profs?.[0];
 const now=new Date().toISOString();
@@ -405,6 +409,21 @@ update.rdv_total=pack.total+rdvRestantsAncien;
 }
 await fetch(SB+"/rest/v1/profiles?email=eq."+encodeURIComponent(email),{method:"PATCH",headers:H,body:JSON.stringify(update)});
 await fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"pack_active",to:email,data:{prenom:current?.prenom||"",pack_name:pack.name,pack_rdv:pack.rdv,pack_prix:pack.prix,pack_par:pack.par,abonnement:pack.abonnement}})});
+if(current?.id&&update.rdv_restants>0){
+let remaining=update.rdv_restants;
+const pendingRes=await fetch(SB+"/rest/v1/leads?assigned_to=eq."+current.id+"&statut=eq.en_attente_recharge&order=created_at.asc&select=*",{headers:H});
+const pendingRaw=await pendingRes.json();
+const pendingList=Array.isArray(pendingRaw)?pendingRaw:[];
+for(const pl of pendingList){
+if(remaining<=0)break;
+await fetch(SB+"/rest/v1/leads?id=eq."+pl.id,{method:"PATCH",headers:H,body:JSON.stringify({statut:"dispatche"})});
+remaining--;
+fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"new_lead_pro",to:email,data:{prenom:current?.prenom||"",travaux:pl.travaux||pl.precision,adresse:pl.adresse,ville:pl.ville,surface:pl.surface,budget:pl.budget,details:pl.details||"",heure:"Immediatement"}})}).catch(()=>{});
+}
+if(remaining!==update.rdv_restants){
+await fetch(SB+"/rest/v1/profiles?id=eq."+current.id,{method:"PATCH",headers:H,body:JSON.stringify({rdv_restants:remaining})});
+}
+}
 return res.status(200).json({ok:true,email,pack:pack.name});
 }}
 if(t==="customer.subscription.deleted"){
@@ -427,10 +446,26 @@ const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
 const H={"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK};
 try{
-const r=await fetch(SB+"/rest/v1/leads",{method:"POST",headers:{...H,"Prefer":"return=representation"},body:JSON.stringify({...body,statut:"dispatche",heure:"Immédiatement",creneaux:"[]"})});
+const proId=body.assigned_to;
+let pro=null;
+if(proId){
+const pr=await fetch(SB+"/rest/v1/profiles?id=eq."+proId+"&select=id,prenom,email,pack,rdv_restants,disponible",{headers:H});
+const prs=await pr.json();
+pro=Array.isArray(prs)&&prs[0]?prs[0]:null;
+}
+const modeUrgenceActif=pro&&pro.disponible===true;
+const hasQuota=modeUrgenceActif&&(pro.pack==="Elite"||pro.pack==="Pro")&&(pro.rdv_restants||0)>0;
+const statutLead=(pro&&modeUrgenceActif&&!hasQuota)?"en_attente_recharge":"dispatche";
+const r=await fetch(SB+"/rest/v1/leads",{method:"POST",headers:{...H,"Prefer":"return=representation"},body:JSON.stringify({...body,statut:statutLead,heure:"Immédiatement",creneaux:"[]"})});
 const leads=await r.json();
 const lead=leads?.[0];
 if(!lead)return res.status(500).json({error:"Lead non cree"});
+if(pro&&hasQuota){
+fetch(SB+"/rest/v1/profiles?id=eq."+pro.id,{method:"PATCH",headers:H,body:JSON.stringify({rdv_restants:Math.max(0,(pro.rdv_restants||1)-1)})}).catch(()=>{});
+}
+if(pro&&modeUrgenceActif&&!hasQuota){
+fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"recharge_needed",to:pro.email,data:{prenom:pro.prenom}})}).catch(()=>{});
+}
 res.status(200).json({ok:true,lead});
 }catch(e){res.status(500).json({error:e.message});}
 }

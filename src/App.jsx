@@ -775,7 +775,7 @@ setLoc({lat:pos.coords.latitude,lon:pos.coords.longitude});
 useEffect(()=>{
 if(loc&&step==="carte"){
 const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
-fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?role=eq.pro&disponible=eq.true&select=id,prenom,nom,entreprise,tel,lat,lon,specialites",{headers:{"apikey":AK}})
+fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?role=eq.pro&disponible=eq.true&pack=in.(Elite,Pro)&select=id,prenom,nom,entreprise,tel,lat,lon,specialites,pack,rdv_restants",{headers:{"apikey":AK}})
 .then(r=>r.json()).then(d=>{
 function haversine(la1,lo1,la2,lo2){const R=6371;const dLat=(la2-la1)*Math.PI/180;const dLon=(lo2-lo1)*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 const sorted=(d||[]).filter(p=>p.lat&&p.lon).map(p=>({...p,dist:Math.round(haversine(loc.lat,loc.lon,p.lat,p.lon)*10)/10})).sort((a,b)=>a.dist-b.dist).slice(0,5);
