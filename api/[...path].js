@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       case "stripe-onboard": return await stripeOnboard(req, res);
       case "stripe-webhook": return await stripeWebhook(req, res);
       case "urgence-lead": return await urgenceLead(req, res);
-      default: return res.status(404).json({ error: "Route inconnue: " + route });
+      default: return res.status(404).json({ error: "Route inconnue: " + route, debug_query: req.query, debug_url: req.url });
     }
   } catch (e) {
     return res.status(500).json({ error: e.message });
