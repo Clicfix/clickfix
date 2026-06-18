@@ -134,8 +134,8 @@ res.setHeader('Access-Control-Allow-Origin','*');
 if(req.method!=='GET')return res.status(405).end();
 const feeds=[
   'https://www.lemonde.fr/immobilier/rss_full.xml',
-  'https://www.challenges.fr/rss/immobilier',
-  'https://batirama.com/feed.xml'
+  'https://www.batiactu.com/accueil/immo.rss',
+  'https://www.batirama.com/rss/2-l-info-actualites.html'
 ];
 const results=[];
 for(const url of feeds){
@@ -143,7 +143,7 @@ for(const url of feeds){
     const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0 (compatible; Googlebot/2.1)','Accept':'application/rss+xml,application/xml'}});
     const xml=await r.text();
     const items=xml.split('<item>').slice(1);
-    const source=url.includes('lemonde')?'Le Monde':url.includes('challenges')?'Challenges':'Batirama';
+    const source=url.includes('lemonde')?'Le Monde':url.includes('batiactu')?'Batiactu':'Batirama';
     let addedFromThisSource=0;
     for(const item of items){
       if(addedFromThisSource>=1)break;
