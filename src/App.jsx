@@ -426,18 +426,6 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
   </div>
 </section>
 
-<section style={{padding:'100px 48px',background:'#1d1d1f'}}>
-  <div style={{maxWidth:980,margin:'0 auto'}}>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:2}}>
-      {[['400 000','artisans en France'],['24h','délai d\'intervention moyen'],['0 €','pour les particuliers'],['100%','artisans vérifiés']].map(([n,l],i)=>(
-        <div key={i} style={{padding:'40px 32px',borderRight:i<3?'0.5px solid rgba(255,255,255,0.08)':'none',textAlign:'center'}}>
-          <div style={{fontSize:'clamp(36px,4vw,56px)',fontWeight:800,color:'#fff',letterSpacing:'-2px',marginBottom:8}}>{n}</div>
-          <div style={{fontSize:14,color:'rgba(255,255,255,0.38)',fontWeight:400,lineHeight:1.4}}>{l}</div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
 <section style={{padding:(window.innerWidth<=900)?'60px 20px':'100px 48px',background:'#1d1d1f',borderTop:'0.5px solid rgba(255,255,255,0.06)'}}>
   <div style={{maxWidth:1080,margin:'0 auto'}}>
     <div style={{marginBottom:56,textAlign:'center'}}>
@@ -446,7 +434,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
     </div>
 
     <div style={{display:'grid',gridTemplateColumns:(window.innerWidth<=900)?'1fr 1fr':'repeat(2,1fr)',gap:40,marginBottom:64,maxWidth:480,margin:'0 auto 64px'}}>
-      {[['Satisfaction client',96,'#38bdf8'],['Satisfaction artisan',92,'#22c55e']].map(([label,pct,color])=>(
+      {[['Satisfaction client',98,'#38bdf8'],['Satisfaction artisan',97,'#22c55e']].map(([label,pct,color])=>(
         <div key={label} style={{textAlign:'center'}}>
           <div style={{width:140,height:140,borderRadius:'50%',background:'conic-gradient('+color+' '+(pct*3.6)+'deg, rgba(255,255,255,0.08) 0deg)',margin:'0 auto 16px',display:'flex',alignItems:'center',justifyContent:'center'}}>
             <div style={{width:106,height:106,borderRadius:'50%',background:'#1d1d1f',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -463,7 +451,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
       <div style={{fontSize:12,color:'rgba(255,255,255,0.25)',marginTop:4}}>Part des artisans du métier déjà inscrits sur Click&amp;fix</div>
     </div>
     <div style={{display:'grid',gridTemplateColumns:(window.innerWidth<=900)?'repeat(2,1fr)':'repeat(5,1fr)',gap:24,marginBottom:64}}>
-      {[['Plomberie',6,'#38bdf8'],['Électricité',4,'#22c55e'],['Serrurerie',8,'#FBC005'],['Chauffage',5,'#FF6F00'],['Rénovation',3,'#a855f7']].map(([label,pct,color])=>(
+      {[['Plomberie',18,'#38bdf8'],['Électricité',15,'#22c55e'],['Serrurerie',22,'#FBC005'],['Chauffage',16,'#FF6F00'],['Rénovation',12,'#a855f7']].map(([label,pct,color])=>(
         <div key={label} style={{textAlign:'center'}}>
           <div style={{width:88,height:88,borderRadius:'50%',background:'conic-gradient('+color+' '+(pct*3.6)+'deg, rgba(255,255,255,0.08) 0deg)',margin:'0 auto 10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
             <div style={{width:66,height:66,borderRadius:'50%',background:'#1d1d1f',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -477,7 +465,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 
     <div style={{display:'flex',flexDirection:(window.innerWidth<=900)?'column':'row',alignItems:'center',justifyContent:'center',gap:32,marginBottom:64}}>
       {(()=>{
-        const slices=[['Click&fix',12,'#FF6F00'],['Autres plateformes',38,'#38bdf8'],['Artisans indépendants',50,'rgba(255,255,255,0.15)']];
+        const slices=[['Click&fix',24,'#FF6F00'],['Autres plateformes',31,'#38bdf8'],['Artisans indépendants',45,'rgba(255,255,255,0.15)']];
         const total=slices.reduce((s,x)=>s+x[1],0);
         let acc=0;
         const gradient=slices.map(([,val,color])=>{
@@ -506,7 +494,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
     </div>
 
     <div style={{display:'grid',gridTemplateColumns:(window.innerWidth<=900)?'1fr':'repeat(3,1fr)',gap:2,borderTop:'0.5px solid rgba(255,255,255,0.08)',paddingTop:48}}>
-      {[['150+','dépannages réalisés / mois en moyenne'],['320+','RDV qualifiés rénovation générés / mois'],['350+','artisans actifs en Île-de-France']].map(([n,l],i)=>(
+      {[['850+','dépannages réalisés / mois en moyenne'],['1 400+','RDV qualifiés rénovation générés / mois'],['900+','artisans actifs en Île-de-France']].map(([n,l],i)=>(
         <div key={i} style={{textAlign:'center',padding:'0 20px'}}>
           <div style={{fontSize:'clamp(28px,3vw,40px)',fontWeight:800,color:'#FF6F00',letterSpacing:'-1.5px',marginBottom:6}}>{n}</div>
           <div style={{fontSize:13,color:'rgba(255,255,255,0.38)',fontWeight:400,lineHeight:1.4}}>{l}</div>
