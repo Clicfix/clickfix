@@ -233,6 +233,15 @@ setBusy(false);
       const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
       await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
       notify("Document depose avec succes !");ctx.updateSession({...sess,docs:newDocs});
+      if(file.type.startsWith("image/")){
+        const docDef=DOCS_DEF.find(d=>d.id===docId);
+        fetch("https://www.click-fix.fr/api/verify-document",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({docType:docId,docLabel:docDef?.label||docId,image:url})})
+          .then(r=>r.json()).then(verif=>{
+            const newVerifAll={...(sess.docs_verification||{}),[docId]:verif};
+            fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs_verification:newVerifAll})});
+            ctx.updateSession({...sess,docs:newDocs,docs_verification:newVerifAll});
+          }).catch(()=>{});
+      }
     } catch(e) { notify("Erreur upload : "+e.message,"err"); }
     setBusy(false);
   }
@@ -1402,14 +1411,14 @@ function ProDocs({ ctx }) {
         Déposez vos justificatifs pour activer votre compte partenaire. Fichiers stockés de façon sécurisée. 
       </p>
       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:22 }}>
-        {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc}/>)}
+        {DOCS_DEF.map(d=><DocRow key={d.id} doc={d} status={ctx.sess?.docs?.[d.id]} onUpload={ctx.uploadDoc} verif={ctx.sess?.docs_verification?.[d.id]}/>)}
       </div>
       <ContratArtisan ctx={ctx}/>
     </Shell>
   );
 }
 
-function DocRow({ doc, status, onUpload }) {
+function DocRow({ doc, status, onUpload, verif }) {
   const ref = useRef();
   return (
     <div style={{ display:"flex", alignItems:"center", gap:14, background:status?"rgba(34,197,94,0.05)":"rgba(255,255,255,0.03)", border:`1px solid ${status?"#22c55e":doc.oblig?"rgba(255,111,0,0.2)":"rgba(255,255,255,0.07)"}`, borderRadius:14, padding:"14px 16px", transition:"all .2s" }}>
@@ -1422,7 +1431,12 @@ function DocRow({ doc, status, onUpload }) {
         <div style={{ color:"rgba(255,255,255,0.3)", fontSize:12 }}>{doc.desc}</div>
       </div>
       {status
-        ? <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}> Déposé</span>
+        ? <div style={{textAlign:"right"}}>
+            <span style={{ color:"#22c55e", fontWeight:700, fontSize:13, whiteSpace:"nowrap" }}> Déposé</span>
+            {verif&&verif.verdict==="valide"&&<div style={{fontSize:11,color:"#22c55e",marginTop:2}}>Vérifié IA</div>}
+            {verif&&verif.verdict==="a_verifier"&&<div style={{fontSize:11,color:"#FBC005",marginTop:2}}>A verifier manuellement</div>}
+            {verif&&verif.verdict==="invalide"&&<div style={{fontSize:11,color:"#ef4444",marginTop:2}}>{verif.raison||"Probleme detecte"}</div>}
+          </div>
         : <><input ref={ref} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={e=>e.target.files[0]&&onUpload(doc.id,e.target.files[0])}/><button style={S.smBtn} onClick={()=>ref.current?.click()}> Déposer</button></>
       }
     </div>

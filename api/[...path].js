@@ -19,6 +19,7 @@ export default async function handler(req, res) {
       case "stripe-onboard": return await stripeOnboard(req, res);
       case "stripe-webhook": return await stripeWebhook(req, res);
       case "urgence-lead": return await urgenceLead(req, res);
+      case "verify-document": return await verifyDocument(req, res);
       default: return res.status(404).json({ error: "Route inconnue: " + route });
     }
   } catch (e) {
@@ -468,4 +469,23 @@ fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content
 }
 res.status(200).json({ok:true,lead});
 }catch(e){res.status(500).json({error:e.message});}
+}
+
+// ===================== VERIFY-DOCUMENT =====================
+async function verifyDocument(req,res){
+if(req.method!=="POST")return res.status(405).end();
+const {docType,docLabel,image}=typeof req.body==="string"?JSON.parse(req.body):req.body;
+if(!image||!image.startsWith("data:image"))return res.status(200).json({verdict:"non_analyse",raison:"Format non analysable automatiquement (PDF ou autre) - verification manuelle requise"});
+const prompt="Tu es un expert en verification de documents administratifs francais pour artisans du BTP. Analyse cette image et determine si c'est bien un document de type \""+(docLabel||docType)+"\" (Kbis = extrait du registre du commerce, Decennale = attestation assurance decennale, RC Pro = attestation assurance responsabilite civile professionnelle, RIB = releve d'identite bancaire, RGE = certificat de qualification RGE). Reponds UNIQUEMENT en JSON sans markdown au format exact: {\"type_detecte\":\"description courte de ce que tu vois\",\"correspond\":true,\"date_expiration\":\"YYYY-MM-DD ou null\",\"expire\":false,\"verdict\":\"valide\",\"raison\":\"phrase courte\"} ou verdict est valide, a_verifier ou invalide.";
+try{
+const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+method:"POST",
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
+body:JSON.stringify({model:"meta-llama/llama-4-scout-17b-16e-instruct",max_tokens:300,messages:[{role:"user",content:[{type:"text",text:prompt},{type:"image_url",image_url:{url:image}}]}]})
+});
+const d=await r.json();
+const text=d.choices?.[0]?.message?.content||"{}";
+const clean=text.replace(/```json|```/g,"").trim();
+res.status(200).json(JSON.parse(clean));
+}catch(e){res.status(200).json({verdict:"a_verifier",raison:"Analyse impossible, verification manuelle recommandee"});}
 }
