@@ -67,10 +67,30 @@ res.status(200).json(JSON.parse(clean));
 // ===================== CAPTURE-PAYMENT =====================
 async function capturePayment(req,res){
 if(req.method!=="POST")return res.status(405).end();
-const{payment_intent_id,amount_final}=typeof req.body==="string"?JSON.parse(req.body):req.body;
+const{payment_intent_id,amount_final,assigned_to}=typeof req.body==="string"?JSON.parse(req.body):req.body;
 try{
 const pi=await stripe.paymentIntents.capture(payment_intent_id,{amount_to_capture:Math.round(amount_final*100)});
-res.status(200).json({success:true,status:pi.status,amount:pi.amount_received});
+let transfer=null;
+if(assigned_to){
+  try{
+    const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+    const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+    const H={"apikey":SK,"Authorization":"Bearer "+SK};
+    const pr=await fetch(SB+"/rest/v1/profiles?id=eq."+assigned_to+"&select=stripe_account_id",{headers:H});
+    const prs=await pr.json();
+    const stripeAccountId=Array.isArray(prs)&&prs[0]?prs[0].stripe_account_id:null;
+    if(stripeAccountId){
+      const montantArtisan=Math.round(amount_final*100*0.85);
+      const tr=await stripe.transfers.create({amount:montantArtisan,currency:"eur",destination:stripeAccountId,transfer_group:payment_intent_id});
+      transfer={id:tr.id,amount:tr.amount,destination:stripeAccountId};
+    }else{
+      transfer={error:"Artisan sans compte Stripe Connect actif - virement manuel necessaire"};
+    }
+  }catch(e){
+    transfer={error:"Echec du transfert automatique: "+e.message+" - virement manuel necessaire"};
+  }
+}
+res.status(200).json({success:true,status:pi.status,amount:pi.amount_received,transfer});
 }catch(e){res.status(500).json({error:e.message});}
 }
 

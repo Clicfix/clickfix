@@ -35,7 +35,7 @@ function badge(l){
 
 async function validerEtPayer(l){
   await fetch(SB+"/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK},body:JSON.stringify({paiement_statut:"paye"})});
-  fetch("https://www.click-fix.fr/api/capture-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_intent_id:l.payment_intent_id,amount_final:l.prix_final})}).then(r=>r.json()).then(d=>ctx.notify(d.success?"Paiement de "+l.prix_final+"EUR confirme !":"Erreur paiement","err"));
+  fetch("https://www.click-fix.fr/api/capture-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_intent_id:l.payment_intent_id,amount_final:l.prix_final,assigned_to:l.assigned_to})}).then(r=>r.json()).then(d=>ctx.notify(d.success?"Paiement de "+l.prix_final+"EUR confirme !":"Erreur paiement","err"));
 }
 
 async function refuserPrix(l){
