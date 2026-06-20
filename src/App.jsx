@@ -1,6 +1,22 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 const LS = { get:(k)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}, del:(k)=>{try{localStorage.removeItem(k)}catch{}} };
+async function pdfToImage(file){
+  const arrayBuffer = await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsArrayBuffer(file);});
+  if(!window.pdfjsLib){
+    await new Promise(res=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=res;document.head.appendChild(s);});
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+  const pdf = await window.pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const page = await pdf.getPage(1);
+  const viewport = page.getViewport({scale:1.5});
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const canvasCtx = canvas.getContext("2d");
+  await page.render({canvasContext:canvasCtx,viewport}).promise;
+  return canvas.toDataURL("image/png");
+}
 
 const SB_URL="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
@@ -233,15 +249,23 @@ setBusy(false);
       const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
       await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
       notify("Document depose avec succes !");ctx.updateSession({...sess,docs:newDocs});
-      if(file.type.startsWith("image/")){
+      (async()=>{
+        let verifImage=null;
+        if(file.type.startsWith("image/")){
+          verifImage=url;
+        }else if(file.type==="application/pdf"){
+          try{verifImage=await pdfToImage(file);}catch(e){verifImage=null;}
+        }
+        if(!verifImage)return;
         const docDef=DOCS_DEF.find(d=>d.id===docId);
-        fetch("https://www.click-fix.fr/api/verify-document",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({docType:docId,docLabel:docDef?.label||docId,image:url})})
-          .then(r=>r.json()).then(verif=>{
-            const newVerifAll={...(sess.docs_verification||{}),[docId]:verif};
-            fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs_verification:newVerifAll})});
-            ctx.updateSession({...sess,docs:newDocs,docs_verification:newVerifAll});
-          }).catch(()=>{});
-      }
+        try{
+          const r=await fetch("https://www.click-fix.fr/api/verify-document",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({docType:docId,docLabel:docDef?.label||docId,image:verifImage})});
+          const verif=await r.json();
+          const newVerifAll={...(sess.docs_verification||{}),[docId]:verif};
+          fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs_verification:newVerifAll})});
+          ctx.updateSession({...sess,docs:newDocs,docs_verification:newVerifAll});
+        }catch(e){}
+      })();
     } catch(e) { notify("Erreur upload : "+e.message,"err"); }
     setBusy(false);
   }
