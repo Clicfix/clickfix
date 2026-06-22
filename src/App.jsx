@@ -74,12 +74,12 @@ export default function App() {
 const isMobile=useIsMobile();
   const [page, setPage] = useState(()=>{const s=LS.get("cf_sess");const params=new URLSearchParams(window.location.search);const w=params.get("welcome");if(w&&s&&s.role==="pro")return "pack-welcome";if(!s)return "home";const r=(s.role||"").toLowerCase();if(r==="pro"){if(window.innerWidth>=900){window.location.href="/pro.html";return "home";}return "pro-dashboard";}if(r==="part")return "part-home";return "home";});
   const [sess, setSess]   = useState(() => LS.get("cf_sess")||JSON.parse(sessionStorage.getItem("cf_sess_bak")||"null"));
-  useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
+  useEffect(()=>{if(sess?.email&&sess?.pass){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/auth/v1/token?grant_type=password",{method:"POST",headers:{"Content-Type":"application/json","apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU"},body:JSON.stringify({email:sess.email,password:sess.pass})}).then(r=>r.json()).then(d=>{if(d.access_token){const u={...sess,token:d.access_token};setSess(u);LS.set("cf_sess",u);}}).catch(()=>{});}},[]);
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState(false);
   const [leads, setLeads] = useState(() => getLeads());
-  useEffect(()=>{if(sess&&sess.id){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?select=id,statut,travaux,precision,details,adresse,ville,code_postal,surface,budget,nb_artisans,creneaux,assigned_to,artisan_statut,nb_refus,client_nom,client_tel,client_email,analyse_ia,payment_intent_id,paiement_statut,prix_final,montant_pre_autorise,user_id,lat,lon,created_at&order=created_at.desc&limit=100",{headers:{"apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"}}).then(r=>r.json()).then(d=>{if(Array.isArray(d))setLeads(d);}).catch(()=>{});}},[sess&&sess.id]);
-  useEffect(()=>{if(!sess?.id)return;const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";const fetchL=()=>{fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?select=id,statut,travaux,precision,details,adresse,ville,code_postal,surface,budget,nb_artisans,creneaux,assigned_to,artisan_statut,nb_refus,client_nom,client_tel,client_email,analyse_ia,payment_intent_id,paiement_statut,prix_final,montant_pre_autorise,user_id,lat,lon,created_at&order=created_at.desc&limit=100",{headers:{"apikey":AK,"Authorization":"Bearer "+AK}}).then(r=>r.json()).then(d=>{if(Array.isArray(d)){setLeads(prev=>{if(prev.length>0){d.forEach(nl=>{const ol=prev.find(x=>x.id===nl.id);if(ol){if(ol.artisan_statut!==nl.artisan_statut){const isCl=nl.user_id===sess?.id;const isPr=nl.assigned_to===sess?.id;if(isCl&&nl.artisan_statut==="arrive")notify("Votre artisan est arrive !");if(isCl&&nl.artisan_statut==="en_cours")notify("L intervention a commence !");if(isCl&&nl.artisan_statut==="termine")notify("Intervention terminee - validez le prix !");if(isPr&&nl.artisan_statut==="termine")notify("Le client confirme - saisissez le prix !");}if(ol.paiement_statut!==nl.paiement_statut){const isCl=nl.user_id===sess?.id;const isPr=nl.assigned_to===sess?.id;if(isCl&&nl.paiement_statut==="en_attente_validation")notify("Votre artisan propose "+nl.prix_final+"EUR - validez !");if(isPr&&nl.paiement_statut==="pre_autorise"&&ol.paiement_statut==="en_attente_validation")notify("Prix refuse - proposez un nouveau montant");if(nl.paiement_statut==="paye")notify("Paiement confirme - "+nl.prix_final+"EUR !");}}})}return d;});}}).catch(()=>{});};fetchL();const ws=new WebSocket("wss://bipqtqezntzcmxwiaqdz.supabase.co/realtime/v1/websocket?apikey="+AK+"&vsn=1.0.0");ws.onopen=()=>{ws.send(JSON.stringify({topic:"realtime:public:leads",event:"phx_join",payload:{},ref:"1"}));};ws.onmessage=(e)=>{const m=JSON.parse(e.data);if(m.event==="INSERT"||m.event==="UPDATE"||m.event==="DELETE"){fetchL();}};return()=>{ws.close();};},[sess?.id]);
+  useEffect(()=>{if(sess&&sess.id){fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?select=id,statut,travaux,precision,details,adresse,ville,code_postal,surface,budget,nb_artisans,creneaux,assigned_to,artisan_statut,nb_refus,client_nom,client_tel,client_email,analyse_ia,payment_intent_id,paiement_statut,prix_final,montant_pre_autorise,user_id,lat,lon,created_at&order=created_at.desc&limit=100",{headers:{"apikey":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M"}}).then(r=>r.json()).then(d=>{if(Array.isArray(d))setLeads(d);}).catch(()=>{});}},[sess&&sess.id]);
+  useEffect(()=>{if(!sess?.id)return;const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNzk5MTAsImV4cCI6MjA5NTY1NTkxMH0.OmScmhwC-qOHf1tW81UxHgk0OHpSJvz5NCpktzMa81M";const fetchL=()=>{fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?select=id,statut,travaux,precision,details,adresse,ville,code_postal,surface,budget,nb_artisans,creneaux,assigned_to,artisan_statut,nb_refus,client_nom,client_tel,client_email,analyse_ia,payment_intent_id,paiement_statut,prix_final,montant_pre_autorise,user_id,lat,lon,created_at&order=created_at.desc&limit=100",{headers:{"apikey":AK,"Authorization":"Bearer "+AK}}).then(r=>r.json()).then(d=>{if(Array.isArray(d)){setLeads(prev=>{if(prev.length>0){d.forEach(nl=>{const ol=prev.find(x=>x.id===nl.id);if(ol){if(ol.artisan_statut!==nl.artisan_statut){const isCl=nl.user_id===sess?.id;const isPr=nl.assigned_to===sess?.id;if(isCl&&nl.artisan_statut==="arrive")notify("Votre artisan est arrive !");if(isCl&&nl.artisan_statut==="en_cours")notify("L intervention a commence !");if(isCl&&nl.artisan_statut==="termine")notify("Intervention terminee - validez le prix !");if(isPr&&nl.artisan_statut==="termine")notify("Le client confirme - saisissez le prix !");}if(ol.paiement_statut!==nl.paiement_statut){const isCl=nl.user_id===sess?.id;const isPr=nl.assigned_to===sess?.id;if(isCl&&nl.paiement_statut==="en_attente_validation")notify("Votre artisan propose "+nl.prix_final+"EUR - validez !");if(isPr&&nl.paiement_statut==="pre_autorise"&&ol.paiement_statut==="en_attente_validation")notify("Prix refuse - proposez un nouveau montant");if(nl.paiement_statut==="paye")notify("Paiement confirme - "+nl.prix_final+"EUR !");}}})}return d;});}}).catch(()=>{});};fetchL();const ws=new WebSocket("wss://bipqtqezntzcmxwiaqdz.supabase.co/realtime/v1/websocket?apikey="+AK+"&vsn=1.0.0");ws.onopen=()=>{ws.send(JSON.stringify({topic:"realtime:public:leads",event:"phx_join",payload:{},ref:"1"}));};ws.onmessage=(e)=>{const m=JSON.parse(e.data);if(m.event==="INSERT"||m.event==="UPDATE"||m.event==="DELETE"){fetchL();}};return()=>{ws.close();};},[sess?.id]);
 
   function notify(msg, type="ok") {
     setToast({msg,type});
@@ -243,12 +243,12 @@ setBusy(false);
         r.onerror = () => rej(new Error("Lecture échouée"));
         r.readAsDataURL(file);
       });
-      const newDocs = {...(sess.docs||{}), [docId]: url};
-      updateSession({ docs: newDocs });
-      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
-      await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
-      notify("Document depose avec succes !");ctx.updateSession({...sess,docs:newDocs});
+      const newDocs = {...(sess.docs||{}), [docId]: url};
+      updateSession({ docs: newDocs });
+      const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+      const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+      await fetch(SB+"/rest/v1/profiles?id=eq."+sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+(sess.token||KEY)},body:JSON.stringify({docs:newDocs})});
+      notify("Document depose avec succes !");ctx.updateSession({...sess,docs:newDocs});
       (async()=>{
         let verifImage=null;
         if(file.type.startsWith("image/")){
@@ -304,104 +304,104 @@ setBusy(false);
 //  HOME
 // 
 function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
-  const [scrollY,setScrollY]=useState(0);
-  const [articles,setArticles]=useState([]);
-  const [artLoading,setArtLoading]=useState(true);
-  useEffect(()=>{
-    const h=()=>setScrollY(window.scrollY);
-    window.addEventListener('scroll',h);
-    return()=>window.removeEventListener('scroll',h);
-  },[]);
-  useEffect(()=>{const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));return()=>obs.disconnect();},[]);  useEffect(()=>{
-    const cached=localStorage.getItem('cf_articles');
-    const cachedTime=localStorage.getItem('cf_articles_time');
-    if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<3600000){
-      const all=JSON.parse(cached);
-      const offset=Math.floor(Date.now()/3600000)%Math.max(1,all.length-2);
-      setArticles(all.slice(offset,offset+3));
-      setArtLoading(false);
-      return;
-    }
-    fetch('/api/news').then(r=>r.json()).then(d=>{
-      const arts=d.articles||[];
-      if(arts.length>0){
-        localStorage.setItem('cf_articles',JSON.stringify(arts));
-        localStorage.setItem('cf_articles_time',Date.now().toString());
-        setArticles(arts.slice(0,3));
-      }
-      setArtLoading(false);
-    }).catch(()=>setArtLoading(false));
-  },[]);
-  function go(role){const isMobile=window.innerWidth<=900;if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}if(role==='pro'&&ctx.sess?.role==='pro'&&window.innerWidth>=900){window.location.href='/pro.html';return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
-  const F={fontFamily:"'Inter',sans-serif"};
-  return(
+  const [scrollY,setScrollY]=useState(0);
+  const [articles,setArticles]=useState([]);
+  const [artLoading,setArtLoading]=useState(true);
+  useEffect(()=>{
+    const h=()=>setScrollY(window.scrollY);
+    window.addEventListener('scroll',h);
+    return()=>window.removeEventListener('scroll',h);
+  },[]);
+  useEffect(()=>{const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.15});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));return()=>obs.disconnect();},[]);  useEffect(()=>{
+    const cached=localStorage.getItem('cf_articles');
+    const cachedTime=localStorage.getItem('cf_articles_time');
+    if(cached&&cachedTime&&Date.now()-parseInt(cachedTime)<3600000){
+      const all=JSON.parse(cached);
+      const offset=Math.floor(Date.now()/3600000)%Math.max(1,all.length-2);
+      setArticles(all.slice(offset,offset+3));
+      setArtLoading(false);
+      return;
+    }
+    fetch('/api/news').then(r=>r.json()).then(d=>{
+      const arts=d.articles||[];
+      if(arts.length>0){
+        localStorage.setItem('cf_articles',JSON.stringify(arts));
+        localStorage.setItem('cf_articles_time',Date.now().toString());
+        setArticles(arts.slice(0,3));
+      }
+      setArtLoading(false);
+    }).catch(()=>setArtLoading(false));
+  },[]);
+  function go(role){const isMobile=window.innerWidth<=900;if(role==='urgence'){if(ctx.sess?.role==='part'){ctx.setPage('urgence');}else{ctx.setPage('login-part');sessionStorage.setItem('after_login','urgence');}return;}if(role==='pro'&&ctx.sess?.role==='pro'&&window.innerWidth>=900){window.location.href='/pro.html';return;}ctx.setPage(ctx.sess?.role===role?(role==='pro'?'pro-dashboard':'part-home'):('login-'+role));}
+  const F={fontFamily:"'Inter',sans-serif"};
+  return(
 <div style={{...F,background:'#fff',color:'#1d1d1f',overflowX:'hidden'}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');html{scroll-behavior:smooth}@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}@keyframes revealUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}.reveal{animation:revealUp .9s cubic-bezier(.4,0,.2,1) both}.hero-btn:hover{transform:scale(1.03);transition:transform .2s}"}</style>
 
 <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:100,background:scrollY>50?'rgba(255,255,255,0.85)':'transparent',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderBottom:scrollY>50?'0.5px solid rgba(0,0,0,0.12)':'none',transition:'all .5s cubic-bezier(.4,0,.2,1)',padding:(window.innerWidth<=900)?'0 16px':'0 48px',height:48,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-  <span style={{fontSize:17,fontWeight:800,color:scrollY>50?'#1d1d1f':'#fff',letterSpacing:'-0.3px',transition:'color .5s'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
-  <div style={{display:'flex',gap:6,alignItems:'center'}}>
-    <button onClick={()=>go('part')} style={{...F,padding:'6px 16px',borderRadius:18,border:'none',background:scrollY>50?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.15)',color:scrollY>50?'#1d1d1f':'#fff',fontSize:13,fontWeight:500,cursor:'pointer',transition:'all .3s',backdropFilter:'blur(10px)'}}>Particulier</button>
-    <button onClick={()=>go('pro')} style={{...F,padding:'6px 16px',borderRadius:18,border:'none',background:'#FF6F00',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'}}>Artisan</button>
-  </div>
+  <span style={{fontSize:17,fontWeight:800,color:scrollY>50?'#1d1d1f':'#fff',letterSpacing:'-0.3px',transition:'color .5s'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
+  <div style={{display:'flex',gap:6,alignItems:'center'}}>
+    <button onClick={()=>go('part')} style={{...F,padding:'6px 16px',borderRadius:18,border:'none',background:scrollY>50?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.15)',color:scrollY>50?'#1d1d1f':'#fff',fontSize:13,fontWeight:500,cursor:'pointer',transition:'all .3s',backdropFilter:'blur(10px)'}}>Particulier</button>
+    <button onClick={()=>go('pro')} style={{...F,padding:'6px 16px',borderRadius:18,border:'none',background:'#FF6F00',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'}}>Artisan</button>
+  </div>
 </nav>
 
 <section style={{height:'100vh',position:'relative',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
-  <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=90" alt="renovation" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
-  <div style={{position:'absolute',inset:0,background:'linear-gradient(160deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0.7) 100%)'}}/>
-  <div style={{position:'relative',textAlign:'center',padding:'0 20px',maxWidth:860,animation:'fadeUp .8s ease both'}}>
-    <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.6)',letterSpacing:3,textTransform:'uppercase',marginBottom:20}}>La plateforme de renovation N°1</p>
-    <h1 style={{fontSize:'clamp(40px,6vw,80px)',fontWeight:800,letterSpacing:'-2.5px',lineHeight:1.05,marginBottom:18,color:'#fff'}}>Trouvez <span style={{color:'#FF6F00'}}>l&apos;artisan</span><br/>qu&apos;il vous faut</h1>
-    <p style={{fontSize:'clamp(15px,2vw,19px)',color:'rgba(255,255,255,0.65)',maxWidth:480,margin:'0 auto 44px',lineHeight:1.65,fontWeight:300}}>Click&amp;fix met en relation particuliers et artisans. Rapide, fiable et gratuit.</p>
-    <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
-      <button className="hero-btn" onClick={()=>go('part')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'#fff',color:'#1d1d1f',fontSize:15,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Déposer une demande</button><button className="hero-btn" onClick={()=>go('urgence')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'rgba(239,68,68,0.9)',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer',letterSpacing:'-0.2px'}}>🚨 Dépannage urgent</button>
-      <button className="hero-btn" onClick={()=>go('pro')} style={{...F,padding:'14px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.4)',background:'transparent',color:'#fff',fontSize:15,fontWeight:500,cursor:'pointer',letterSpacing:'-0.2px'}}>Je suis artisan</button>
-    </div>
-  </div>
+  <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=90" alt="renovation" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+  <div style={{position:'absolute',inset:0,background:'linear-gradient(160deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0.7) 100%)'}}/>
+  <div style={{position:'relative',textAlign:'center',padding:'0 20px',maxWidth:860,animation:'fadeUp .8s ease both'}}>
+    <p style={{fontSize:13,fontWeight:500,color:'rgba(255,255,255,0.6)',letterSpacing:3,textTransform:'uppercase',marginBottom:20}}>La plateforme de renovation N°1</p>
+    <h1 style={{fontSize:'clamp(40px,6vw,80px)',fontWeight:800,letterSpacing:'-2.5px',lineHeight:1.05,marginBottom:18,color:'#fff'}}>Trouvez <span style={{color:'#FF6F00'}}>l&apos;artisan</span><br/>qu&apos;il vous faut</h1>
+    <p style={{fontSize:'clamp(15px,2vw,19px)',color:'rgba(255,255,255,0.65)',maxWidth:480,margin:'0 auto 44px',lineHeight:1.65,fontWeight:300}}>Click&amp;fix met en relation particuliers et artisans. Rapide, fiable et gratuit.</p>
+    <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
+      <button className="hero-btn" onClick={()=>go('part')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'#fff',color:'#1d1d1f',fontSize:15,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Déposer une demande</button><button className="hero-btn" onClick={()=>go('urgence')} style={{...F,padding:'14px 32px',borderRadius:980,border:'none',background:'rgba(239,68,68,0.9)',color:'#fff',fontSize:15,fontWeight:700,cursor:'pointer',letterSpacing:'-0.2px'}}>🚨 Dépannage urgent</button>
+      <button className="hero-btn" onClick={()=>go('pro')} style={{...F,padding:'14px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.4)',background:'transparent',color:'#fff',fontSize:15,fontWeight:500,cursor:'pointer',letterSpacing:'-0.2px'}}>Je suis artisan</button>
+    </div>
+  </div>
 </section>
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
-  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:(window.innerWidth<=900)?"1fr":"1fr 1fr",gap:(window.innerWidth<=900)?32:96,alignItems:"center"}}>
-    <div>
-      <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Particuliers</p>
-      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Vos travaux,<br/>sans le stress</h2>
-      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.75,marginBottom:40,fontWeight:400}}>Décrivez votre projet. Nous envoyons votre demande aux meilleurs artisans de votre région sous 24h. Gratuit et sans engagement.</p>
-      {[['Décrivez votre projet','Notre assistant pose les bonnes questions selon vos travaux.'],['Recevez des artisans','Artisans vérifiés, assurés, dans votre zone géographique.'],['Confirmez votre RDV','Choisissez votre créneau et suivez en temps réel.']].map(([t,d],i)=>(
-        <div key={i} style={{display:'flex',gap:14,marginBottom:24}}>
-          <div style={{width:28,height:28,borderRadius:'50%',background:'#1d1d1f',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:12,flexShrink:0,marginTop:2}}>{i+1}</div>
-          <div><p style={{fontWeight:600,fontSize:15,marginBottom:2,color:'#1d1d1f'}}>{t}</p><p style={{fontSize:13,color:'#6e6e73',lineHeight:1.55,margin:0}}>{d}</p></div>
-        </div>
-      ))}
-      <button onClick={()=>go('part')} style={{...F,marginTop:24,padding:'13px 28px',borderRadius:980,border:'none',background:'#1d1d1f',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Commencer gratuitement →</button>
-    </div>
-    <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.1)'}}>
-      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85" alt="renovation interieure" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
-    </div>
-  </div>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:(window.innerWidth<=900)?"1fr":"1fr 1fr",gap:(window.innerWidth<=900)?32:96,alignItems:"center"}}>
+    <div>
+      <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Particuliers</p>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Vos travaux,<br/>sans le stress</h2>
+      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.75,marginBottom:40,fontWeight:400}}>Décrivez votre projet. Nous envoyons votre demande aux meilleurs artisans de votre région sous 24h. Gratuit et sans engagement.</p>
+      {[['Décrivez votre projet','Notre assistant pose les bonnes questions selon vos travaux.'],['Recevez des artisans','Artisans vérifiés, assurés, dans votre zone géographique.'],['Confirmez votre RDV','Choisissez votre créneau et suivez en temps réel.']].map(([t,d],i)=>(
+        <div key={i} style={{display:'flex',gap:14,marginBottom:24}}>
+          <div style={{width:28,height:28,borderRadius:'50%',background:'#1d1d1f',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:12,flexShrink:0,marginTop:2}}>{i+1}</div>
+          <div><p style={{fontWeight:600,fontSize:15,marginBottom:2,color:'#1d1d1f'}}>{t}</p><p style={{fontSize:13,color:'#6e6e73',lineHeight:1.55,margin:0}}>{d}</p></div>
+        </div>
+      ))}
+      <button onClick={()=>go('part')} style={{...F,marginTop:24,padding:'13px 28px',borderRadius:980,border:'none',background:'#1d1d1f',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Commencer gratuitement →</button>
+    </div>
+    <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.1)'}}>
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=85" alt="renovation interieure" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
+    </div>
+  </div>
 </section>
 
 <section style={{padding:(window.innerWidth<=900)?'60px 20px':'120px 48px',background:'#f5f5f7'}}>
-  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:(window.innerWidth<=900)?"1fr":"1fr 1fr",gap:(window.innerWidth<=900)?32:96,alignItems:"center"}}>
-    <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.12)'}}>
-      <img src="https://images.unsplash.com/photo-1588854337221-4cf9fa96059c?w=900&q=85" alt="artisan professionnel" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
-    </div>
-    <div>
-      <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Artisans</p>
-      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Plus de clients,<br/>moins de démarches</h2>
-      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.75,marginBottom:40,fontWeight:400}}>Recevez des leads qualifiés dans votre zone. Nous sélectionnons uniquement les projets qui correspondent à vos spécialités.</p>
-      {[['Profil professionnel complet','Spécialités, zone d\'intervention, documents centralisés.'],['Leads qualifiés','Les clients viennent à vous. Fini le démarchage.'],['Dashboard de suivi','Confirmez vos RDV et gérez votre activité facilement.']].map(([t,d],i)=>(
-        <div key={i} style={{display:'flex',gap:14,marginBottom:24}}>
-          <div style={{width:28,height:28,borderRadius:'50%',background:'#FF6F00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:12,flexShrink:0,marginTop:2}}>{i+1}</div>
-          <div><p style={{fontWeight:600,fontSize:15,marginBottom:2,color:'#1d1d1f'}}>{t}</p><p style={{fontSize:13,color:'#6e6e73',lineHeight:1.55,margin:0}}>{d}</p></div>
-        </div>
-      ))}
-      <button onClick={()=>go('pro')} style={{...F,marginTop:24,padding:'13px 28px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Rejoindre la plateforme →</button>
-    </div>
-  </div>
+  <div className="reveal" style={{maxWidth:980,margin:"0 auto",display:"grid",gridTemplateColumns:(window.innerWidth<=900)?"1fr":"1fr 1fr",gap:(window.innerWidth<=900)?32:96,alignItems:"center"}}>
+    <div style={{borderRadius:20,overflow:'hidden',boxShadow:'0 32px 80px rgba(0,0,0,0.12)'}}>
+      <img src="https://images.unsplash.com/photo-1588854337221-4cf9fa96059c?w=900&q=85" alt="artisan professionnel" style={{width:'100%',height:560,objectFit:'cover',display:'block'}}/>
+    </div>
+    <div>
+      <p style={{fontSize:12,fontWeight:600,color:'#FF6F00',letterSpacing:3,textTransform:'uppercase',marginBottom:16}}>Artisans</p>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',lineHeight:1.1,marginBottom:18}}>Plus de clients,<br/>moins de démarches</h2>
+      <p style={{fontSize:16,color:'#6e6e73',lineHeight:1.75,marginBottom:40,fontWeight:400}}>Recevez des leads qualifiés dans votre zone. Nous sélectionnons uniquement les projets qui correspondent à vos spécialités.</p>
+      {[['Profil professionnel complet','Spécialités, zone d\'intervention, documents centralisés.'],['Leads qualifiés','Les clients viennent à vous. Fini le démarchage.'],['Dashboard de suivi','Confirmez vos RDV et gérez votre activité facilement.']].map(([t,d],i)=>(
+        <div key={i} style={{display:'flex',gap:14,marginBottom:24}}>
+          <div style={{width:28,height:28,borderRadius:'50%',background:'#FF6F00',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:12,flexShrink:0,marginTop:2}}>{i+1}</div>
+          <div><p style={{fontWeight:600,fontSize:15,marginBottom:2,color:'#1d1d1f'}}>{t}</p><p style={{fontSize:13,color:'#6e6e73',lineHeight:1.55,margin:0}}>{d}</p></div>
+        </div>
+      ))}
+      <button onClick={()=>go('pro')} style={{...F,marginTop:24,padding:'13px 28px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer',letterSpacing:'-0.2px'}}>Rejoindre la plateforme →</button>
+    </div>
+  </div>
 </section>
 
 <section style={{padding:'120px 48px',background:'#fff'}}>
-  <div style={{maxWidth:980,margin:'0 auto'}}>
+  <div style={{maxWidth:980,margin:'0 auto'}}>
 <section style={{padding:(window.innerWidth<=900)?'60px 20px':'100px 48px',background:'linear-gradient(135deg,#1a0a0a,#2d0f0f)'}}>
   <div style={{maxWidth:980,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
     <div>
@@ -431,32 +431,32 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
   </div>
 </section>
 
-    <div style={{marginBottom:64}}>
-      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8,color:'#1d1d1f'}}>Actualités travaux</h2>
-      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Les dernières nouvelles du secteur</p>
-    </div>
-    {artLoading?(
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
-        {[1,2,3].map(i=><div key={i} style={{borderRadius:16,background:'#f5f5f7',height:340,animation:'pulse 1.5s infinite'}}/>)}
-      </div>
-    ):(
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
-        {articles.map((a,i)=>(
-          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{borderRadius:16,overflow:'hidden',background:'#f5f5f7',textDecoration:'none',display:'block',transition:'transform .3s'}}>
-            <div style={{height:180,overflow:'hidden'}}>
-              <img src={a.urlToImage} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .4s'}} onError={e=>{e.target.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80';}}/>
-            </div>
-            <div style={{padding:20}}>
-              <p style={{fontSize:11,fontWeight:600,color:'#FF6F00',letterSpacing:2,marginBottom:8,textTransform:'uppercase',margin:'0 0 8px'}}>{a.source&&a.source.name?a.source.name:'Actualité'}</p>
-              <p style={{fontWeight:700,fontSize:14,marginBottom:8,color:'#1d1d1f',lineHeight:1.35,margin:'0 0 8px'}}>{a.title&&a.title.length>70?a.title.slice(0,70)+'…':a.title}</p>
-              <p style={{fontSize:12,color:'#6e6e73',lineHeight:1.55,margin:'0 0 14px'}}>{a.description&&a.description.length>100?a.description.slice(0,100)+'…':a.description}</p>
-              <p style={{fontSize:12,color:'#FF6F00',fontWeight:600,margin:0}}>Lire l&apos;article →</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    )}
-  </div>
+    <div style={{marginBottom:64}}>
+      <h2 style={{fontSize:'clamp(28px,3.5vw,48px)',fontWeight:800,letterSpacing:'-1.8px',marginBottom:8,color:'#1d1d1f'}}>Actualités travaux</h2>
+      <p style={{fontSize:15,color:'#6e6e73',fontWeight:400}}>Les dernières nouvelles du secteur</p>
+    </div>
+    {artLoading?(
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+        {[1,2,3].map(i=><div key={i} style={{borderRadius:16,background:'#f5f5f7',height:340,animation:'pulse 1.5s infinite'}}/>)}
+      </div>
+    ):(
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
+        {articles.map((a,i)=>(
+          <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{borderRadius:16,overflow:'hidden',background:'#f5f5f7',textDecoration:'none',display:'block',transition:'transform .3s'}}>
+            <div style={{height:180,overflow:'hidden'}}>
+              <img src={a.urlToImage} alt={a.title} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform .4s'}} onError={e=>{e.target.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80';}}/>
+            </div>
+            <div style={{padding:20}}>
+              <p style={{fontSize:11,fontWeight:600,color:'#FF6F00',letterSpacing:2,marginBottom:8,textTransform:'uppercase',margin:'0 0 8px'}}>{a.source&&a.source.name?a.source.name:'Actualité'}</p>
+              <p style={{fontWeight:700,fontSize:14,marginBottom:8,color:'#1d1d1f',lineHeight:1.35,margin:'0 0 8px'}}>{a.title&&a.title.length>70?a.title.slice(0,70)+'…':a.title}</p>
+              <p style={{fontSize:12,color:'#6e6e73',lineHeight:1.55,margin:'0 0 14px'}}>{a.description&&a.description.length>100?a.description.slice(0,100)+'…':a.description}</p>
+              <p style={{fontSize:12,color:'#FF6F00',fontWeight:600,margin:0}}>Lire l&apos;article →</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
 </section>
 
 <section style={{padding:(window.innerWidth<=900)?'60px 20px':'100px 48px',background:'#1d1d1f',borderTop:'0.5px solid rgba(255,255,255,0.06)'}}>
@@ -563,24 +563,24 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
 </section>
 
 <section style={{padding:'120px 48px',background:'#1d1d1f',textAlign:'center'}}>
-  <div style={{maxWidth:640,margin:'0 auto'}}>
-    <h2 style={{fontSize:'clamp(32px,4.5vw,60px)',fontWeight:800,letterSpacing:'-2.5px',color:'#fff',marginBottom:16,lineHeight:1.08}}>Prêt à transformer votre habitat ?</h2>
-    <p style={{fontSize:17,color:'rgba(255,255,255,0.38)',marginBottom:44,lineHeight:1.65,fontWeight:300}}>Gratuit pour les particuliers. Des artisans vérifiés sous 24h.</p>
-    <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
-      <button onClick={()=>go('part')} style={{...F,padding:'15px 32px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:600,cursor:'pointer'}}>Déposer une demande</button>
-      <button onClick={()=>go('pro')} style={{...F,padding:'15px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.2)',background:'transparent',color:'rgba(255,255,255,0.8)',fontSize:15,fontWeight:500,cursor:'pointer'}}>Espace artisan</button>
-    </div>
-  </div>
+  <div style={{maxWidth:640,margin:'0 auto'}}>
+    <h2 style={{fontSize:'clamp(32px,4.5vw,60px)',fontWeight:800,letterSpacing:'-2.5px',color:'#fff',marginBottom:16,lineHeight:1.08}}>Prêt à transformer votre habitat ?</h2>
+    <p style={{fontSize:17,color:'rgba(255,255,255,0.38)',marginBottom:44,lineHeight:1.65,fontWeight:300}}>Gratuit pour les particuliers. Des artisans vérifiés sous 24h.</p>
+    <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+      <button onClick={()=>go('part')} style={{...F,padding:'15px 32px',borderRadius:980,border:'none',background:'#FF6F00',color:'#fff',fontSize:15,fontWeight:600,cursor:'pointer'}}>Déposer une demande</button>
+      <button onClick={()=>go('pro')} style={{...F,padding:'15px 32px',borderRadius:980,border:'1.5px solid rgba(255,255,255,0.2)',background:'transparent',color:'rgba(255,255,255,0.8)',fontSize:15,fontWeight:500,cursor:'pointer'}}>Espace artisan</button>
+    </div>
+  </div>
 </section>
 
 <footer style={{background:'#000',padding:'36px 48px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
-  <span style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.3px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
-  <div style={{display:'flex',gap:24,fontSize:12,color:'rgba(255,255,255,0.25)'}}>
-    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
-    <span style={{cursor:'pointer'}}>Mentions légales</span>
-    <span style={{cursor:'pointer'}}>CGU</span>
-  </div>
-  <span style={{fontSize:11,color:'rgba(255,255,255,0.12)'}}>© 2026 Click&fix</span><div style={{display:'flex',gap:20,flexWrap:'wrap'}}><button onClick={()=>ctx.setPage('mentions-legales')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Mentions légales</button><button onClick={()=>ctx.setPage('cgv')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGV</button><button onClick={()=>ctx.setPage('cgu')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGU</button><button onClick={()=>ctx.setPage('rgpd')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Confidentialité</button></div>
+  <span style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'-0.3px'}}>click<span style={{color:'#FF6F00'}}>&</span>fix</span>
+  <div style={{display:'flex',gap:24,fontSize:12,color:'rgba(255,255,255,0.25)'}}>
+    <span style={{cursor:'pointer'}}>contact@click-fix.fr</span>
+    <span style={{cursor:'pointer'}}>Mentions légales</span>
+    <span style={{cursor:'pointer'}}>CGU</span>
+  </div>
+  <span style={{fontSize:11,color:'rgba(255,255,255,0.12)'}}>© 2026 Click&fix</span><div style={{display:'flex',gap:20,flexWrap:'wrap'}}><button onClick={()=>ctx.setPage('mentions-legales')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Mentions légales</button><button onClick={()=>ctx.setPage('cgv')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGV</button><button onClick={()=>ctx.setPage('cgu')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>CGU</button><button onClick={()=>ctx.setPage('rgpd')} style={{background:'none',border:'none',color:'rgba(255,255,255,0.3)',fontSize:11,cursor:'pointer'}}>Confidentialité</button></div>
 </footer>
 </div>
 );
@@ -662,33 +662,33 @@ ctx.register({...f,role,tel:(f.tel||"").replace(/\s/g,""),siret:(f.siret||"").re
 // 
 
 function LeafletMap({loc,artisans}){
-  useEffect(()=>{
-    const loadMap=()=>{
-      const el=document.getElementById("urgence-map");
-      if(!el)return;
-      if(el._leafmap){el._leafmap.remove();el._leafmap=null;}
-      const L=window.L;
-      const map=L.map(el).setView([loc.lat,loc.lon],13);
-      el._leafmap=map;
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"OSM"}).addTo(map);
-      const you=L.divIcon({html:"<div style='background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[16,16],className:""});
-      L.marker([loc.lat,loc.lon],{icon:you}).addTo(map).bindPopup("Votre position").openPopup();
-      const pro=L.divIcon({html:"<div style='background:#FF6F00;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[14,14],className:""});
-      artisans.forEach(a=>{
-        if(a.lat&&a.lon){
-          L.marker([a.lat,a.lon],{icon:pro}).addTo(map).bindPopup("<b>"+a.prenom+" "+a.nom+"</b><br/>"+a.dist+" km");
-        }
-      });
-    };
-    if(window.L){loadMap();}
-    else{
-      const css=document.createElement("link");css.rel="stylesheet";css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";document.head.appendChild(css);
-      const s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-      s.onload=loadMap;document.head.appendChild(s);
-    }
-    return()=>{const el=document.getElementById("urgence-map");if(el&&el._leafmap){el._leafmap.remove();el._leafmap=null;}};
-  },[loc,artisans]);
-  return <div id="urgence-map" style={{width:"100%",height:280,borderRadius:16,border:"1px solid #f0f0f0",marginBottom:16}}/>;
+  useEffect(()=>{
+    const loadMap=()=>{
+      const el=document.getElementById("urgence-map");
+      if(!el)return;
+      if(el._leafmap){el._leafmap.remove();el._leafmap=null;}
+      const L=window.L;
+      const map=L.map(el).setView([loc.lat,loc.lon],13);
+      el._leafmap=map;
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"OSM"}).addTo(map);
+      const you=L.divIcon({html:"<div style='background:#ef4444;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[16,16],className:""});
+      L.marker([loc.lat,loc.lon],{icon:you}).addTo(map).bindPopup("Votre position").openPopup();
+      const pro=L.divIcon({html:"<div style='background:#FF6F00;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3)'></div>",iconSize:[14,14],className:""});
+      artisans.forEach(a=>{
+        if(a.lat&&a.lon){
+          L.marker([a.lat,a.lon],{icon:pro}).addTo(map).bindPopup("<b>"+a.prenom+" "+a.nom+"</b><br/>"+a.dist+" km");
+        }
+      });
+    };
+    if(window.L){loadMap();}
+    else{
+      const css=document.createElement("link");css.rel="stylesheet";css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";document.head.appendChild(css);
+      const s=document.createElement("script");s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      s.onload=loadMap;document.head.appendChild(s);
+    }
+    return()=>{const el=document.getElementById("urgence-map");if(el&&el._leafmap){el._leafmap.remove();el._leafmap=null;}};
+  },[loc,artisans]);
+  return <div id="urgence-map" style={{width:"100%",height:280,borderRadius:16,border:"1px solid #f0f0f0",marginBottom:16}}/>;
 }
 function TrackingMap({lead,clientLat,clientLon}){
 const mapId="tm"+lead.id;
@@ -981,99 +981,100 @@ return(
 <div style={{...F,minHeight:"100vh",background:"#111113",display:"flex",color:"#fff"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap')"}</style>
 <div style={{width:240,minHeight:"100vh",background:"rgba(255,255,255,0.025)",borderRight:"0.5px solid rgba(255,255,255,0.07)",padding:"24px 14px",flexShrink:0,display:"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
-  <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
-    <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>{initiales.toUpperCase()}</div>
-    <div>
-      <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.2}}>{s?.prenom} {s?.nom}</div>
-      <div style={{fontSize:11,color:"rgba(255,255,255,0.28)"}}>Particulier</div>
-    </div>
-  </div>
-  <button onClick={()=>ctx.setPage("urgence")} style={{...F,width:"100%",padding:"11px 16px",background:"#ef4444",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:8,letterSpacing:"-0.2px"}}>🚨 Dépannage urgent</button><button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
-  <div style={{flex:1}}>
-    {TABS.map(t=>(
-      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
-        <span style={{fontSize:14}}>{t.ico}</span>{t.label}
-        {t.id==="demandes"&&ctx.myLeadsPart.length>0&&<span style={{marginLeft:"auto",fontSize:11,fontWeight:700,background:"rgba(56,189,248,0.15)",color:"#38bdf8",padding:"2px 7px",borderRadius:99}}>{ctx.myLeadsPart.length}</span>}
-      </button>
-    ))}
-  </div>
-  <div style={{padding:"0 8px",marginBottom:8}}>
-    <div style={{fontSize:10,color:"rgba(255,255,255,0.15)",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>click<span style={{color:"#38bdf8"}}>&</span>fix</div>
-  </div>
-  <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.18)",fontSize:12,cursor:"pointer",textAlign:"left"}}>Déconnexion</button>
+  <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px",marginBottom:28}}>
+    <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#38bdf8,#0ea5e9)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>{initiales.toUpperCase()}</div>
+    <div>
+      <div style={{fontSize:13,fontWeight:700,color:"#fff",lineHeight:1.2}}>{s?.prenom} {s?.nom}</div>
+      <div style={{fontSize:11,color:"rgba(255,255,255,0.28)"}}>Particulier</div>
+    </div>
+  </div>
+  <button onClick={()=>ctx.setPage("urgence")} style={{...F,width:"100%",padding:"11px 16px",background:"#ef4444",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:8,letterSpacing:"-0.2px"}}>🚨 Dépannage urgent</button><button onClick={()=>ctx.setPage("ai-lead")} style={{...F,width:"100%",padding:"11px 16px",background:"#38bdf8",border:"none",borderRadius:12,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,letterSpacing:"-0.2px"}}>+ Nouvelle demande</button>
+  <div style={{flex:1}}>
+    {TABS.map(t=>(
+      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:tab===t.id?"rgba(56,189,248,0.1)":"transparent",color:tab===t.id?"#38bdf8":"rgba(255,255,255,0.32)",fontWeight:tab===t.id?600:400,fontSize:13,cursor:"pointer",marginBottom:2,textAlign:"left",transition:"all .2s"}}>
+        <span style={{fontSize:14}}>{t.ico}</span>{t.label}
+        {t.id==="demandes"&&ctx.myLeadsPart.length>0&&<span style={{marginLeft:"auto",fontSize:11,fontWeight:700,background:"rgba(56,189,248,0.15)",color:"#38bdf8",padding:"2px 7px",borderRadius:99}}>{ctx.myLeadsPart.length}</span>}
+      </button>
+    ))}
+  </div>
+  <div style={{padding:"0 8px",marginBottom:8}}>
+    <div style={{fontSize:10,color:"rgba(255,255,255,0.15)",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>click<span style={{color:"#38bdf8"}}>&</span>fix</div>
+  </div>
+  <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 12px",borderRadius:10,border:"none",background:"transparent",color:"rgba(255,255,255,0.18)",fontSize:12,cursor:"pointer",textAlign:"left"}}>Déconnexion</button>
 </div>
 <div style={{flex:1,marginLeft:240,padding:"40px 48px",minHeight:"100vh"}}>
-  <div style={{maxWidth:760,margin:"0 auto"}}>
-    <div style={{marginBottom:32}}>
-      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4}}>Bonjour {s?.prenom} 👋</h1>
-      <p style={{fontSize:13,color:"rgba(255,255,255,0.28)",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
-    </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:32}}>
-      {[["Demandes",ctx.myLeadsPart.length,"#38bdf8","rgba(56,189,248,0.08)","rgba(56,189,248,0.15)"],["En attente",pending.length,"#FBC005","rgba(251,192,5,0.08)","rgba(251,192,5,0.15)"],["Confirmés",confirmed.length,"#22c55e","rgba(34,197,94,0.08)","rgba(34,197,94,0.15)"]].map(([label,val,color,bg,border])=>(
-        <div key={label} style={{background:bg,border:"0.5px solid "+border,borderRadius:16,padding:"18px 20px"}}>
-          <div style={{fontSize:10,fontWeight:600,color:color,letterSpacing:2,textTransform:"uppercase",opacity:0.7,marginBottom:6}}>{label}</div>
-          <div style={{fontSize:32,fontWeight:800,color:color,letterSpacing:"-1px"}}>{val}</div>
-        </div>
-      ))}
-    </div>
-    {tab==="demandes"&&(
-      <div>
-        <div style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.2)",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes demandes</div>
-        {ctx.myLeadsPart.length===0?(
-          <div style={{background:"rgba(255,255,255,0.02)",border:"0.5px solid rgba(255,255,255,0.06)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
-            <div style={{fontSize:40,marginBottom:12}}>📋</div>
-            <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>Aucune demande</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginBottom:20}}>Déposez votre premier projet gratuitement</div>
-            <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,padding:"12px 24px",background:"#38bdf8",border:"none",borderRadius:980,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer"}}>Déposer une demande</button>
-          </div>
-        ):(
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            {ctx.myLeadsPart.map(l=>(
-              <div key={l.id} onClick={()=>setSelLead(selLead?.id===l.id?null:l)} style={{background:"rgba(255,255,255,0.025)",border:"0.5px solid rgba(255,255,255,0.07)",borderLeft:"3px solid "+statusColor(l.statut),borderRadius:14,padding:"16px 18px",cursor:"pointer",transition:"all .2s"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-                  <div style={{flex:1}}>
-                    <span style={{fontWeight:700,fontSize:14,color:"#fff"}}>{l.travaux||""}</span>
-                    {l.precision&&<span style={{color:"rgba(255,255,255,0.3)",fontSize:12}}> — {l.precision}</span>}
-                    <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4,display:"flex",gap:10,flexWrap:"wrap"}}>
-                      {l.budget&&<span>{l.budget}</span>}
-                      {l.surface&&<span>{l.surface}</span>}
-                      {l.ville&&<span>📍 {l.ville}</span>}
-                      <span>{timeAgo(l.created_at)}</span>
-                    </div>
-                  </div>
-                  <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
-                </div>
-                {selLead?.id===l.id&&(
-                  <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",display:"grid",gap:8}}>
-                    {[["Spécialité",l.precision],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&(
-                      <div key={k} style={{display:"flex",gap:12}}>
-                        <span style={{fontSize:11,color:"rgba(255,255,255,0.22)",minWidth:80,flexShrink:0}}>{k}</span>
-                        <span style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>{v}</span>
-                      </div>
-                    ))}
+  <div style={{maxWidth:760,margin:"0 auto"}}>
+    <div style={{marginBottom:32}}>
+      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4}}>Bonjour {s?.prenom} 👋</h1>
+      <p style={{fontSize:13,color:"rgba(255,255,255,0.28)",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:32}}>
+      {[["Demandes",ctx.myLeadsPart.length,"#38bdf8","rgba(56,189,248,0.08)","rgba(56,189,248,0.15)"],["En attente",pending.length,"#FBC005","rgba(251,192,5,0.08)","rgba(251,192,5,0.15)"],["Confirmés",confirmed.length,"#22c55e","rgba(34,197,94,0.08)","rgba(34,197,94,0.15)"]].map(([label,val,color,bg,border])=>(
+        <div key={label} style={{background:bg,border:"0.5px solid "+border,borderRadius:16,padding:"18px 20px"}}>
+          <div style={{fontSize:10,fontWeight:600,color:color,letterSpacing:2,textTransform:"uppercase",opacity:0.7,marginBottom:6}}>{label}</div>
+          <div style={{fontSize:32,fontWeight:800,color:color,letterSpacing:"-1px"}}>{val}</div>
+        </div>
+      ))}
+    </div>
+    {tab==="demandes"&&(
+      <div>
+        <div style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.2)",letterSpacing:2,textTransform:"uppercase",marginBottom:14}}>Mes demandes</div>
+        {ctx.myLeadsPart.length===0?(
+          <div style={{background:"rgba(255,255,255,0.02)",border:"0.5px solid rgba(255,255,255,0.06)",borderRadius:20,padding:"48px 32px",textAlign:"center"}}>
+            <div style={{fontSize:40,marginBottom:12}}>📋</div>
+            <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>Aucune demande</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,0.3)",marginBottom:20}}>Déposez votre premier projet gratuitement</div>
+            <button onClick={()=>ctx.setPage("ai-lead")} style={{...F,padding:"12px 24px",background:"#38bdf8",border:"none",borderRadius:980,color:"#000",fontWeight:700,fontSize:13,cursor:"pointer"}}>Déposer une demande</button>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {ctx.myLeadsPart.map(l=>(
+              <div key={l.id} onClick={()=>setSelLead(selLead?.id===l.id?null:l)} style={{background:"rgba(255,255,255,0.025)",border:"0.5px solid rgba(255,255,255,0.07)",borderLeft:"3px solid "+statusColor(l.statut),borderRadius:14,padding:"16px 18px",cursor:"pointer",transition:"all .2s"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                  <div style={{flex:1}}>
+                    <span style={{fontWeight:700,fontSize:14,color:"#fff"}}>{l.travaux||""}</span>
+                    {l.precision&&<span style={{color:"rgba(255,255,255,0.3)",fontSize:12}}> — {l.precision}</span>}
+                    <div style={{fontSize:11,color:"rgba(255,255,255,0.2)",marginTop:4,display:"flex",gap:10,flexWrap:"wrap"}}>
+                      {l.budget&&<span>{l.budget}</span>}
+                      {l.surface&&<span>{l.surface}</span>}
+                      {l.ville&&<span>📍 {l.ville}</span>}
+                      <span>{timeAgo(l.created_at)}</span>
+                    </div>
+                  </div>
+                  <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
+                </div>
+                {selLead?.id===l.id&&(
+                  <div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",display:"grid",gap:8}}>
+                    {[["Spécialité",l.precision],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget],["Adresse",l.adresse],["Ville",l.ville],["Artisans",l.nb_artisans+" artisans"]].map(([k,v])=>v&&(
+                      <div key={k} style={{display:"flex",gap:12}}>
+                        <span style={{fontSize:11,color:"rgba(255,255,255,0.22)",minWidth:80,flexShrink:0}}>{k}</span>
+                        <span style={{fontSize:12,color:"rgba(255,255,255,0.75)"}}>{v}</span>
+                      </div>
+                    ))}
                     {l.paiement_statut==="en_attente_validation"&&<div style={{marginTop:14,paddingTop:14,borderTop:"0.5px solid rgba(255,255,255,0.06)",background:"rgba(255,111,0,0.08)",padding:"12px",borderRadius:10}}><div style={{fontSize:11,fontWeight:700,color:"#FF6F00",marginBottom:8}}>ARTISAN A TERMINE</div><div style={{fontSize:13,color:"rgba(255,255,255,0.8)",marginBottom:12}}>{l.artisan_nom||"L artisan"} propose : <span style={{fontWeight:700,color:"#FF6F00"}}>{l.prix_final}EUR</span></div><div style={{display:"flex",gap:8}}><button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({paiement_statut:"paye"})});fetch("https://www.click-fix.fr/api/capture-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_intent_id:l.payment_intent_id,amount_final:l.prix_final,assigned_to:l.assigned_to})}).then(r=>r.json()).then(d=>ctx.notify(d.success?"Paiement de "+l.prix_final+"EUR confirme !":"Erreur paiement","err"));}} style={{flex:1,padding:"10px",background:"#22c55e",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>✓ Valider et payer</button><button onClick={e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";const nbRefus=(l.nb_refus||0)+1;const newSt=nbRefus>=2?"en_litige":"pre_autorise";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({paiement_statut:newSt,nb_refus:nbRefus})});ctx.notify(nbRefus>=2?"Litige ouvert - Click&fix va vous contacter":"Prix refuse - artisan peut modifier");}} style={{flex:1,padding:"10px",background:"rgba(239,68,68,0.15)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer"}}>✕ Refuser</button></div></div>}
                     {l.paiement_statut==="paye"&&<div style={{marginTop:12,padding:"12px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:10}}><div style={{fontSize:13,fontWeight:700,color:"#22c55e",marginBottom:8}}>✅ Intervention payée — {l.prix_final}EUR</div><button onClick={e=>{e.stopPropagation();const showInvoice=()=>{const doc=new window.jspdf.jsPDF();const prix=parseFloat(l.prix_final)||0;const ht=prix;const ville=(l.ville||l.adresse||"France");const adresseClient=(l.adresse&&l.adresse!=="Géolocalisation"?l.adresse+", ":"")+ville;doc.setFillColor(29,29,31);doc.rect(0,0,210,28,"F");doc.setFont("helvetica","bold");doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text("Click&fix",20,16);doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(180,180,180);doc.text("Services a domicile",20,23);doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(255,255,255);doc.text("FACTURE",190,16,{align:"right"});doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(180,180,180);doc.text("N° CF-"+new Date().getFullYear()+"-"+String(l.id).padStart(4,"0"),190,23,{align:"right"});doc.setFontSize(9);doc.setTextColor(100,100,100);doc.text("Date: "+new Date(l.created_at).toLocaleDateString("fr-FR"),20,40);doc.text("Lieu d intervention: "+ville,20,47);doc.setDrawColor(230,230,230);doc.line(20,53,190,53);doc.setFillColor(248,248,250);doc.roundedRect(20,57,82,45,2,2,"F");doc.roundedRect(108,57,82,45,2,2,"F");doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(120,120,120);doc.text("CLIENT",25,64);doc.text("ARTISAN",113,64);doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(20,20,20);doc.text(l.client_nom||"Client",25,72);doc.text(l.artisan_nom||"Artisan",113,72);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(100,100,100);if(l.client_email)doc.text(l.client_email,25,79);doc.text("Partenaire Click&fix",113,79);if(l.client_tel)doc.text(l.client_tel,25,86);doc.text("Adresse: "+adresseClient,25,93);doc.text("SIRET: sur demande",113,86);doc.setDrawColor(230,230,230);doc.line(20,108,190,108);doc.setFillColor(29,29,31);doc.rect(20,112,170,9,"F");doc.setFont("helvetica","bold");doc.setFontSize(8);doc.setTextColor(255,255,255);doc.text("DESCRIPTION",25,118);doc.text("QTE",138,118);doc.text("MONTANT",185,118,{align:"right"});doc.setFillColor(252,252,252);doc.rect(20,121,170,20,"F");doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(20,20,20);const trav=l.travaux||"Intervention";doc.text(trav.charAt(0).toUpperCase()+trav.slice(1),25,130);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(120,120,120);const cleanDetails=((l.details||"").replace(/[|] Diagnostic IA:.*/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:"");if(cleanDetails){const det=doc.splitTextToSize(cleanDetails,95);doc.text(det,25,136);}doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(20,20,20);doc.text("1",140,130);doc.text(prix.toFixed(2)+" EUR",185,130,{align:"right"});doc.setDrawColor(230,230,230);doc.line(20,144,190,144);doc.setFontSize(9);doc.setTextColor(80,80,80);doc.text("Sous-total HT:",130,152);doc.text(ht.toFixed(2)+" EUR",185,152,{align:"right"});doc.setFont("helvetica","italic");doc.setFontSize(8);doc.setTextColor(140,140,140);doc.text("TVA non applicable - Art. 293 B du CGI",25,160);doc.text("0.00 EUR",185,160,{align:"right"});doc.setDrawColor(200,200,200);doc.line(130,164,190,164);doc.setFillColor(29,29,31);doc.roundedRect(120,167,70,14,2,2,"F");doc.setFont("helvetica","bold");doc.setFontSize(11);doc.setTextColor(255,255,255);doc.text("Total TTC: "+prix.toFixed(2)+" EUR",155,176,{align:"center"});doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text("Paiement securise via Stripe",20,192);doc.setDrawColor(200,200,200);doc.line(20,268,190,268);doc.setFontSize(7.5);doc.text("Click&fix — contact@click-fix.fr — www.click-fix.fr",105,273,{align:"center"});doc.text("Plateforme de mise en relation entre particuliers et artisans",105,279,{align:"center"});const url=doc.output("bloburl");const overlay=document.createElement("div");overlay.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;";const btn=document.createElement("button");btn.textContent="✕ Fermer";btn.style.cssText="margin-bottom:12px;padding:8px 20px;background:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;";btn.onclick=()=>document.body.removeChild(overlay);const iframe=document.createElement("iframe");iframe.src=url;iframe.style.cssText="width:90%;max-width:700px;height:80vh;border:none;border-radius:12px;";overlay.appendChild(btn);overlay.appendChild(iframe);document.body.appendChild(overlay);};if(window.jspdf){showInvoice();}else{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";s.onload=showInvoice;document.head.appendChild(s);}}} style={{width:"100%",padding:"10px",background:"rgba(34,197,94,0.15)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:10,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer"}}>📄 Voir la facture</button></div>}
-                    {l.artisan_statut==="en_route"&&<TrackingMap lead={l} clientLat={l.lat} clientLon={l.lon}/>}
+                    {l.artisan_statut==="en_route"&&<TrackingMap lead={l} clientLat={l.lat} clientLon={l.lon}/>}
 {l.artisan_statut==="en_cours"&&l.paiement_statut==="pre_autorise"&&<div style={{marginTop:12,padding:"12px 16px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12}}><div style={{fontSize:13,fontWeight:700,color:"#22c55e",marginBottom:10}}>{l.artisan_statut==="en_cours"?"🔧 Intervention en cours":"✅ Votre artisan est arrivé"}</div><button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({artisan_statut:"termine"})});ctx.notify("Intervention marquee comme terminee");}} style={{width:"100%",padding:"10px",background:"#22c55e",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>✓ Intervention terminée</button></div>}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    )}
-    {tab==="profil"&&<PartProfilTab s={s} ctx={ctx}/>}
-  </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tab==="profil"&&<PartProfilTab s={s} ctx={ctx}/>}
+  </div>
 </div>
+{showDevisCheck&&<DevisCheckModal onClose={()=>setShowDevisCheck(false)} onFile={handleDevisFile} loading={devisLoading} result={devisResult}/>}
 </div>
 );
 }
 
 function PackWelcome({ ctx }) {
   const s=ctx.sess;
-  const [profile,setProfile]=useState(s);
-  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0]){const u={...s,...d[0]};setProfile(u);ctx.updateSession(u);}}).catch(()=>{});}},[]);  return (
+  const [profile,setProfile]=useState(s);
+  useEffect(()=>{if(s?.id){const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}}).then(r=>r.json()).then(d=>{if(d&&d[0]){const u={...s,...d[0]};setProfile(u);ctx.updateSession(u);}}).catch(()=>{});}},[]);  return (
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#07090f",padding:20}}>
       <BgFx/>
       <div style={{zIndex:2,textAlign:"center",maxWidth:480}}>
@@ -1102,39 +1103,39 @@ const d=await r.json();
 if(d.url)window.open(d.url,"_blank");
 }catch(e){ctx.notify("Erreur Stripe","err");}
 }
-  const [sel,setSel]=useState(null);
-  const history=(s?.packs_history||[]).slice().reverse();
-  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
-  return (
-    <>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-        <div style={{color:"#1d1d1f",fontWeight:800,fontSize:18}}>Mon Pack</div>
-        <button onClick={()=>hasMonthly?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
-      </div>
-      {history.length===0&&<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:32,textAlign:"center",color:"#6e6e73"}}>Aucun pack actif. <span style={{color:"#FF6F00",cursor:"pointer"}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack</span></div>}
-      {history.map((p,i)=>(
-        <div key={i} onClick={()=>setSel(sel===i?null:i)} style={{background:"rgba(255,111,0,0.07)",border:"1px solid "+(sel===i?"#FF6F00":"rgba(255,111,0,0.2)"),borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div>
-              <div style={{color:"#FF6F00",fontWeight:800,fontSize:15}}>{p.name}</div>
-              <div style={{color:"#6e6e73",fontSize:12,marginTop:2}}>{p.rdv} RDV · {p.prix} EUR · {new Date(p.date_achat).toLocaleDateString("fr-FR")}</div>
-            </div>
-            <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.abonnement?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.abonnement?"#FF6F00":"#38bdf8"}}>{p.abonnement?"Mensuel":"Unique"}</div>
-          </div>
-          {sel===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>RDV inclus</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:16}}>{p.rdv}</div></div>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Prix</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:16}}>{p.prix} EUR</div></div>
-              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Date achat</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:13}}>{new Date(p.date_achat).toLocaleDateString("fr-FR")}</div></div>
-              {p.date_renouvellement&&<div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Renouvellement</div><div style={{color:"#FF6F00",fontWeight:700,fontSize:13}}>{new Date(p.date_renouvellement).toLocaleDateString("fr-FR")}</div></div>}
-            </div>
-            {p.specialites&&p.specialites.length>0&&<div style={{marginTop:8}}><div style={{color:"#6e6e73",fontSize:11,marginBottom:6}}>Specialites</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{p.specialites.map(sp=><span key={sp} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}</span>)}</div></div>}
-          </div>}
-        </div>
-      ))}
-      {hasMonthly&&<div style={{fontSize:12,color:"#6e6e73",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}<div style={{marginTop:16,padding:"16px",background:s?.stripe_account_id?"rgba(34,197,94,0.05)":"rgba(99,102,241,0.05)",border:"1px solid "+(s?.stripe_account_id?"rgba(34,197,94,0.2)":"rgba(99,102,241,0.2)"),borderRadius:14}}><div style={{fontSize:11,fontWeight:700,color:s?.stripe_account_id?"#22c55e":"#6366f1",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Paiements urgences</div><div style={{fontSize:13,color:"#6e6e73",marginBottom:12}}>{s?.stripe_account_id?"✅ Compte Stripe connecté — Vous pouvez recevoir des paiements d urgences":"Connectez votre compte Stripe pour recevoir les paiements d urgences directement."}</div>{!s?.stripe_account_id&&<button onClick={connectStripe} style={{width:"100%",padding:"10px",background:"#6366f1",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>🔗 Connecter mon compte Stripe</button>}</div>
-    </>
-  );
+  const [sel,setSel]=useState(null);
+  const history=(s?.packs_history||[]).slice().reverse();
+  const hasMonthly=s?.pack&&(s.pack==="Pro"||s.pack==="Elite");
+  return (
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+        <div style={{color:"#1d1d1f",fontWeight:800,fontSize:18}}>Mon Pack</div>
+        <button onClick={()=>hasMonthly?window.open("https://buy.stripe.com/test_00w6oJ8diba42kW9pv7wA00","_blank"):ctx.setPage("pro-pricing")} style={{padding:"8px 16px",background:"rgba(255,111,0,0.12)",border:"1px solid rgba(255,111,0,0.3)",borderRadius:8,color:"#FF6F00",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Ajouter un pack</button>
+      </div>
+      {history.length===0&&<div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:32,textAlign:"center",color:"#6e6e73"}}>Aucun pack actif. <span style={{color:"#FF6F00",cursor:"pointer"}} onClick={()=>ctx.setPage("pro-pricing")}>Choisir un pack</span></div>}
+      {history.map((p,i)=>(
+        <div key={i} onClick={()=>setSel(sel===i?null:i)} style={{background:"rgba(255,111,0,0.07)",border:"1px solid "+(sel===i?"#FF6F00":"rgba(255,111,0,0.2)"),borderRadius:14,padding:"16px 20px",marginBottom:10,cursor:"pointer"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{color:"#FF6F00",fontWeight:800,fontSize:15}}>{p.name}</div>
+              <div style={{color:"#6e6e73",fontSize:12,marginTop:2}}>{p.rdv} RDV · {p.prix} EUR · {new Date(p.date_achat).toLocaleDateString("fr-FR")}</div>
+            </div>
+            <div style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:p.abonnement?"rgba(255,111,0,0.15)":"rgba(56,189,248,0.15)",color:p.abonnement?"#FF6F00":"#38bdf8"}}>{p.abonnement?"Mensuel":"Unique"}</div>
+          </div>
+          {sel===i&&<div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.08)"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>RDV inclus</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:16}}>{p.rdv}</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Prix</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:16}}>{p.prix} EUR</div></div>
+              <div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Date achat</div><div style={{color:"#1d1d1f",fontWeight:700,fontSize:13}}>{new Date(p.date_achat).toLocaleDateString("fr-FR")}</div></div>
+              {p.date_renouvellement&&<div style={{background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"10px 12px"}}><div style={{color:"#6e6e73",fontSize:11}}>Renouvellement</div><div style={{color:"#FF6F00",fontWeight:700,fontSize:13}}>{new Date(p.date_renouvellement).toLocaleDateString("fr-FR")}</div></div>}
+            </div>
+            {p.specialites&&p.specialites.length>0&&<div style={{marginTop:8}}><div style={{color:"#6e6e73",fontSize:11,marginBottom:6}}>Specialites</div><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{p.specialites.map(sp=><span key={sp} style={{fontSize:11,padding:"3px 8px",borderRadius:6,background:"rgba(255,111,0,0.1)",color:"#FF6F00",border:"1px solid rgba(255,111,0,0.2)"}}>{sp}</span>)}</div></div>}
+          </div>}
+        </div>
+      ))}
+      {hasMonthly&&<div style={{fontSize:12,color:"#6e6e73",textAlign:"center",marginTop:8}}>Pour changer de pack mensuel : <a href="mailto:contact@click-fix.fr" style={{color:"#FF6F00"}}>contact@click-fix.fr</a></div>}<div style={{marginTop:16,padding:"16px",background:s?.stripe_account_id?"rgba(34,197,94,0.05)":"rgba(99,102,241,0.05)",border:"1px solid "+(s?.stripe_account_id?"rgba(34,197,94,0.2)":"rgba(99,102,241,0.2)"),borderRadius:14}}><div style={{fontSize:11,fontWeight:700,color:s?.stripe_account_id?"#22c55e":"#6366f1",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Paiements urgences</div><div style={{fontSize:13,color:"#6e6e73",marginBottom:12}}>{s?.stripe_account_id?"✅ Compte Stripe connecté — Vous pouvez recevoir des paiements d urgences":"Connectez votre compte Stripe pour recevoir les paiements d urgences directement."}</div>{!s?.stripe_account_id&&<button onClick={connectStripe} style={{width:"100%",padding:"10px",background:"#6366f1",border:"none",borderRadius:10,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>🔗 Connecter mon compte Stripe</button>}</div>
+    </>
+  );
 }
 
 function CityInput({value,onChange,onSelect,label}){const [sugg,setSugg]=useState([]);const [show,setShow]=useState(false);function search(v){onChange(v);if(v.length<2){setSugg([]);return;}fetch("https://geo.api.gouv.fr/communes?nom="+encodeURIComponent(v)+"\&fields=nom,codesPostaux,centre\&limit=5\&boost=population").then(r=>r.json()).then(d=>{setSugg(d||[]);setShow(true);}).catch(()=>{});}function pick(c){const cp=c.codesPostaux?.[0]||"";const lat=c.centre?.coordinates?.[1]||null;const lon=c.centre?.coordinates?.[0]||null;onSelect({ville:c.nom,code_postal:cp,lat,lon});setSugg([]);setShow(false);}return(<div style={{position:"relative",gridColumn:"1/-1"}}><label style={{display:"block",fontSize:12,color:"#6e6e73",marginBottom:5,fontWeight:600}}>{label}</label><input value={value} onChange={e=>search(e.target.value)} onBlur={()=>setTimeout(()=>setShow(false),200)} style={{width:"100%",background:"#f5f5f7",border:"1.5px solid rgba(0,0,0,0.1)",borderRadius:12,padding:"14px 16px",color:"#1d1d1f",fontSize:15,outline:"none",boxSizing:"border-box"}} placeholder="Ex: Paris, Lyon, Marseille..."/>{show&&sugg.length>0&&<div style={{position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1px solid rgba(0,0,0,0.1)",borderRadius:10,zIndex:999,marginTop:4}}>{sugg.map((c,i)=><div key={i} onClick={()=>pick(c)} style={{padding:"10px 14px",cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,0.05)",color:"#1d1d1f",fontSize:14}} onMouseDown={e=>e.preventDefault()}>{c.nom} <span style={{color:"#6e6e73",fontSize:12}}>({c.codesPostaux?.[0]})</span></div>)}</div>}</div>);}
@@ -1501,7 +1502,7 @@ function ProPricing({ ctx }) {
                 <span style={{ color:p.couleur, flexShrink:0 }}></span>{f}
               </div>
             ))}
-            {hasMonthly&&p.id!=="decouverte" ? <button disabled style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,color:"rgba(255,255,255,0.3)",fontWeight:800,fontSize:14,cursor:"not-allowed",fontFamily:"Outfit,sans-serif" }}>Pack actif</button> : <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"Outfit,sans-serif",boxShadow:`0 4px 24px ${p.couleur}44`,letterSpacing:.3 }}>{p.id==="decouverte"&&hasMonthly?"+ Ajouter 5 RDV":"Choisir ce pack"}</button>}
+            {hasMonthly&&p.id!=="decouverte" ? <button disabled style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,color:"rgba(255,255,255,0.3)",fontWeight:800,fontSize:14,cursor:"not-allowed",fontFamily:"Outfit,sans-serif" }}>Pack actif</button> : <button onClick={()=>ctx.buyPack(p)} style={{ marginTop:"auto",paddingTop:14,width:"100%",padding:"13px 0",background:`linear-gradient(135deg,${p.couleur},${p.couleur}bb)`,border:"none",borderRadius:12,color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",fontFamily:"Outfit,sans-serif",boxShadow:`0 4px 24px ${p.couleur}44`,letterSpacing:.3 }}>{p.id==="decouverte"&&hasMonthly?"+ Ajouter 5 RDV":"Choisir ce pack"}</button>}
           </div>
         ))}
       </div>
@@ -1514,118 +1515,118 @@ function ProPricing({ ctx }) {
 //  PRO DASHBOARD
 // 
 function ProDashboard({ ctx }) {
-  const isMobile=useIsMobile();
-  console.log("ProDashboard isMobile:",isMobile,"innerWidth:",window.innerWidth);
-  const s=ctx.sess;
-  const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
-  const [profile,setProfile]=useState(s);
-  const [selRdv,setSelRdv]=useState(null);
-  const [selConf,setSelConf]=useState(null);
-  const [dispo,setDispo]=useState(s?.disponible||false);
-  async function toggleDispo(){const isMobile=window.innerWidth<=900;const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
-  const F={fontFamily:"'Inter',sans-serif"};
-  const rdv=ctx.myLeadsPro;
-  const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
-  const pending=rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length;
-  const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
-  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);useEffect(()=>{if(profile?.disponible!==undefined)setDispo(profile.disponible);},[profile?.disponible]);
-  useEffect(()=>{
-    if(!s?.id)return;
-    const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
-    fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}})
-    .then(r=>r.json()).then(d=>{if(d[0])setProfile({...s,...d[0]});}).catch(()=>{});
-  },[s?.id]);
-  const TABS=[{id:"rdv",ico:"📋",label:"Mes RDV"},{id:"confirmes",ico:"✅",label:"Confirmés"},{id:"docs",ico:"📄",label:"Documents"},{id:"pack",ico:"📦",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
-  const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
-  const rdvPct=profile?.rdv_total>0?Math.round(((profile?.rdv_restants||0)/profile.rdv_total)*100):0;
-  if(isMobile)return <ProDashboardMobile ctx={ctx} tab={tab} setTab={t=>{setTab(t);sessionStorage.setItem("pro_tab",t);}} dispo={dispo} toggleDispo={toggleDispo}/>;
-  return(
+  const isMobile=useIsMobile();
+  console.log("ProDashboard isMobile:",isMobile,"innerWidth:",window.innerWidth);
+  const s=ctx.sess;
+  const [tab,setTab]=useState(()=>sessionStorage.getItem("pro_tab")||"rdv");
+  const [profile,setProfile]=useState(s);
+  const [selRdv,setSelRdv]=useState(null);
+  const [selConf,setSelConf]=useState(null);
+  const [dispo,setDispo]=useState(s?.disponible||false);
+  async function toggleDispo(){const isMobile=window.innerWidth<=900;const nd=!dispo;setDispo(nd);const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+(s.token||AK)},body:JSON.stringify({disponible:nd})});ctx.notify(nd?"Vous etes disponible !":"Vous etes hors ligne");}
+  const F={fontFamily:"'Inter',sans-serif"};
+  const rdv=ctx.myLeadsPro;
+  const conf=rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length;
+  const pending=rdv.filter(l=>l.statut==="dispatche"||l.statut==="en attente").length;
+  const thisMonth=rdv.filter(l=>{const d=new Date(l.created_at);const now=new Date();return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
+  useEffect(()=>{if(s?.docs)setProfile(p=>({...p,docs:s.docs}));},[s?.docs]);useEffect(()=>{if(profile?.disponible!==undefined)setDispo(profile.disponible);},[profile?.disponible]);
+  useEffect(()=>{
+    if(!s?.id)return;
+    const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+    fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/profiles?id=eq."+s.id+"&select=*",{headers:{"apikey":AK,"Authorization":"Bearer "+(s.token||AK)}})
+    .then(r=>r.json()).then(d=>{if(d[0])setProfile({...s,...d[0]});}).catch(()=>{});
+  },[s?.id]);
+  const TABS=[{id:"rdv",ico:"📋",label:"Mes RDV"},{id:"confirmes",ico:"✅",label:"Confirmés"},{id:"docs",ico:"📄",label:"Documents"},{id:"pack",ico:"📦",label:"Mon Pack"},{id:"profil",ico:"👤",label:"Profil"}];
+  const initiales=((s?.prenom||"")[0]||"")+(((s?.nom||"")[0])||"");
+  const rdvPct=profile?.rdv_total>0?Math.round(((profile?.rdv_restants||0)/profile.rdv_total)*100):0;
+  if(isMobile)return <ProDashboardMobile ctx={ctx} tab={tab} setTab={t=>{setTab(t);sessionStorage.setItem("pro_tab",t);}} dispo={dispo} toggleDispo={toggleDispo}/>;
+  return(
 <div style={{...F,minHeight:"100vh",background:"#fff",color:"#1d1d1f",display:"flex",flexDirection:isMobile?"column":"row"}}>
 <style>{"@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.pro-row{transition:all .2s;cursor:pointer}.pro-row:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.08)!important}"}</style>
 <div data-sidebar="" style={{width:isMobile?"100%":260,minHeight:isMobile?"auto":"100vh",background:"#fafafa",borderRight:isMobile?"none":"1px solid #f0f0f0",borderBottom:isMobile?"1px solid #f0f0f0":"none",padding:isMobile?"12px 16px":"28px 16px",flexShrink:0,display:isMobile?"none":"flex",flexDirection:"column",position:"fixed",top:0,left:0,bottom:0}}>
-  <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
-    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
-    <div>
-      <div style={{fontSize:14,fontWeight:700,color:"#1d1d1f",letterSpacing:"-0.2px"}}>{s?.prenom} {s?.nom}</div>
-      <div style={{fontSize:11,color:"#8e8e93",marginTop:1}}>{s?.entreprise||"Artisan"}</div>
-    </div>
-  </div>
-  <div style={{height:1,background:"#f0f0f0",margin:"16px 0"}}/>
-  {profile?.pack?(
-    <div style={{background:"linear-gradient(135deg,rgba(255,111,0,0.06),rgba(251,192,5,0.06))",border:"1px solid rgba(255,111,0,0.12)",borderRadius:14,padding:"14px 16px",marginBottom:20}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-        <span style={{fontSize:11,fontWeight:700,color:"#FF6F00",letterSpacing:1,textTransform:"uppercase"}}>Pack {profile.pack}</span>
-        <span style={{fontSize:11,fontWeight:600,color:"#FF6F00"}}>{profile.rdv_restants||0} RDV</span>
-      </div>
-      <div style={{height:4,background:"rgba(255,111,0,0.1)",borderRadius:99,overflow:"hidden"}}>
-        <div style={{width:rdvPct+"%",height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99,transition:"width .5s"}}/>
-      </div>
-      <div style={{fontSize:10,color:"#8e8e93",marginTop:5}}>{rdvPct}% restants</div>
-    </div>
-  ):(
-    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.25)"}}>🚀 Activer un pack</button>
-  )}
-  <div style={{flex:1}}>
-    {TABS.map(t=>(
-      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:12,border:"none",background:tab===t.id?"linear-gradient(135deg,rgba(255,111,0,0.08),rgba(251,192,5,0.05))":"transparent",color:tab===t.id?"#FF6F00":"#3a3a3c",fontWeight:tab===t.id?700:500,fontSize:13,cursor:"pointer",marginBottom:3,textAlign:"left",transition:"all .2s",boxShadow:tab===t.id?"inset 0 0 0 1px rgba(255,111,0,0.15)":"none"}}>
-        <span style={{fontSize:15}}>{t.ico}</span>{t.label}
-        {t.id==="rdv"&&pending>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#fff",padding:"2px 7px",borderRadius:99}}>{pending}</span>}
-      </button>
-    ))}
-  </div>
-  <div style={{height:1,background:"#f0f0f0",margin:"12px 0"}}/>
-  <div style={{padding:"0 8px",marginBottom:8,fontSize:16,fontWeight:800,color:"#1d1d1f",letterSpacing:"-0.3px"}}>click<span style={{color:"#FF6F00"}}>&</span>fix</div>
+  <div style={{display:"flex",alignItems:"center",gap:12,padding:"4px 8px",marginBottom:8}}>
+    <div style={{width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,#FF6F00,#FBC005)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff",flexShrink:0,boxShadow:"0 4px 12px rgba(255,111,0,0.3)"}}>{initiales.toUpperCase()}</div>
+    <div>
+      <div style={{fontSize:14,fontWeight:700,color:"#1d1d1f",letterSpacing:"-0.2px"}}>{s?.prenom} {s?.nom}</div>
+      <div style={{fontSize:11,color:"#8e8e93",marginTop:1}}>{s?.entreprise||"Artisan"}</div>
+    </div>
+  </div>
+  <div style={{height:1,background:"#f0f0f0",margin:"16px 0"}}/>
+  {profile?.pack?(
+    <div style={{background:"linear-gradient(135deg,rgba(255,111,0,0.06),rgba(251,192,5,0.06))",border:"1px solid rgba(255,111,0,0.12)",borderRadius:14,padding:"14px 16px",marginBottom:20}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+        <span style={{fontSize:11,fontWeight:700,color:"#FF6F00",letterSpacing:1,textTransform:"uppercase"}}>Pack {profile.pack}</span>
+        <span style={{fontSize:11,fontWeight:600,color:"#FF6F00"}}>{profile.rdv_restants||0} RDV</span>
+      </div>
+      <div style={{height:4,background:"rgba(255,111,0,0.1)",borderRadius:99,overflow:"hidden"}}>
+        <div style={{width:rdvPct+"%",height:"100%",background:"linear-gradient(90deg,#FF6F00,#FBC005)",borderRadius:99,transition:"width .5s"}}/>
+      </div>
+      <div style={{fontSize:10,color:"#8e8e93",marginTop:5}}>{rdvPct}% restants</div>
+    </div>
+  ):(
+    <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,width:"100%",padding:"11px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:20,boxShadow:"0 4px 16px rgba(255,111,0,0.25)"}}>🚀 Activer un pack</button>
+  )}
+  <div style={{flex:1}}>
+    {TABS.map(t=>(
+      <button key={t.id} onClick={()=>{setTab(t.id);sessionStorage.setItem("pro_tab",t.id);}} style={{...F,display:"flex",alignItems:"center",gap:10,width:"100%",padding:"11px 14px",borderRadius:12,border:"none",background:tab===t.id?"linear-gradient(135deg,rgba(255,111,0,0.08),rgba(251,192,5,0.05))":"transparent",color:tab===t.id?"#FF6F00":"#3a3a3c",fontWeight:tab===t.id?700:500,fontSize:13,cursor:"pointer",marginBottom:3,textAlign:"left",transition:"all .2s",boxShadow:tab===t.id?"inset 0 0 0 1px rgba(255,111,0,0.15)":"none"}}>
+        <span style={{fontSize:15}}>{t.ico}</span>{t.label}
+        {t.id==="rdv"&&pending>0&&<span style={{marginLeft:"auto",fontSize:10,fontWeight:700,background:"#FF6F00",color:"#fff",padding:"2px 7px",borderRadius:99}}>{pending}</span>}
+      </button>
+    ))}
+  </div>
+  <div style={{height:1,background:"#f0f0f0",margin:"12px 0"}}/>
+  <div style={{padding:"0 8px",marginBottom:8,fontSize:16,fontWeight:800,color:"#1d1d1f",letterSpacing:"-0.3px"}}>click<span style={{color:"#FF6F00"}}>&</span>fix</div>
   <div style={{padding:"10px 14px",marginBottom:8,background:dispo?"rgba(34,197,94,0.06)":"rgba(0,0,0,0.02)",borderRadius:12,border:"1px solid "+(dispo?"rgba(34,197,94,0.2)":"#f0f0f0")}}><div style={{fontSize:10,fontWeight:600,color:"#8e8e93",marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>Dépannage urgent</div><div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:12,fontWeight:600,color:dispo?"#22c55e":"#8e8e93"}}>{dispo?"Disponible":"Hors ligne"}</span><div onClick={toggleDispo} style={{width:44,height:26,borderRadius:13,background:dispo?"#22c55e":"#e5e5ea",position:"relative",cursor:"pointer",transition:"background .3s"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:dispo?20:2,transition:"left .3s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/></div></div></div>
-  <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
+  <button onClick={ctx.logout} style={{...F,display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:"none",background:"transparent",color:"#8e8e93",fontSize:12,cursor:"pointer",textAlign:"left"}}>↩ Déconnexion</button>
 </div>
 <div data-maincontent="" style={{flex:1,marginLeft:isMobile?0:260,padding:isMobile?"16px":"40px 48px",minHeight:"100vh",background:"#fff"}}>
-  <div style={{maxWidth:820,margin:"0 auto",animation:"fadeUp .5s ease both"}}>
-    <div style={{marginBottom:32}}>
-      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
-      <p style={{fontSize:13,color:"#8e8e93",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
-    </div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:36}}>
-      {[["RDV ce mois",thisMonth,"#FF6F00","rgba(255,111,0,0.06)","rgba(255,111,0,0.1)"],["Confirmés",conf,"#22c55e","rgba(34,197,94,0.06)","rgba(34,197,94,0.12)"],["En attente",pending,"#f59e0b","rgba(245,158,11,0.06)","rgba(245,158,11,0.12)"],["RDV restants",profile?.rdv_restants||0,"#6366f1","rgba(99,102,241,0.06)","rgba(99,102,241,0.12)"]].map(([label,val,color,bg,border])=>(
-        <div key={label} style={{background:bg,border:"1px solid "+border,borderRadius:20,padding:"20px 22px",boxShadow:"0 2px 12px rgba(0,0,0,0.03)",transition:"transform .2s"}}>
-          <div style={{fontSize:10,fontWeight:700,color:color,letterSpacing:2,textTransform:"uppercase",marginBottom:10,opacity:0.9}}>{label}</div>
-          <div style={{fontSize:36,fontWeight:800,color:color,letterSpacing:"-1.5px",lineHeight:1}}>{val}</div>
-        </div>
-      ))}
-    </div>
-    {tab==="rdv"&&(
-      <div style={{animation:"fadeUp .4s ease both"}}>
-        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Mes RDV</div>
-        {rdv.length===0?(
-          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
-            <div style={{fontSize:52,marginBottom:16}}>📋</div>
-            <div style={{fontWeight:700,fontSize:17,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
-            <div style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Activez un pack pour recevoir vos premiers RDV</div>
-            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"13px 32px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.25)"}}>Voir les packs</button>
-          </div>
-        ):(
-          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-            {rdv.map(l=>(
-              <div key={l.id} className="pro-row" onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selRdv?.id===l.id?"rgba(255,111,0,0.3)":"#f0f0f0"),borderLeft:"4px solid #FF6F00",borderRadius:18,padding:"18px 22px",boxShadow:selRdv?.id===l.id?"0 8px 32px rgba(255,111,0,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
-                    {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
-                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selRdv?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
-                  </div>
-                </div>
-                {selRdv?.id===l.id&&(
-                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
-                    <div style={{display:"grid",gap:8,marginBottom:14}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)]].map(([k,v])=>v&&(
-                        <div key={k} style={{display:"flex",gap:12}}>
-                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
-                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
-                        </div>
-                      ))}
-                    </div>
+  <div style={{maxWidth:820,margin:"0 auto",animation:"fadeUp .5s ease both"}}>
+    <div style={{marginBottom:32}}>
+      <h1 style={{fontSize:26,fontWeight:800,letterSpacing:"-0.8px",marginBottom:4,color:"#1d1d1f"}}>Bonjour {s?.prenom} 👋</h1>
+      <p style={{fontSize:13,color:"#8e8e93",fontWeight:400}}>{new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</p>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:36}}>
+      {[["RDV ce mois",thisMonth,"#FF6F00","rgba(255,111,0,0.06)","rgba(255,111,0,0.1)"],["Confirmés",conf,"#22c55e","rgba(34,197,94,0.06)","rgba(34,197,94,0.12)"],["En attente",pending,"#f59e0b","rgba(245,158,11,0.06)","rgba(245,158,11,0.12)"],["RDV restants",profile?.rdv_restants||0,"#6366f1","rgba(99,102,241,0.06)","rgba(99,102,241,0.12)"]].map(([label,val,color,bg,border])=>(
+        <div key={label} style={{background:bg,border:"1px solid "+border,borderRadius:20,padding:"20px 22px",boxShadow:"0 2px 12px rgba(0,0,0,0.03)",transition:"transform .2s"}}>
+          <div style={{fontSize:10,fontWeight:700,color:color,letterSpacing:2,textTransform:"uppercase",marginBottom:10,opacity:0.9}}>{label}</div>
+          <div style={{fontSize:36,fontWeight:800,color:color,letterSpacing:"-1.5px",lineHeight:1}}>{val}</div>
+        </div>
+      ))}
+    </div>
+    {tab==="rdv"&&(
+      <div style={{animation:"fadeUp .4s ease both"}}>
+        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>Mes RDV</div>
+        {rdv.length===0?(
+          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
+            <div style={{fontSize:52,marginBottom:16}}>📋</div>
+            <div style={{fontWeight:700,fontSize:17,marginBottom:8,color:"#1d1d1f"}}>Aucun RDV pour l&apos;instant</div>
+            <div style={{fontSize:14,color:"#8e8e93",marginBottom:24}}>Activez un pack pour recevoir vos premiers RDV</div>
+            <button onClick={()=>ctx.setPage("pro-pricing")} style={{...F,padding:"13px 32px",background:"linear-gradient(135deg,#FF6F00,#FBC005)",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.25)"}}>Voir les packs</button>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {rdv.map(l=>(
+              <div key={l.id} className="pro-row" onClick={()=>setSelRdv(selRdv?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selRdv?.id===l.id?"rgba(255,111,0,0.3)":"#f0f0f0"),borderLeft:"4px solid #FF6F00",borderRadius:18,padding:"18px 22px",boxShadow:selRdv?.id===l.id?"0 8px 32px rgba(255,111,0,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div>
+                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
+                    {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <SBadge s={l.statut}/><PBadge s={l.paiement_statut} montant={l.prix_final||l.montant_pre_autorise}/>
+                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selRdv?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
+                  </div>
+                </div>
+                {selRdv?.id===l.id&&(
+                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
+                    <div style={{display:"grid",gap:8,marginBottom:14}}>
+                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Adresse",l.adresse],["Surface",l.surface],["Budget",l.budget],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)]].map(([k,v])=>v&&(
+                        <div key={k} style={{display:"flex",gap:12}}>
+                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
+                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
+                        </div>
+                      ))}
+                    </div>
                     <PhotoButton leadId={l.id}/>
                     {l.analyse_ia&&<div style={{padding:"14px 16px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.15)",borderRadius:14,marginBottom:12}}>
                       <div style={{fontSize:10,fontWeight:700,color:"#22c55e",letterSpacing:2,textTransform:"uppercase",marginBottom:8}}>Analyse IA</div>
@@ -1634,79 +1635,79 @@ function ProDashboard({ ctx }) {
                       {l.analyse_ia.duree&&<div style={{fontSize:12,color:"#6e6e73",marginBottom:4}}>{"⏱ Durée: "+l.analyse_ia.duree}</div>}
                       {l.analyse_ia.prix_min&&l.analyse_ia.prix_max&&<div style={{fontSize:13,fontWeight:700,color:"#FF6F00",marginTop:4}}>{"💰 Estimation: "+l.analyse_ia.prix_min+" — "+l.analyse_ia.prix_max+(l.analyse_ia.main_oeuvre?" (MO: "+l.analyse_ia.main_oeuvre+")":"")}</div>}
                     </div>}
-                    {(l.statut==="dispatche"||l.statut==="en attente")&&(
-                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                        <div style={{display:"flex",gap:8}}>
-                          <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
-                          <button onClick={e=>{e.stopPropagation();ctx.refuserRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✕ Refuser</button>
-                        </div>
-                        {(l.lat||l.adresse)&&l.payment_intent_id&&<div style={{display:"flex",gap:8}}>
-                          <a href={l.lat?"https://waze.com/ul?ll="+l.lat+","+l.lon+"&navigate=yes":"https://waze.com/ul?q="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(0,119,195,0.08)",border:"1px solid rgba(0,119,195,0.2)",borderRadius:12,color:"#0077c3",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>🗺 Waze</a>
-                          <a href={l.lat?"https://maps.google.com/maps?daddr="+l.lat+","+l.lon:"https://maps.google.com/maps?daddr="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(66,133,244,0.08)",border:"1px solid rgba(66,133,244,0.2)",borderRadius:12,color:"#4285f4",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>📍 Google Maps</a>
-                        </div>}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    )}
-    {tab==="confirmes"&&(
-      <div style={{animation:"fadeUp .4s ease both"}}>
-        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>RDV confirmés</div>
-        {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?(
-          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
-            <div style={{fontSize:52,marginBottom:16}}>✅</div>
-            <div style={{fontWeight:700,fontSize:17,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
-          </div>
-        ):(
-          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-            {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(
-              <div key={l.id} className="pro-row" onClick={()=>setSelConf(selConf?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selConf?.id===l.id?"rgba(34,197,94,0.3)":"#f0f0f0"),borderLeft:"4px solid #22c55e",borderRadius:18,padding:"18px 22px",boxShadow:selConf?.id===l.id?"0 8px 32px rgba(34,197,94,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div>
-                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
-                    {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",fontWeight:700}}>Confirmé</span>
-                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selConf?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
-                  </div>
-                </div>
-                {selConf?.id===l.id&&(
-                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
-                    <div style={{display:"grid",gap:8,marginBottom:12}}>
-                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
-                        <div key={k} style={{display:"flex",gap:12}}>
-                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
-                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
-                      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
-                        {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
-                          <span key={i} style={{fontSize:11,padding:"4px 12px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {(sl.label||sl).replace(/([0-9]{2})\/([0-9]{2})\/[0-9]{4} a ([0-9]{2}:[0-9]{2})/,(m,d,mo,h)=>["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][new Date(2026,mo-1,d).getDay()]+" "+d+" "+["jan","fev","mars","avr","mai","juin","juil","aout","sep","oct","nov","dec"][mo-1]+" a "+h)}</span>
-                        ))}
-                      </div>
-                    )}
+                    {(l.statut==="dispatche"||l.statut==="en attente")&&(
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        <div style={{display:"flex",gap:8}}>
+                          <button onClick={e=>{e.stopPropagation();ctx.confirmerRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:12,color:"#22c55e",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✓ Confirmer</button>
+                          <button onClick={e=>{e.stopPropagation();ctx.refuserRdv(l);}} style={{...F,flex:1,padding:"11px",background:"rgba(239,68,68,0.06)",border:"1px solid rgba(239,68,68,0.15)",borderRadius:12,color:"#ef4444",fontWeight:700,fontSize:13,cursor:"pointer",transition:"all .2s"}}>✕ Refuser</button>
+                        </div>
+                        {(l.lat||l.adresse)&&l.payment_intent_id&&<div style={{display:"flex",gap:8}}>
+                          <a href={l.lat?"https://waze.com/ul?ll="+l.lat+","+l.lon+"&navigate=yes":"https://waze.com/ul?q="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(0,119,195,0.08)",border:"1px solid rgba(0,119,195,0.2)",borderRadius:12,color:"#0077c3",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>🗺 Waze</a>
+                          <a href={l.lat?"https://maps.google.com/maps?daddr="+l.lat+","+l.lon:"https://maps.google.com/maps?daddr="+encodeURIComponent((l.adresse||"")+" "+(l.ville||"")+" France")} target="_blank" rel="noopener noreferrer" style={{...F,flex:1,padding:"10px",background:"rgba(66,133,244,0.08)",border:"1px solid rgba(66,133,244,0.2)",borderRadius:12,color:"#4285f4",fontWeight:600,fontSize:12,cursor:"pointer",textDecoration:"none",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>📍 Google Maps</a>
+                        </div>}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tab==="confirmes"&&(
+      <div style={{animation:"fadeUp .4s ease both"}}>
+        <div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:16}}>RDV confirmés</div>
+        {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").length===0?(
+          <div style={{background:"#fafafa",border:"1px solid #f0f0f0",borderRadius:24,padding:"56px 32px",textAlign:"center"}}>
+            <div style={{fontSize:52,marginBottom:16}}>✅</div>
+            <div style={{fontWeight:700,fontSize:17,color:"#1d1d1f"}}>Aucun RDV confirmé</div>
+          </div>
+        ):(
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {rdv.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé").map(l=>(
+              <div key={l.id} className="pro-row" onClick={()=>setSelConf(selConf?.id===l.id?null:l)} style={{background:"#fff",border:"1px solid "+(selConf?.id===l.id?"rgba(34,197,94,0.3)":"#f0f0f0"),borderLeft:"4px solid #22c55e",borderRadius:18,padding:"18px 22px",boxShadow:selConf?.id===l.id?"0 8px 32px rgba(34,197,94,0.08)":"0 2px 8px rgba(0,0,0,0.03)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div>
+                    <span style={{fontWeight:700,fontSize:15,color:"#1d1d1f"}}>{l.client_nom||l.travaux||l.precision}</span>
+                    {l.ville&&<span style={{fontSize:12,color:"#8e8e93",marginLeft:8}}>📍 {l.ville}</span>}
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{fontSize:11,padding:"4px 10px",borderRadius:99,background:"rgba(34,197,94,0.1)",color:"#22c55e",fontWeight:700}}>Confirmé</span>
+                    <span style={{color:"#8e8e93",fontSize:16,transition:"transform .2s",transform:selConf?.id===l.id?"rotate(180deg)":"rotate(0)"}}></span>
+                  </div>
+                </div>
+                {selConf?.id===l.id&&(
+                  <div style={{marginTop:16,paddingTop:16,borderTop:"1px solid #f5f5f5",animation:"fadeUp .3s ease both"}}>
+                    <div style={{display:"grid",gap:8,marginBottom:12}}>
+                      {[["Client",l.client_nom],["Téléphone",l.client_tel],["Email",l.client_email],["Adresse",l.adresse],["Détails",((l.details||"").replace(/[|] Diagnostic IA:/,"").trim())||(l.analyse_ia&&l.analyse_ia.diagnostic?l.analyse_ia.diagnostic:null)],["Surface",l.surface],["Budget",l.budget]].map(([k,v])=>v&&(
+                        <div key={k} style={{display:"flex",gap:12}}>
+                          <span style={{fontSize:11,color:"#8e8e93",minWidth:80,flexShrink:0,fontWeight:500}}>{k}</span>
+                          <span style={{fontSize:13,color:"#1d1d1f",fontWeight:500}}>{v}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {l.creneaux&&JSON.parse(typeof l.creneaux==="string"?l.creneaux:"[]").length>0&&(
+                      <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
+                        {(typeof l.creneaux==="string"?JSON.parse(l.creneaux):l.creneaux).map((sl,i)=>(
+                          <span key={i} style={{fontSize:11,padding:"4px 12px",borderRadius:8,background:"rgba(99,102,241,0.08)",color:"#6366f1",border:"1px solid rgba(99,102,241,0.15)",fontWeight:500}}>📅 {(sl.label||sl).replace(/([0-9]{2})\/([0-9]{2})\/[0-9]{4} a ([0-9]{2}:[0-9]{2})/,(m,d,mo,h)=>["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][new Date(2026,mo-1,d).getDay()]+" "+d+" "+["jan","fev","mars","avr","mai","juin","juil","aout","sep","oct","nov","dec"][mo-1]+" a "+h)}</span>
+                        ))}
+                      </div>
+                    )}
                     {l.statut==="confirme"&&<div style={{marginTop:12,padding:"14px",background:"#f8f8fa",borderRadius:14}}><div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:10}}>Suivi intervention</div><div style={{display:"flex",flexDirection:"column",gap:8}}>{(!l.artisan_statut||l.artisan_statut==="confirme")&&<button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({artisan_statut:"en_route"})});navigator.geolocation.watchPosition(pos=>{fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/artisan_positions",{method:"POST",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK,"Prefer":"resolution=merge-duplicates"},body:JSON.stringify({artisan_id:ctx.sess.id,lat:pos.coords.latitude,lon:pos.coords.longitude,statut:"en_route",lead_id:l.id,updated_at:new Date().toISOString()})});},err=>console.warn("Geo error",err),{enableHighAccuracy:true});ctx.notify("Statut mis a jour - En route !");}} style={{padding:"11px",background:"#FF6F00",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>🚗 Je suis en route</button>}{l.artisan_statut==="en_route"&&<button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({artisan_statut:"arrive"})});await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/artisan_positions?artisan_id=eq."+ctx.sess.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({statut:"arrive"})});ctx.notify("Statut mis a jour - Arrive !");}} style={{padding:"11px",background:"#22c55e",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>📍 Je suis arrivé</button>}{l.artisan_statut==="en_route"&&<ArtisanTrackingMap lead={l}/>}{l.artisan_statut==="arrive"&&<button onClick={async e=>{e.stopPropagation();const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({artisan_statut:"en_cours"})});ctx.notify("Intervention commencee !");}} style={{padding:"11px",background:"#6366f1",border:"none",borderRadius:12,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",width:"100%"}}>🔧 Commencer l intervention</button>}{l.artisan_statut==="en_cours"&&<div style={{fontSize:13,fontWeight:700,color:"#6366f1",textAlign:"center",padding:8}}>🔧 Intervention en cours</div>}</div></div>}
-                    {l.payment_intent_id&&<div style={{marginTop:12,padding:"12px 14px",background:"rgba(255,111,0,0.05)",border:"1px solid rgba(255,111,0,0.15)",borderRadius:12}}><div style={{fontSize:11,fontWeight:700,color:"#FF6F00",marginBottom:6}}>{l.montant_pre_autorise?"Paiement urgence - max "+l.montant_pre_autorise+"EUR":"Paiement urgence"}</div>{l.paiement_statut==="pre_autorise"&&l.artisan_statut==="termine"&&<div style={{display:"flex",gap:8,marginTop:8}}><input onClick={e=>e.stopPropagation()} id={"p"+l.id} type="number" placeholder="Prix EUR" min="10" max={l.montant_pre_autorise||1000} onKeyPress={e=>{if(!/[0-9]/.test(e.key))e.preventDefault();}} onPaste={e=>e.preventDefault()} style={{flex:1,padding:"8px 10px",border:"1px solid #f0f0f0",borderRadius:8,fontSize:13,outline:"none"}}/><button onClick={async e=>{e.stopPropagation();const el=document.getElementById("p"+l.id);const raw=(el&&el.value||0);const prix=parseFloat(raw);if(!prix||isNaN(prix)||prix<10)return ctx.notify("Prix invalide — minimum 10 EUR");const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({prix_final:prix,paiement_statut:"en_attente_validation"})});ctx.notify("Prix envoye");}} style={{padding:"8px 14px",background:"#FF6F00",border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>Envoyer</button></div>}{l.paiement_statut==="en_attente_validation"&&<div style={{fontSize:12,color:"#FF6F00",marginTop:6}}>{"En attente validation - "+l.prix_final+"EUR"}</div>}{l.paiement_statut==="pre_autorise"&&l.nb_refus>0&&l.artisan_statut==="arrive"&&<div style={{fontSize:12,color:"#ef4444",marginTop:6,padding:"8px",background:"rgba(239,68,68,0.05)",borderRadius:8}}>{"Prix refuse par le client ("+l.nb_refus+"/2) - Proposez un nouveau prix"+(l.nb_refus>=2?" - LITIGE OUVERT":"")}</div>}{l.paiement_statut==="en_litige"&&<div style={{fontSize:12,color:"#ef4444",fontWeight:700,marginTop:6,padding:"8px",background:"rgba(239,68,68,0.08)",borderRadius:8}}>⚠️ Litige en cours - Click&fix va vous contacter</div>}</div>}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    )}
-    {tab==="docs"&&<div style={{animation:"fadeUp .4s ease both",background:"#fff",border:"1px solid #f0f0f0",borderRadius:24,padding:32,boxShadow:"0 2px 12px rgba(0,0,0,0.03)"}}><div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:24}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map((d,i,arr)=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",borderBottom:i<arr.length-1?"1px solid #f5f5f5":"none"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#8e8e93",marginTop:3}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"9px 20px",background:profile?.docs?.[d.id]?"rgba(34,197,94,0.08)":"#f5f5f5",border:"1px solid "+(profile?.docs?.[d.id]?"rgba(34,197,94,0.2)":"#e8e8e8"),borderRadius:12,fontSize:12,fontWeight:600,color:profile?.docs?.[d.id]?"#22c55e":"#1d1d1f",cursor:"pointer",transition:"all .2s"}}>{profile?.docs?.[d.id]?"✓ Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
-    {tab==="pack"&&<div style={{animation:"fadeUp .4s ease both"}}><PackTab s={profile} ctx={ctx}/></div>}
-    {tab==="profil"&&<div style={{animation:"fadeUp .4s ease both"}}><ProfilTab s={profile} ctx={ctx}/></div>}
-  </div>
+                    {l.payment_intent_id&&<div style={{marginTop:12,padding:"12px 14px",background:"rgba(255,111,0,0.05)",border:"1px solid rgba(255,111,0,0.15)",borderRadius:12}}><div style={{fontSize:11,fontWeight:700,color:"#FF6F00",marginBottom:6}}>{l.montant_pre_autorise?"Paiement urgence - max "+l.montant_pre_autorise+"EUR":"Paiement urgence"}</div>{l.paiement_statut==="pre_autorise"&&l.artisan_statut==="termine"&&<div style={{display:"flex",gap:8,marginTop:8}}><input onClick={e=>e.stopPropagation()} id={"p"+l.id} type="number" placeholder="Prix EUR" min="10" max={l.montant_pre_autorise||1000} onKeyPress={e=>{if(!/[0-9]/.test(e.key))e.preventDefault();}} onPaste={e=>e.preventDefault()} style={{flex:1,padding:"8px 10px",border:"1px solid #f0f0f0",borderRadius:8,fontSize:13,outline:"none"}}/><button onClick={async e=>{e.stopPropagation();const el=document.getElementById("p"+l.id);const raw=(el&&el.value||0);const prix=parseFloat(raw);if(!prix||isNaN(prix)||prix<10)return ctx.notify("Prix invalide — minimum 10 EUR");const AK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";await fetch("https://bipqtqezntzcmxwiaqdz.supabase.co/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":AK,"Authorization":"Bearer "+AK},body:JSON.stringify({prix_final:prix,paiement_statut:"en_attente_validation"})});ctx.notify("Prix envoye");}} style={{padding:"8px 14px",background:"#FF6F00",border:"none",borderRadius:8,color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>Envoyer</button></div>}{l.paiement_statut==="en_attente_validation"&&<div style={{fontSize:12,color:"#FF6F00",marginTop:6}}>{"En attente validation - "+l.prix_final+"EUR"}</div>}{l.paiement_statut==="pre_autorise"&&l.nb_refus>0&&l.artisan_statut==="arrive"&&<div style={{fontSize:12,color:"#ef4444",marginTop:6,padding:"8px",background:"rgba(239,68,68,0.05)",borderRadius:8}}>{"Prix refuse par le client ("+l.nb_refus+"/2) - Proposez un nouveau prix"+(l.nb_refus>=2?" - LITIGE OUVERT":"")}</div>}{l.paiement_statut==="en_litige"&&<div style={{fontSize:12,color:"#ef4444",fontWeight:700,marginTop:6,padding:"8px",background:"rgba(239,68,68,0.08)",borderRadius:8}}>⚠️ Litige en cours - Click&fix va vous contacter</div>}</div>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tab==="docs"&&<div style={{animation:"fadeUp .4s ease both",background:"#fff",border:"1px solid #f0f0f0",borderRadius:24,padding:32,boxShadow:"0 2px 12px rgba(0,0,0,0.03)"}}><div style={{fontSize:11,fontWeight:700,color:"#8e8e93",letterSpacing:2,textTransform:"uppercase",marginBottom:24}}>Documents requis</div>{[{id:"siret",label:"Justificatif SIRET",required:true},{id:"assurance",label:"Assurance décennale",required:true},{id:"rib",label:"RIB",required:false}].map((d,i,arr)=>(<div key={d.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 0",borderBottom:i<arr.length-1?"1px solid #f5f5f5":"none"}}><div><div style={{fontWeight:600,fontSize:14,color:"#1d1d1f"}}>{d.label}{d.required&&<span style={{color:"#ef4444",marginLeft:4}}>*</span>}</div><div style={{fontSize:12,color:profile?.docs?.[d.id]?"#22c55e":"#8e8e93",marginTop:3}}>{profile?.docs?.[d.id]?"✓ Document uploadé":"Non fourni"}</div></div><label style={{padding:"9px 20px",background:profile?.docs?.[d.id]?"rgba(34,197,94,0.08)":"#f5f5f5",border:"1px solid "+(profile?.docs?.[d.id]?"rgba(34,197,94,0.2)":"#e8e8e8"),borderRadius:12,fontSize:12,fontWeight:600,color:profile?.docs?.[d.id]?"#22c55e":"#1d1d1f",cursor:"pointer",transition:"all .2s"}}>{profile?.docs?.[d.id]?"✓ Modifier":"Uploader"}<input type="file" accept=".pdf,.jpg,.png" style={{display:"none"}} onChange={e=>e.target.files[0]&&ctx.uploadDoc(d.id,e.target.files[0])}/></label></div>))}</div>}
+    {tab==="pack"&&<div style={{animation:"fadeUp .4s ease both"}}><PackTab s={profile} ctx={ctx}/></div>}
+    {tab==="profil"&&<div style={{animation:"fadeUp .4s ease both"}}><ProfilTab s={profile} ctx={ctx}/></div>}
+  </div>
 </div>
 </div>
 );
