@@ -3,11 +3,47 @@ import React,{useState} from "react";
 const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
 
+async function pdfToImage(file){
+  const arrayBuffer = await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsArrayBuffer(file);});
+  if(!window.pdfjsLib){
+    await new Promise(res=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=res;document.head.appendChild(s);});
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+  const pdf = await window.pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const page = await pdf.getPage(1);
+  const viewport = page.getViewport({scale:1.5});
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const canvasCtx = canvas.getContext("2d");
+  await page.render({canvasContext:canvasCtx,viewport}).promise;
+  return canvas.toDataURL("image/png");
+}
+
 export default function PartDashboardMobile({ctx,tab,setTab}){
 const s=ctx.sess;
 const leads=ctx.myLeadsPart||[];
 const [selLead,setSelLead]=useState(null);
 const [prixRefuse,setPrixRefuse]=useState(false);
+const [showDevisCheck,setShowDevisCheck]=useState(false);
+const [devisResult,setDevisResult]=useState(null);
+const [devisLoading,setDevisLoading]=useState(false);
+async function handleDevisFile(file){
+  setDevisLoading(true);setDevisResult(null);
+  try{
+    let imageData=null;
+    if(file.type.startsWith("image/")){
+      imageData=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+    }else if(file.type==="application/pdf"){
+      imageData=await pdfToImage(file);
+    }
+    if(!imageData){setDevisResult({verdict:"non_analyse",raison:"Format non supporte, utilisez une image ou un PDF"});setDevisLoading(false);return;}
+    const r=await fetch("https://www.click-fix.fr/api/check-devis",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:imageData})});
+    const d=await r.json();
+    setDevisResult(d);
+  }catch(e){setDevisResult({verdict:"a_verifier",raison:"Erreur lors de l analyse"});}
+  setDevisLoading(false);
+}
 
 const confirmed=leads.filter(l=>l.statut==="confirme"||l.statut==="confirmed"||l.statut==="confirmé");
 const aValider=leads.filter(l=>l.paiement_statut==="en_attente_validation");
@@ -174,6 +210,8 @@ function HomeTab(){return(<main style={{padding:"20px 16px 100px",display:"flex"
     <button onClick={()=>ctx.setPage("ai-lead")} style={{flex:1,padding:"13px",background:"#38bdf8",border:"none",borderRadius:14,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Nouvelle demande</button>
   </div>
 
+  <button onClick={()=>{setShowDevisCheck(true);setDevisResult(null);}} style={{width:"100%",padding:"13px",background:"#fff",border:"1px solid #DCDCE6",borderRadius:14,color:"#333344",fontWeight:700,fontSize:13,cursor:"pointer"}}>📄 Vérifier un devis</button>
+
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
     <div style={{...card,padding:"14px 10px",textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#38bdf8"}}>{leads.length}</div><div style={{fontSize:10,color:"#9898A8",fontWeight:700,marginTop:2}}>Demandes</div></div>
     <div style={{...card,padding:"14px 10px",textAlign:"center"}}><div style={{fontSize:24,fontWeight:800,color:"#22C55E"}}>{confirmed.length}</div><div style={{fontSize:10,color:"#9898A8",fontWeight:700,marginTop:2}}>Confirmés</div></div>
@@ -249,6 +287,47 @@ function ProfilTab(){
   </main>);
 }
 
+function DevisCheckModal(){
+  function badgeColor(v){if(v==="coherent")return"#22C55E";if(v==="eleve")return"#EF4444";if(v==="bas")return"#38bdf8";return"#F59E0B";}
+  function badgeLabel(v){if(v==="coherent")return"Prix coherent avec le marche";if(v==="eleve")return"Prix plus eleve que la moyenne";if(v==="bas")return"Prix plus bas que la moyenne";return"A verifier manuellement";}
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={()=>setShowDevisCheck(false)}>
+      <div style={{background:"#fff",borderRadius:20,padding:24,maxWidth:380,width:"100%"}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+          <div style={{fontSize:16,fontWeight:800}}>Vérifier un devis</div>
+          <button onClick={()=>setShowDevisCheck(false)} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#9898A8"}}>×</button>
+        </div>
+        <p style={{fontSize:13,color:"#6B6B80",marginBottom:16,lineHeight:1.5}}>Photographiez ou importez le devis recu d'un artisan. L'IA verifie si le prix est coherent.</p>
+        {!devisResult&&!devisLoading&&<label style={{display:"block",border:"2px dashed #DCDCE6",borderRadius:14,padding:"24px 14px",textAlign:"center",cursor:"pointer",background:"#F7F8FA"}}>
+          <div style={{fontSize:28,marginBottom:6}}>📄</div>
+          <div style={{fontSize:12,color:"#6B6B80"}}>Choisir un fichier (image ou PDF)</div>
+          <input type="file" accept="image/*,.pdf" style={{display:"none"}} onChange={e=>e.target.files[0]&&handleDevisFile(e.target.files[0])}/>
+        </label>}
+        {devisLoading&&<div style={{textAlign:"center",padding:"24px 0",color:"#6B6B80",fontSize:13}}>🔍 Analyse en cours...</div>}
+        {devisResult&&!devisLoading&&(
+          <div>
+            {devisResult.verdict==="non_analyse"?(
+              <div style={{padding:12,background:"#FFF8E1",borderRadius:10,fontSize:12,color:"#6B6B80"}}>{devisResult.raison}</div>
+            ):(
+              <div>
+                <div style={{padding:"10px 12px",borderRadius:10,background:badgeColor(devisResult.verdict)+"1A",marginBottom:10}}>
+                  <div style={{fontSize:12,fontWeight:700,color:badgeColor(devisResult.verdict)}}>{badgeLabel(devisResult.verdict)}</div>
+                </div>
+                {devisResult.travaux_detecte&&<div style={{fontSize:12,color:"#6B6B80",marginBottom:6}}>Travaux : <strong style={{color:"#333344"}}>{devisResult.travaux_detecte}</strong></div>}
+                {devisResult.prix_detecte>0&&<div style={{fontSize:12,color:"#6B6B80",marginBottom:6}}>Prix devis : <strong style={{color:"#333344"}}>{devisResult.prix_detecte} EUR</strong></div>}
+                {devisResult.ecart_pct!==undefined&&devisResult.ecart_pct!==0&&<div style={{fontSize:12,color:"#6B6B80",marginBottom:6}}>Ecart marche : <strong style={{color:badgeColor(devisResult.verdict)}}>{devisResult.ecart_pct>0?"+":""}{devisResult.ecart_pct}%</strong></div>}
+                {devisResult.fourchette_min>0&&<div style={{fontSize:12,color:"#6B6B80",marginBottom:6}}>Fourchette : <strong style={{color:"#333344"}}>{devisResult.fourchette_min} - {devisResult.fourchette_max} EUR</strong></div>}
+                {devisResult.explication&&<div style={{fontSize:11,color:"#9898A8",marginTop:8,lineHeight:1.5}}>{devisResult.explication}</div>}
+              </div>
+            )}
+            <button onClick={()=>setShowDevisCheck(false)} style={{width:"100%",marginTop:14,padding:11,background:"#F7F8FA",border:"1px solid #DCDCE6",borderRadius:12,color:"#333344",fontWeight:700,fontSize:13,cursor:"pointer"}}>Fermer</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 return(<div style={{fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",background:"#F7F8FA",color:"#333344",maxWidth:430,margin:"0 auto",minHeight:"100vh",position:"relative",overflowX:"hidden"}}>
   <header style={{background:"#fff",padding:"16px 20px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid #EEEEF2",position:"sticky",top:0,zIndex:100}}>
     <div style={{fontSize:18,fontWeight:800,letterSpacing:"-0.5px",color:"#333344"}}>click<span style={{color:"#38bdf8"}}>&</span>fix</div>
@@ -263,5 +342,6 @@ return(<div style={{fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",bac
       <div style={{fontSize:10,fontWeight:600,color:tab===t.id?"#38bdf8":"#9898A8"}}>{t.label}</div>
     </div>))}
   </nav>
+  {showDevisCheck&&<DevisCheckModal/>}
 </div>);
 }
