@@ -144,6 +144,30 @@ function voirFacture(l){
   }
 }
 
+function RatingBlockMobile({l}){
+  const [note,setNote]=useState(0);
+  const [commentaire,setCommentaire]=useState("");
+  const [sent,setSent]=useState(false);
+  async function envoyerNote(){
+    if(note===0)return;
+    await fetch(SB+"/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:{"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK},body:JSON.stringify({note_client:note,commentaire_client:commentaire})});
+    setSent(true);
+  }
+  if(sent)return <div style={{marginTop:10,fontSize:12,color:"#22C55E"}}>Merci, votre avis a ete envoye !</div>;
+  return(
+    <div style={{marginTop:12,padding:12,background:"#F7F8FA",border:"1px solid #DCDCE6",borderRadius:10}}>
+      <div style={{fontSize:12,fontWeight:700,color:"#6B6B80",marginBottom:8}}>Notez cette intervention</div>
+      <div style={{display:"flex",gap:4,marginBottom:8}}>
+        {[1,2,3,4,5].map(n=>(
+          <span key={n} onClick={()=>setNote(n)} style={{fontSize:24,cursor:"pointer",color:note>=n?"#F59E0B":"#DCDCE6"}}>★</span>
+        ))}
+      </div>
+      <textarea value={commentaire} onChange={e=>setCommentaire(e.target.value)} placeholder="Un commentaire (facultatif)" style={{width:"100%",minHeight:60,background:"#fff",border:"1px solid #DCDCE6",borderRadius:8,color:"#333344",fontSize:13,padding:8,fontFamily:"inherit",resize:"none",boxSizing:"border-box"}}/>
+      <button onClick={envoyerNote} disabled={note===0} style={{marginTop:8,width:"100%",padding:10,background:note===0?"#EEEEF2":"#F59E0B",border:"none",borderRadius:8,color:note===0?"#9898A8":"#fff",fontWeight:700,fontSize:13,cursor:note===0?"default":"pointer"}}>Envoyer mon avis</button>
+    </div>
+  );
+}
+
 function LeadCard({l,onClick}){
   const b=badge(l);
   const init=(l.travaux||"?")[0].toUpperCase();
@@ -194,6 +218,7 @@ function LeadDetail({l}){
     {l.paiement_statut==="paye"&&<div style={{...card,background:"#E8FAF0",border:"1px solid #B8F0D6"}}>
       <div style={{fontSize:13,fontWeight:700,color:"#27AE60",marginBottom:10}}>✅ Intervention payee - {l.prix_final} EUR</div>
       <button onClick={()=>voirFacture(l)} style={{width:"100%",padding:12,background:"rgba(34,197,94,0.12)",border:"1px solid rgba(34,197,94,0.3)",borderRadius:10,color:"#22C55E",fontWeight:700,fontSize:13,cursor:"pointer"}}>📄 Voir la facture</button>
+      {!l.note_client&&<RatingBlockMobile l={l}/>}
     </div>}
 
     {l.paiement_statut==="en_litige"&&<div style={{...card,background:"#FEE2E2",border:"1px solid #FECACA"}}>
