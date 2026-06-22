@@ -1,9 +1,27 @@
 import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+export const config = { api: { bodyParser: false } };
+
+function getRawBody(req){
+  return new Promise((resolve,reject)=>{
+    let data="";
+    req.on("data",chunk=>{data+=chunk;});
+    req.on("end",()=>resolve(data));
+    req.on("error",reject);
+  });
+}
+
 export default async function handler(req, res) {
   const pathValue = req.query.path || req.query["...path"];
   const route = Array.isArray(pathValue) ? pathValue[0] : pathValue;
+
+  const rawBody = req.method==="POST" ? await getRawBody(req) : "";
+  if(route==="stripe-webhook"){
+    req.rawBody = rawBody;
+  }else if(rawBody){
+    try{ req.body = JSON.parse(rawBody); }catch(e){ req.body = {}; }
+  }
 
   try {
     switch (route) {
@@ -383,8 +401,14 @@ res.status(200).json({url:accountLink.url,account_id:account.id});
 // ===================== STRIPE-WEBHOOK =====================
 async function stripeWebhook(req,res){
 if(req.method!=="POST")return res.status(405).end();
+let event;
 try{
-const event=req.body;
+  const sig=req.headers["stripe-signature"];
+  event=stripe.webhooks.constructEvent(req.rawBody,sig,process.env.STRIPE_WEBHOOK_SECRET);
+}catch(e){
+  return res.status(400).json({error:"Signature webhook invalide: "+e.message});
+}
+try{
 const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
 const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
 const H={"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK};

@@ -773,8 +773,18 @@ async function saveSpecialites(){
 
 // === ACTIONS ===
 async function confirmer(id){
-  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=minimal'},body:JSON.stringify({artisan_statut:'confirme'})});
-  if(r.ok){toast('✅ RDV confirmé !');await loadLeads();}else toast('Erreur — réessayez');
+  const r=await fetch(SB+'/rest/v1/leads?id=eq.'+id,{method:'PATCH',headers:{...hdr(sess.token),'Prefer':'return=representation'},body:JSON.stringify({artisan_statut:'confirme'})});
+  if(r.ok){
+    toast('✅ RDV confirmé !');
+    try{
+      const leadsData=await r.json();
+      const lead=leadsData&&leadsData[0];
+      if(lead&&lead.client_email){
+        fetch('https://www.click-fix.fr/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'confirm_rdv_client',to:lead.client_email,data:{client_prenom:(lead.client_nom||'').split(' ')[0],artisan_prenom:sess.prenom||'',artisan_nom:sess.nom||'',artisan_entreprise:sess.entreprise||'',artisan_tel:sess.tel||'',artisan_email:sess.email||'',creneau:lead.heure||'Sur RDV'}})}).catch(()=>{});
+      }
+    }catch(e){}
+    await loadLeads();
+  }else toast('Erreur — réessayez');
 }
 
 async function refuser(id){
