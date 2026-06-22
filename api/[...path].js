@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       case "stripe-webhook": return await stripeWebhook(req, res);
       case "urgence-lead": return await urgenceLead(req, res);
       case "verify-document": return await verifyDocument(req, res);
+      case "check-devis": return await checkDevis(req, res);
       default: return res.status(404).json({ error: "Route inconnue: " + route });
     }
   } catch (e) {
@@ -49,7 +50,7 @@ res.status(200).json({text});
 async function analyzePhoto(req,res){
 if(req.method!=="POST")return res.status(405).end();
 const {image,description}=typeof req.body==="string"?JSON.parse(req.body):req.body;
-const prompt="Tu es un expert en rénovation et dépannage en France avec 20 ans d experience. Analyse ce problème et réponds UNIQUEMENT en JSON sans markdown avec des prix PRÉCIS en euros basés sur les tarifs réels du marché français 2025. Format: {\"diagnostic\":\"description précise du problème\",\"materiel\":[\"matériel1\",\"matériel2\"],\"duree\":\"ex: 1h30\",\"prix_min\":\"ex: 150€\",\"prix_max\":\"ex: 280€\",\"main_oeuvre\":\"ex: 80€/h\",\"urgence\":\"critique|urgent|normal\",\"conseils\":\"conseil pratique\"}. Description du problème: "+description;
+const prompt="Tu es un expert en depannage a domicile en Ile-de-France avec 20 ans d experience terrain, specialise dans l estimation de prix pour intervention urgente. Analyse precisement cette panne a partir de la photo et de la description, et reponds UNIQUEMENT en JSON sans markdown avec une fourchette de prix la PLUS ETROITE et REALISTE possible, basee sur les tarifs reels pratiques en Ile-de-France en 2025-2026 (pas les tarifs nationaux moyens, specifiquement IDF qui sont plus eleves). Sois rigoureux: ne surestime pas par prudence, vise la fourchette qu un artisan honnete facturerait reellement. Format: {\"diagnostic\":\"description precise du probleme observe\",\"materiel\":[\"materiel1\",\"materiel2\"],\"duree\":\"ex: 1h30\",\"prix_min\":\"ex: 150 EUR\",\"prix_max\":\"ex: 220 EUR\",\"main_oeuvre\":\"ex: 80 EUR/h\",\"urgence\":\"critique|urgent|normal\",\"conseils\":\"conseil pratique\"}. Description du probleme: "+description;
 try{
 const messages=[{role:"user",content:image?[{type:"text",text:prompt},{type:"image_url",image_url:{url:image}}]:[{type:"text",text:prompt}]}];
 const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
@@ -489,6 +490,25 @@ fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content
 }
 res.status(200).json({ok:true,lead});
 }catch(e){res.status(500).json({error:e.message});}
+}
+
+// ===================== CHECK-DEVIS =====================
+async function checkDevis(req,res){
+if(req.method!=="POST")return res.status(405).end();
+const {image}=typeof req.body==="string"?JSON.parse(req.body):req.body;
+if(!image||!image.startsWith("data:image"))return res.status(200).json({verdict:"non_analyse",raison:"Format non analysable - assurez-vous d avoir bien telecharge une image ou un PDF du devis"});
+const prompt="Tu es un expert independant en batiment et travaux en France, specialiste de l analyse de devis pour proteger les particuliers contre les prix abusifs. Analyse l image de ce devis de travaux. Identifie le ou les postes de travaux et le montant total TTC indique. Compare ce montant aux tarifs reels du marche francais 2025-2026 pour ce type de travaux (en Ile-de-France si mentionne, sinon moyenne nationale). Reponds UNIQUEMENT en JSON sans markdown au format exact: {\"travaux_detecte\":\"description courte des travaux identifies sur le devis\",\"prix_detecte\":0,\"verdict\":\"coherent\",\"ecart_pct\":0,\"fourchette_min\":0,\"fourchette_max\":0,\"explication\":\"2 phrases courtes expliquant le verdict\"} ou verdict est coherent, eleve ou bas, et ecart_pct est positif si plus cher que la moyenne marche, negatif si moins cher. Si le prix n est pas clairement lisible sur le devis, mets prix_detecte a 0 et explique pourquoi dans explication.";
+try{
+const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+method:"POST",
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.GROQ_API_KEY},
+body:JSON.stringify({model:"meta-llama/llama-4-scout-17b-16e-instruct",max_tokens:400,messages:[{role:"user",content:[{type:"text",text:prompt},{type:"image_url",image_url:{url:image}}]}]})
+});
+const d=await r.json();
+const text=d.choices?.[0]?.message?.content||"{}";
+const clean=text.replace(/```json|```/g,"").trim();
+res.status(200).json(JSON.parse(clean));
+}catch(e){res.status(500).json({verdict:"a_verifier",raison:"Analyse impossible pour le moment, reessayez"});}
 }
 
 // ===================== VERIFY-DOCUMENT =====================
