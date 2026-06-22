@@ -21,6 +21,7 @@ export default async function handler(req, res) {
       case "urgence-lead": return await urgenceLead(req, res);
       case "verify-document": return await verifyDocument(req, res);
       case "check-devis": return await checkDevis(req, res);
+      case "refund-payment": return await refundPayment(req, res);
       default: return res.status(404).json({ error: "Route inconnue: " + route });
     }
   } catch (e) {
@@ -489,6 +490,19 @@ if(pro&&modeUrgenceActif&&!hasQuota){
 fetch("https://www.click-fix.fr/api/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"recharge_needed",to:pro.email,data:{prenom:pro.prenom}})}).catch(()=>{});
 }
 res.status(200).json({ok:true,lead});
+}catch(e){res.status(500).json({error:e.message});}
+}
+
+// ===================== REFUND-PAYMENT =====================
+async function refundPayment(req,res){
+if(req.method!=="POST")return res.status(405).end();
+const{payment_intent_id,amount}=typeof req.body==="string"?JSON.parse(req.body):req.body;
+if(!payment_intent_id)return res.status(400).json({error:"payment_intent_id requis"});
+try{
+const params={payment_intent:payment_intent_id};
+if(amount){params.amount=Math.round(amount*100);}
+const refund=await stripe.refunds.create(params);
+res.status(200).json({success:true,refund_id:refund.id,status:refund.status,amount:refund.amount});
 }catch(e){res.status(500).json({error:e.message});}
 }
 
