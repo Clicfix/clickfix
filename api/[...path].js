@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       case "verify-document": return await verifyDocument(req, res);
       case "check-devis": return await checkDevis(req, res);
       case "refund-payment": return await refundPayment(req, res);
+      case "weekly-payout": return await weeklyPayout(req, res);
       default: return res.status(404).json({ error: "Route inconnue: " + route });
     }
   } catch (e) {
@@ -67,32 +68,15 @@ res.status(200).json(JSON.parse(clean));
 }
 
 // ===================== CAPTURE-PAYMENT =====================
+// Note: le versement a l'artisan ne se fait plus a chaque transaction.
+// Les fonds restent bloques chez Click&fix et sont verses une fois par
+// semaine via la fonction weeklyPayout (voir plus bas).
 async function capturePayment(req,res){
 if(req.method!=="POST")return res.status(405).end();
-const{payment_intent_id,amount_final,assigned_to}=typeof req.body==="string"?JSON.parse(req.body):req.body;
+const{payment_intent_id,amount_final}=typeof req.body==="string"?JSON.parse(req.body):req.body;
 try{
 const pi=await stripe.paymentIntents.capture(payment_intent_id,{amount_to_capture:Math.round(amount_final*100)});
-let transfer=null;
-if(assigned_to){
-  try{
-    const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
-    const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
-    const H={"apikey":SK,"Authorization":"Bearer "+SK};
-    const pr=await fetch(SB+"/rest/v1/profiles?id=eq."+assigned_to+"&select=stripe_account_id",{headers:H});
-    const prs=await pr.json();
-    const stripeAccountId=Array.isArray(prs)&&prs[0]?prs[0].stripe_account_id:null;
-    if(stripeAccountId){
-      const montantArtisan=Math.round(amount_final*100*0.85);
-      const tr=await stripe.transfers.create({amount:montantArtisan,currency:"eur",destination:stripeAccountId,transfer_group:payment_intent_id});
-      transfer={id:tr.id,amount:tr.amount,destination:stripeAccountId};
-    }else{
-      transfer={error:"Artisan sans compte Stripe Connect actif - virement manuel necessaire"};
-    }
-  }catch(e){
-    transfer={error:"Echec du transfert automatique: "+e.message+" - virement manuel necessaire"};
-  }
-}
-res.status(200).json({success:true,status:pi.status,amount:pi.amount_received,transfer});
+res.status(200).json({success:true,status:pi.status,amount:pi.amount_received});
 }catch(e){res.status(500).json({error:e.message});}
 }
 
@@ -503,6 +487,55 @@ const params={payment_intent:payment_intent_id};
 if(amount){params.amount=Math.round(amount*100);}
 const refund=await stripe.refunds.create(params);
 res.status(200).json({success:true,refund_id:refund.id,status:refund.status,amount:refund.amount});
+}catch(e){res.status(500).json({error:e.message});}
+}
+
+// ===================== WEEKLY-PAYOUT =====================
+// Declenche automatiquement chaque lundi par Vercel Cron (voir vercel.json).
+// Securise par CRON_SECRET : Vercel envoie automatiquement
+// Authorization: Bearer <CRON_SECRET> quand il invoque ce cron.
+async function weeklyPayout(req,res){
+const authHeader=req.headers.authorization;
+if(!process.env.CRON_SECRET||authHeader!=="Bearer "+process.env.CRON_SECRET){
+  return res.status(401).json({error:"unauthorized"});
+}
+const SB="https://bipqtqezntzcmxwiaqdz.supabase.co";
+const SK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpcHF0cWV6bnR6Y214d2lhcWR6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDA3OTkxMCwiZXhwIjoyMDk1NjU1OTEwfQ.NJxvcp7MJEGbpNmvjkwDGc4CJCswcoLZdGUSw0EDisU";
+const H={"Content-Type":"application/json","apikey":SK,"Authorization":"Bearer "+SK};
+try{
+const leadsRes=await fetch(SB+"/rest/v1/leads?paiement_statut=eq.paye&verse_artisan=is.null&assigned_to=not.is.null&select=*",{headers:H});
+const leadsRaw=await leadsRes.json();
+const leads=Array.isArray(leadsRaw)?leadsRaw:[];
+const byArtisan={};
+for(const l of leads){
+  if(!l.assigned_to)continue;
+  if(!byArtisan[l.assigned_to])byArtisan[l.assigned_to]=[];
+  byArtisan[l.assigned_to].push(l);
+}
+const results=[];
+for(const artisanId of Object.keys(byArtisan)){
+  const mine=byArtisan[artisanId];
+  const total=mine.reduce((s,l)=>s+(parseFloat(l.prix_final)||0),0);
+  const montantArtisan=Math.round(total*100*0.85);
+  if(montantArtisan<=0)continue;
+  try{
+    const pr=await fetch(SB+"/rest/v1/profiles?id=eq."+artisanId+"&select=stripe_account_id,prenom,email",{headers:H});
+    const prs=await pr.json();
+    const prof=Array.isArray(prs)&&prs[0]?prs[0]:null;
+    if(!prof||!prof.stripe_account_id){
+      results.push({artisanId,nb_leads:mine.length,montant:montantArtisan/100,error:"pas de compte Stripe Connect actif - virement manuel necessaire"});
+      continue;
+    }
+    const tr=await stripe.transfers.create({amount:montantArtisan,currency:"eur",destination:prof.stripe_account_id,transfer_group:"weekly-"+new Date().toISOString().slice(0,10)});
+    for(const l of mine){
+      await fetch(SB+"/rest/v1/leads?id=eq."+l.id,{method:"PATCH",headers:H,body:JSON.stringify({verse_artisan:true,transfer_id:tr.id})});
+    }
+    results.push({artisanId,nb_leads:mine.length,montant:montantArtisan/100,transfer_id:tr.id});
+  }catch(e){
+    results.push({artisanId,nb_leads:mine.length,montant:montantArtisan/100,error:e.message});
+  }
+}
+res.status(200).json({ok:true,date:new Date().toISOString(),nb_artisans_payes:results.filter(r=>r.transfer_id).length,results});
 }catch(e){res.status(500).json({error:e.message});}
 }
 
