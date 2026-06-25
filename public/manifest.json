@@ -1,0 +1,13 @@
+{
+  "name": "Click&fix",
+  "short_name": "Click&fix",
+  "description": "Trouvez un artisan verifie pres de chez vous, depannage urgent et renovation en Ile-de-France",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090f",
+  "theme_color": "#FF6F00",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
