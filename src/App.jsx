@@ -303,6 +303,61 @@ setBusy(false);
 // 
 //  HOME
 // 
+function InstallAppButton(){
+  const [deferredPrompt,setDeferredPrompt]=useState(null);
+  const [showIosHelp,setShowIosHelp]=useState(false);
+  const [installed,setInstalled]=useState(false);
+  useEffect(()=>{
+    if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true){
+      setInstalled(true);
+      return;
+    }
+    function onBeforeInstall(e){
+      e.preventDefault();
+      setDeferredPrompt(e);
+    }
+    window.addEventListener('beforeinstallprompt',onBeforeInstall);
+    return()=>window.removeEventListener('beforeinstallprompt',onBeforeInstall);
+  },[]);
+  if(installed)return null;
+  const isIos=/iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  async function handleClick(){
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      const{outcome}=await deferredPrompt.userChoice;
+      if(outcome==='accepted')setDeferredPrompt(null);
+    }else if(isIos){
+      setShowIosHelp(true);
+    }else{
+      setShowIosHelp(true);
+    }
+  }
+  return(<>
+    <button onClick={handleClick} style={{position:"fixed",bottom:20,right:20,zIndex:998,padding:"13px 22px",background:"#FF6F00",border:"none",borderRadius:980,color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(255,111,0,0.4)",display:"flex",alignItems:"center",gap:8,fontFamily:"Inter,sans-serif"}}>
+      📲 Installer l&apos;application
+    </button>
+    {showIosHelp&&(
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={()=>setShowIosHelp(false)}>
+        <div style={{background:"#fff",borderRadius:20,padding:28,maxWidth:360,width:"100%"}} onClick={e=>e.stopPropagation()}>
+          <div style={{fontSize:17,fontWeight:800,marginBottom:14,color:"#1d1d1f"}}>Installer Click&amp;fix</div>
+          {isIos?(
+            <div style={{fontSize:14,color:"#6e6e73",lineHeight:1.7}}>
+              1. Appuyez sur le bouton <strong>Partager</strong> en bas de Safari (le carre avec une fleche)<br/>
+              2. Faites defiler et appuyez sur <strong>"Sur l'ecran d'accueil"</strong><br/>
+              3. Confirmez en haut a droite
+            </div>
+          ):(
+            <div style={{fontSize:14,color:"#6e6e73",lineHeight:1.7}}>
+              Sur Chrome/Edge : cherchez l&apos;icone d&apos;installation dans la barre d&apos;adresse, ou ouvrez le menu (trois points) puis <strong>"Installer l'application"</strong>.
+            </div>
+          )}
+          <button onClick={()=>setShowIosHelp(false)} style={{marginTop:18,width:"100%",padding:12,background:"#f5f5f7",border:"none",borderRadius:12,color:"#1d1d1f",fontWeight:700,fontSize:13,cursor:"pointer"}}>Fermer</button>
+        </div>
+      </div>
+    )}
+  </>);
+}
+
 function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={{borderBottom:"0.5px solid rgba(0,0,0,0.1)",padding:"20px 0"}}><button onClick={()=>setOpen(!open)} style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontFamily:"Inter,sans-serif"}}><span style={{fontWeight:600,fontSize:16,color:"#1d1d1f",letterSpacing:"-0.3px"}}>{q}</span><span style={{fontSize:20,color:"#6e6e73",flexShrink:0,marginLeft:16,transform:open?"rotate(45deg)":"rotate(0)",transition:"transform .3s"}}>+</span></button>{open&&<p style={{fontSize:14,color:"#6e6e73",lineHeight:1.7,marginTop:12,marginBottom:0,fontWeight:400}}>{a}</p>}</div>);}function HomePage({ ctx }) {
   const [scrollY,setScrollY]=useState(0);
   const [articles,setArticles]=useState([]);
@@ -346,6 +401,7 @@ function FaqItem({q,a}){const [open,setOpen]=useState(false);return(<div style={
   </div>
 </nav>
 
+<InstallAppButton/>
 <section style={{height:'100vh',position:'relative',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
   <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1920&q=90" alt="renovation" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
   <div style={{position:'absolute',inset:0,background:'linear-gradient(160deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.3) 50%,rgba(0,0,0,0.7) 100%)'}}/>
